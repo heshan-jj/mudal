@@ -38,8 +38,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Pennywisecompose">
 
-        <!-- GPU acceleration for LiteRT-LM (optional) -->
-        <uses-native-library android:name="libOpenCL.so" android:required="false" />
 
         <activity
             android:name=".MainActivity"

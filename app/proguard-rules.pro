@@ -20,9 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# LiteRT-LM
--keep class com.google.ai.edge.litertlm.** { *; }
--dontwarn com.google.ai.edge.litertlm.**
 
 # Room, Hilt, Compose, WorkManager, kotlinx.serialization and Markdown ship
 # their own consumer rules, and nothing here serializes via reflection (backup

@@ -123,7 +123,7 @@ class LlmRepository @Inject constructor(
         Log.d(TAG, "=== SENDING TO LLM ===")
         Log.d(TAG, "Total messages in context: ${currentMessages.size}")
 
-        // Stream response — LiteRT-LM conversation manages history internally.
+        // Stream response from Gemini.
         // Tool calls are handed to us (never auto-run, #170): a lookup is
         // answered from the DB, a proposed transaction becomes a confirm card.
         val responseBuilder = StringBuilder()
@@ -220,7 +220,7 @@ class LlmRepository @Inject constructor(
         return handleToolCallInner(call, userMessage)
     }
 
-    /** LiteRT-LM snake_cases parameter names (daysAgo → days_ago); accept either. */
+    /** Accept either camelCase or snake_case parameter names. */
     private fun Map<String, Any?>.arg(camel: String): Any? =
         this[camel] ?: this[camel.replace(Regex("([A-Z])")) { "_" + it.value.lowercase() }]
 
