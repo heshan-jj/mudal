@@ -1,6 +1,6 @@
 package com.pennywiseai.tracker.di
 
-import com.pennywiseai.tracker.data.service.LlmServiceImpl
+import com.pennywiseai.tracker.data.service.GeminiLlmServiceImpl
 import com.pennywiseai.tracker.domain.service.LlmService
 import dagger.Binds
 import dagger.Module
@@ -15,6 +15,6 @@ abstract class LlmModule {
     @Binds
     @Singleton
     abstract fun bindLlmService(
-        llmServiceImpl: LlmServiceImpl
+        geminiLlmServiceImpl: GeminiLlmServiceImpl
     ): LlmService
 }
