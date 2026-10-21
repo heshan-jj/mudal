@@ -4,14 +4,10 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pennywiseai.tracker.R
-import com.pennywiseai.tracker.core.Constants
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import com.pennywiseai.tracker.data.manager.ModelDownloader
 import com.pennywiseai.tracker.data.database.entity.ChatMessage
 import com.pennywiseai.tracker.data.repository.LlmRepository
-import com.pennywiseai.tracker.data.repository.ModelRepository
-import com.pennywiseai.tracker.data.repository.ModelState
 import com.pennywiseai.tracker.data.preferences.UserPreferencesRepository
 import com.pennywiseai.tracker.ui.UiText
 import com.pennywiseai.tracker.utils.TokenUtils
@@ -32,28 +28,22 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val llmRepository: LlmRepository,
-    private val modelRepository: ModelRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val addTransactionUseCase: com.pennywiseai.tracker.domain.usecase.AddTransactionUseCase,
     private val deleteTransactionUseCase: com.pennywiseai.tracker.domain.usecase.DeleteTransactionUseCase,
-    private val transactionRepository: com.pennywiseai.tracker.data.repository.TransactionRepository,
-    private val modelDownloader: ModelDownloader
+    private val transactionRepository: com.pennywiseai.tracker.data.repository.TransactionRepository
 ) : ViewModel() {
 
+    val isApiKeyConfigured: StateFlow<Boolean> = userPreferencesRepository.geminiApiKey
+        .map { !it.isNullOrBlank() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val downloadProgress: StateFlow<Int> = modelDownloader.progress
-        .map { (it.downloadedBytes * 100 / it.totalBytes.coerceAtLeast(1)).toInt() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    fun saveApiKey(key: String) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateGeminiApiKey(key)
+        }
+    }
 
-    val downloadedMB: StateFlow<Long> = modelDownloader.progress
-        .map { it.downloadedBytes / BYTES_PER_MB }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
-
-    val totalMB: StateFlow<Long> = modelDownloader.progress
-        .map { it.totalBytes / BYTES_PER_MB }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Constants.ModelDownload.MODEL_SIZE_MB)
-
-    
     private val _contextMessage = MutableStateFlow<ChatMessage?>(null)
     
     val messages: StateFlow<List<ChatMessage>> = combine(
@@ -72,17 +62,6 @@ class ChatViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
-    
-    val modelState: StateFlow<ModelState> = modelRepository.modelState
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = when {
-                modelRepository.isModelVerified() -> ModelState.READY
-                modelRepository.isModelDownloaded() -> ModelState.LOADING // present, pending re-verify
-                else -> ModelState.NOT_DOWNLOADED
-            }
-        )
     
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
@@ -142,22 +121,6 @@ class ChatViewModel @Inject constructor(
         // Load initial context message for display
         viewModelScope.launch {
             loadContextMessage()
-        }
-
-        // Resume an in-progress download, or (when idle) resolve + re-verify the model.
-        checkAndResumeDownload()
-
-        viewModelScope.launch {
-            modelDownloader.progress.map { it.failure }.distinctUntilChanged().collect { failure ->
-                val message = when (failure) {
-                    ModelDownloader.Failure.NO_SPACE -> R.string.chat_error_no_storage
-                    ModelDownloader.Failure.NETWORK -> R.string.chat_error_download_failed
-                    ModelDownloader.Failure.INTEGRITY -> R.string.chat_error_integrity_failed
-                    ModelDownloader.Failure.ROAMING -> R.string.chat_error_download_roaming
-                    null -> return@collect
-                }
-                _uiState.value = _uiState.value.copy(error = UiText.Res(message))
-            }
         }
     }
     
@@ -297,36 +260,16 @@ class ChatViewModel @Inject constructor(
         }
     }
     
-    // The checks match LlmRepository's own (untranslated) exception messages.
     private fun sendErrorText(error: Throwable, @androidx.annotation.StringRes fallback: Int): UiText = when {
-        error.message?.contains("memory is full") == true -> UiText.Res(R.string.chat_error_memory_full)
-        error.message?.contains("downloading") == true -> UiText.Res(R.string.chat_error_model_downloading)
-        error.message?.contains("not downloaded") == true -> UiText.Res(R.string.chat_error_model_not_downloaded)
+        error.message?.contains("key is not configured", ignoreCase = true) == true ||
+        error.message?.contains("key is not set", ignoreCase = true) == true -> UiText.Plain("Gemini API key is not configured. Please enter your API key to continue.")
+        error.message?.contains("API_KEY_INVALID", ignoreCase = true) == true ||
+        error.message?.contains("400") == true && error.message?.contains("API key", ignoreCase = true) == true -> UiText.Plain("Invalid Gemini API key. Please check your key in Settings.")
         else -> error.message?.let { UiText.Plain(it) } ?: UiText.Res(fallback)
     }
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
-    }
-
-    fun startModelDownload() = modelDownloader.start()
-
-    fun checkAndResumeDownload() {
-        viewModelScope.launch {
-            if (modelDownloader.isRunning ||
-                modelDownloader.adoptLegacyDownload() ||
-                modelDownloader.resumeIfInterrupted()
-            ) return@launch
-            // No download to resume → resolve the model state, re-verifying a
-            // present-but-unverified file before it is shown as READY.
-            modelRepository.refreshModelState()
-        }
-    }
-
-    fun cancelDownload() = modelDownloader.cancel()
-
-    private companion object {
-        const val BYTES_PER_MB = 1024L * 1024L
     }
 }
 

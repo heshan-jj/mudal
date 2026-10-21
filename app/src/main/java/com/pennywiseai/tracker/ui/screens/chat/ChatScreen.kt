@@ -31,7 +31,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.pennywiseai.tracker.data.repository.ModelState
 import com.pennywiseai.tracker.ui.components.CustomTitleTopAppBar
 import com.pennywiseai.tracker.ui.components.cards.PennyWiseCardV2
 import com.pennywiseai.tracker.ui.theme.Dimensions
@@ -53,7 +52,7 @@ fun ChatScreen(
     onNavigateToSettings: () -> Unit
 ) {
     val messages by viewModel.messages.collectAsStateWithLifecycle()
-    val modelState by viewModel.modelState.collectAsStateWithLifecycle()
+    val isApiKeyConfigured by viewModel.isApiKeyConfigured.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val currentResponse by viewModel.currentResponse.collectAsStateWithLifecycle()
     val pendingAction by viewModel.pendingAction.collectAsStateWithLifecycle()
@@ -61,9 +60,10 @@ fun ChatScreen(
     val baseCurrency by viewModel.baseCurrency.collectAsStateWithLifecycle()
     val isDeveloperMode by viewModel.isDeveloperModeEnabled.collectAsStateWithLifecycle()
     val chatStats by viewModel.chatStats.collectAsStateWithLifecycle()
-    val downloadProgress by viewModel.downloadProgress.collectAsStateWithLifecycle()
-    val downloadedMB by viewModel.downloadedMB.collectAsStateWithLifecycle()
-    val totalMB by viewModel.totalMB.collectAsStateWithLifecycle()
+    
+    var apiKeyInput by remember { mutableStateOf("") }
+    var showPassword by remember { mutableStateOf(false) }
+    val localContext = androidx.compose.ui.platform.LocalContext.current
     
     var inputText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
@@ -105,211 +105,93 @@ fun ChatScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(paddingValues)
     ) {
-        when (modelState) {
-            ModelState.NOT_DOWNLOADED, ModelState.DOWNLOADING, ModelState.ERROR -> {
-                val isDownloading = modelState == ModelState.DOWNLOADING
-                // Show existing messages if any, but disable input
-                Column(
-                    modifier = Modifier.fillMaxSize()
+        if (!isApiKeyConfigured && messages.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(Dimensions.Padding.content),
+                contentAlignment = Alignment.Center
+            ) {
+                PennyWiseCardV2(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    // If no messages, show the download prompt centered
-                    if (messages.isEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(Spacing.md),
-                                modifier = Modifier.padding(horizontal = Dimensions.Padding.content)
-                            ) {
-                                Icon(
-                                    Icons.Default.CloudDownload,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(64.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Text(
-                                    text = stringResource(if (isDownloading) R.string.chat_downloading_model else R.string.chat_model_required_title),
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                                Text(
-                                    text = if (isDownloading) stringResource(R.string.chat_download_progress, downloadedMB, totalMB) else stringResource(R.string.chat_model_required_body),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                if (isDownloading) {
-                                    LinearProgressIndicator(
-                                        progress = { downloadProgress / 100f },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(Spacing.sm)
-                                            .clip(RoundedCornerShape(Spacing.xs)),
-                                        drawStopIndicator = {}
-                                    )
-                                    OutlinedButton(onClick = { viewModel.cancelDownload() }) {
-                                        Icon(
-                                            Icons.Default.Close,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(Dimensions.Icon.small)
-                                        )
-                                        Spacer(modifier = Modifier.width(Spacing.xs))
-                                        Text(stringResource(R.string.chat_cancel))
-                                    }
-                                } else {
-                                    Button(onClick = { viewModel.startModelDownload() }) {
-                                        Icon(
-                                            Icons.Default.Download,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(Dimensions.Icon.small)
-                                        )
-                                        Spacer(modifier = Modifier.width(Spacing.xs))
-                                        Text(stringResource(R.string.chat_download_with_size, totalMB))
-                                    }
-                                }
-                                TextButton(onClick = onNavigateToSettings) {
-                                    Text(stringResource(R.string.chat_settings))
-                                }
-                            }
-                        }
-                    } else {
-                        // Show existing messages (read-only)
-                        LazyColumn(
-                            state = listState,
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                                .overScrollVertical(),
-                            contentPadding = PaddingValues(
-                                start = Dimensions.Padding.content,
-                                end = Dimensions.Padding.content,
-                                top = Dimensions.Padding.content,
-                                bottom = Spacing.lg
-                            ),
-                            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-                            flingBehavior = rememberOverscrollFlingBehavior { listState }
-                        ) {
-                            items(messages) { message ->
-                                ChatMessageItem(message = message)
-                            }
-                        }
-                    }
-
-                    // Show model required banner at bottom
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.tertiaryContainer,
-                        tonalElevation = 3.dp
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(Spacing.lg),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Spacing.md)
                     ) {
-                        if (isDownloading) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(Dimensions.Padding.content),
-                                verticalArrangement = Arrangement.spacedBy(Spacing.sm)
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = stringResource(R.string.chat_downloading_model),
-                                            style = MaterialTheme.typography.titleSmall,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = stringResource(R.string.chat_download_progress, downloadedMB, totalMB),
-                                            style = MaterialTheme.typography.bodySmall
-                                        )
-                                    }
-                                    OutlinedButton(
-                                        onClick = { viewModel.cancelDownload() },
-                                        modifier = Modifier.padding(start = Spacing.sm)
-                                    ) {
-                                        Text(stringResource(R.string.chat_cancel))
-                                    }
-                                }
-                                LinearProgressIndicator(
-                                    progress = { downloadProgress / 100f },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(Spacing.sm)
-                                        .clip(CircleShape),
-                                    drawStopIndicator = {}
-                                )
-                            }
-                        } else {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(Dimensions.Padding.content),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.chat_model_required_short),
-                                        style = MaterialTheme.typography.titleSmall,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Text(
-                                        // 1.6 GB via the system Download Manager; some phones (Samsung
-                                        // with Data saver) won't start it on mobile data.
-                                        text = stringResource(R.string.chat_model_size_hint),
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                                Button(
-                                    onClick = { viewModel.startModelDownload() },
-                                    modifier = Modifier.padding(start = Spacing.sm)
-                                ) {
+                        Icon(
+                            Icons.Default.AutoAwesome,
+                            contentDescription = null,
+                            modifier = Modifier.size(56.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Setup Google Gemini AI",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Mudal uses Google Gemini (gemini-3.5-flash-lite) to analyze your finances and parse transactions. Enter your Google Gemini API key to get started. It is free and takes 1 minute to generate at Google AI Studio.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        OutlinedTextField(
+                            value = apiKeyInput,
+                            onValueChange = { apiKeyInput = it },
+                            label = { Text("Gemini API Key") },
+                            placeholder = { Text("AIzaSy...") },
+                            singleLine = true,
+                            visualTransformation = if (showPassword) androidx.compose.ui.text.input.VisualTransformation.None else androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                            trailingIcon = {
+                                IconButton(onClick = { showPassword = !showPassword }) {
                                     Icon(
-                                        Icons.Default.Download,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(Dimensions.Icon.small)
+                                        imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                        contentDescription = if (showPassword) "Hide key" else "Show key"
                                     )
-                                    Spacer(modifier = Modifier.width(Spacing.xs))
-                                    Text(stringResource(R.string.chat_download))
                                 }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TextButton(
+                                onClick = {
+                                    val intent = android.content.Intent(
+                                        android.content.Intent.ACTION_VIEW,
+                                        android.net.Uri.parse("https://aistudio.google.com/app/apikey")
+                                    )
+                                    localContext.startActivity(intent)
+                                }
+                            ) {
+                                Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Get Free Key")
+                            }
+                            Button(
+                                onClick = {
+                                    if (apiKeyInput.isNotBlank()) {
+                                        viewModel.saveApiKey(apiKeyInput.trim())
+                                    }
+                                },
+                                enabled = apiKeyInput.isNotBlank()
+                            ) {
+                                Text("Save Key")
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(Dimensions.Component.bottomBarHeight))
                 }
             }
-
-            ModelState.READY, ModelState.LOADING -> {
-                // Show loading overlay when model is loading
-                if (modelState == ModelState.LOADING) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(Spacing.md)
-                        ) {
-                            CircularProgressIndicator()
-                            Text(
-                                text = stringResource(R.string.chat_initializing_model),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Text(
-                                text = stringResource(R.string.chat_initializing_hint),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                } else {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
                         // Developer info card
                         AnimatedVisibility(
                             visible = isDeveloperMode && messages.isNotEmpty(),
@@ -475,51 +357,76 @@ fun ChatScreen(
                         }
 
                         // Input field
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colorScheme.surface,
-                            tonalElevation = 3.dp
-                        ) {
-                            Row(
+                        if (!isApiKeyConfigured) {
+                            PennyWiseCardV2(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(Dimensions.Padding.content),
-                                verticalAlignment = Alignment.Bottom
+                                    .padding(horizontal = Dimensions.Padding.content, vertical = Spacing.xs)
                             ) {
-                                OutlinedTextField(
-                                    value = inputText,
-                                    onValueChange = { inputText = it },
+                                Row(
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .focusRequester(focusRequester),
-                                    placeholder = { Text(stringResource(R.string.chat_input_placeholder)) },
-                                    enabled = !uiState.isLoading,
-                                    maxLines = 3,
-                                    shape = MaterialTheme.shapes.extraLarge
-                                )
-
-                                Spacer(modifier = Modifier.width(Spacing.sm))
-
-                                FilledIconButton(
-                                    onClick = {
-                                        viewModel.sendMessage(inputText)
-                                        inputText = ""
-                                        // Keep keyboard open by requesting focus
-                                        focusRequester.requestFocus()
-                                    },
-                                    enabled = inputText.isNotBlank() && !uiState.isLoading,
-                                    modifier = Modifier.size(48.dp)
+                                        .fillMaxWidth()
+                                        .padding(Spacing.sm),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    if (uiState.isLoading) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(Dimensions.Icon.medium),
-                                            strokeWidth = 2.dp
-                                        )
-                                    } else {
-                                        Icon(
-                                            Icons.AutoMirrored.Filled.Send,
-                                            contentDescription = stringResource(R.string.chat_send)
-                                        )
+                                    Text(
+                                        "Gemini API key is required to send messages",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    TextButton(onClick = onNavigateToSettings) {
+                                        Text("Settings")
+                                    }
+                                }
+                            }
+                        } else {
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.surface,
+                                tonalElevation = 3.dp
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(Dimensions.Padding.content),
+                                    verticalAlignment = Alignment.Bottom
+                                ) {
+                                    OutlinedTextField(
+                                        value = inputText,
+                                        onValueChange = { inputText = it },
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .focusRequester(focusRequester),
+                                        placeholder = { Text(stringResource(R.string.chat_input_placeholder)) },
+                                        enabled = !uiState.isLoading,
+                                        maxLines = 3,
+                                        shape = MaterialTheme.shapes.extraLarge
+                                    )
+
+                                    Spacer(modifier = Modifier.width(Spacing.sm))
+
+                                    FilledIconButton(
+                                        onClick = {
+                                            viewModel.sendMessage(inputText)
+                                            inputText = ""
+                                            // Keep keyboard open by requesting focus
+                                            focusRequester.requestFocus()
+                                        },
+                                        enabled = inputText.isNotBlank() && !uiState.isLoading,
+                                        modifier = Modifier.size(48.dp)
+                                    ) {
+                                        if (uiState.isLoading) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(Dimensions.Icon.medium),
+                                                strokeWidth = 2.dp
+                                            )
+                                        } else {
+                                            Icon(
+                                                Icons.AutoMirrored.Filled.Send,
+                                                contentDescription = stringResource(R.string.chat_send)
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -530,8 +437,6 @@ fun ChatScreen(
             }
         }
     }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
