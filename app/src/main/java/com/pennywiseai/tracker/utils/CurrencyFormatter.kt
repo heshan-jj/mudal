@@ -13,6 +13,7 @@ import java.util.Locale
 object CurrencyFormatter {
 
     private val INDIAN_LOCALE = Locale.Builder().setLanguage("en").setRegion("IN").build()
+    private val SRI_LANKAN_LOCALE = Locale.Builder().setLanguage("en").setRegion("LK").build()
 
     /** Western/international digit grouping (1,000,000). */
     private val INTERNATIONAL_LOCALE = Locale.US
@@ -88,7 +89,7 @@ object CurrencyFormatter {
         "JOD" to "JD",
         "BHD" to "BD",
         "OMR" to "RO",
-        "LKR" to "රු",
+        "LKR" to "Rs.",
         "BDT" to "৳",
         "CZK" to "Kč",
         "RUB" to "₽",
@@ -109,6 +110,7 @@ object CurrencyFormatter {
      * Locale mapping for different currencies
      */
     private val CURRENCY_LOCALES = mapOf(
+        "LKR" to SRI_LANKAN_LOCALE,
         "INR" to INDIAN_LOCALE,
         "USD" to Locale.US,
         "EUR" to Locale.GERMANY,
@@ -155,7 +157,7 @@ object CurrencyFormatter {
     /**
      * Formats a BigDecimal amount as currency with the specified currency code
      */
-    fun formatCurrency(amount: BigDecimal, currencyCode: String = "INR"): String {
+    fun formatCurrency(amount: BigDecimal, currencyCode: String = "LKR"): String {
         if (currencyCode in EXPLICIT_SYMBOL_CURRENCIES) {
             return "${CURRENCY_SYMBOLS[currencyCode]}${formatAmount(amount, currencyCode)}"
         }
@@ -198,13 +200,13 @@ object CurrencyFormatter {
     /**
      * Formats a Double amount as currency with the specified currency code
      */
-    fun formatCurrency(amount: Double, currencyCode: String = "INR"): String {
+    fun formatCurrency(amount: Double, currencyCode: String = "LKR"): String {
         return formatCurrency(amount.toBigDecimal(), currencyCode)
     }
 
     /**
-     * Defaults the currency to INR, which silently mislabels every non-INR
-     * amount (the "₹600 for a $600 group" bug). Always pass the amount's own
+     * Defaults the currency to LKR, which silently mislabels every non-LKR
+     * amount. Always pass the amount's own
      * currency. For a total over a possibly-mixed list, bucket with
      * [com.pennywiseai.tracker.utils.sumByCurrency] and render with
      * [formatByCurrency] instead of summing into one figure.
@@ -216,11 +218,11 @@ object CurrencyFormatter {
         level = DeprecationLevel.ERROR
     )
     fun formatCurrency(amount: BigDecimal): String {
-        return formatCurrency(amount, "INR")
+        return formatCurrency(amount, "LKR")
     }
 
     /**
-     * Defaults the currency to INR — see the [BigDecimal] overload above. Always
+     * Defaults the currency to LKR — see the [BigDecimal] overload above. Always
      * pass the amount's own currency.
      */
     @Deprecated(
@@ -229,14 +231,14 @@ object CurrencyFormatter {
         level = DeprecationLevel.ERROR
     )
     fun formatCurrency(amount: Double): String {
-        return formatCurrency(amount.toBigDecimal(), "INR")
+        return formatCurrency(amount.toBigDecimal(), "LKR")
     }
 
     /**
      * Formats a set of per-currency totals. We never sum across currencies (that
      * would be meaningless), so a single-currency total renders as one figure
      * (e.g. "$600") while a mixed set renders each currency's total joined by
-     * " · " (e.g. "$600 · ₹500"). Zero/empty totals fall back to a single zero
+     * " · " (e.g. "$600 · Rs. 500"). Zero/empty totals fall back to a single zero
      * in the input's own currency when known, else [fallbackCurrency].
      *
      * [signPrefix] (e.g. "-" or "+") expresses the sign for the whole figure, so
@@ -246,7 +248,7 @@ object CurrencyFormatter {
     fun formatByCurrency(
         totalsByCurrency: Map<String, Money>,
         signPrefix: String = "",
-        fallbackCurrency: String = "INR"
+        fallbackCurrency: String = "LKR"
     ): String {
         val nonZero = totalsByCurrency.values.filter { it.amount.signum() != 0 }
         if (nonZero.isEmpty()) {
@@ -329,10 +331,10 @@ object CurrencyFormatter {
      * Returns INR as default for unknown banks
      */
     fun getBankBaseCurrency(bankName: String?): String {
-        if (bankName == null) return "INR"
+        if (bankName == null) return "LKR"
 
         // Try to find a parser that can handle this bank name
         val parser = BankParserFactory.getParserByName(bankName)
-        return parser?.getCurrency() ?: "INR"
+        return parser?.getCurrency() ?: "LKR"
     }
 }

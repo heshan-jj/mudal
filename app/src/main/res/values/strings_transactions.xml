@@ -23,7 +23,7 @@
     <string name="txn_export_action_export">Export</string>
     <string name="txn_export_action_export_first">Export first %1$d</string>
     <string name="txn_export_action_done">Done</string>
-    <string name="txn_export_share_subject">PennyWise Transactions Export</string>
+    <string name="txn_export_share_subject">Mudal Transactions Export</string>
     <string name="txn_export_share_chooser_title">Share CSV</string>
     <string name="txn_export_action_share">Share</string>
     <string name="txn_export_action_close">Close</string>
@@ -390,14 +390,14 @@
     <string name="share_sheet_show">Show</string>
     <string name="share_sheet_transactions">Transactions</string>
     <string name="share_sheet_subscriptions">Subscriptions</string>
-    <string name="share_sheet_no_subscriptions">No subscriptions detected yet — PennyWise finds these from recurring payments in your SMS.</string>
+    <string name="share_sheet_no_subscriptions">No subscriptions detected yet — Mudal finds these from recurring payments in your SMS.</string>
     <string name="share_sheet_period">Period</string>
     <string name="share_sheet_this_month">This month</string>
     <string name="share_sheet_last_month">Last month</string>
     <string name="share_sheet_all_time">All time</string>
     <!-- %1$s = month name -->
     <string name="share_banner_title">%1$s, summed up</string>
-    <string name="share_banner_subtitle">See what PennyWise tracked for you</string>
+    <string name="share_banner_subtitle">See what Mudal tracked for you</string>
     <string name="share_banner_dismiss">Dismiss</string>
 
     <!-- Shared transaction components -->

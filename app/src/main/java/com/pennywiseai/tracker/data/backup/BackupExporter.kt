@@ -280,8 +280,8 @@ class BackupExporter @Inject constructor(
                     firstLaunchTime = firstLaunchTime,
                     hasShownReviewPrompt = hasShownReviewPrompt,
                     lastReviewPromptTime = lastReviewPromptTime,
-                    licenseKey = storedLicense?.key,
-                    licenseInstanceId = storedLicense?.instanceId,
+                    licenseKey = null,
+                    licenseInstanceId = null,
                     // Bank name + last four, so it identifies accounts the same
                     // way the licence key identifies a person — FULL only, or a
                     // masked export would leak what the mode exists to hide.

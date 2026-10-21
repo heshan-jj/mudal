@@ -53,12 +53,12 @@ class CurrencyFormatterTest {
     }
 
     @Test
-    fun `sms-tracked account on an unknown bank defaults to INR`() {
+    fun `sms-tracked account on an unknown bank defaults to LKR`() {
         assertEquals(
-            "INR",
+            "LKR",
             CurrencyFormatter.resolveAccountCurrency(
                 sourceType = null,
-                storedCurrency = "INR",
+                storedCurrency = "LKR",
                 bankName = "Totally Unknown Bank"
             )
         )
@@ -142,7 +142,7 @@ class CurrencyFormatterTest {
         val pkr = CurrencyFormatter.formatCurrency(BigDecimal(500), "PKR")
         val lkr = CurrencyFormatter.formatCurrency(BigDecimal(500), "LKR")
         assertTrue("PKR should use its explicit symbol, got: $pkr", pkr.startsWith("Rs"))
-        assertTrue("LKR should use its explicit symbol, got: $lkr", lkr.startsWith("රු"))
+        assertTrue("LKR should use its explicit symbol, got: $lkr", lkr.startsWith("Rs."))
         assertFalse("PKR and LKR must not render identically", pkr == lkr)
     }
 
@@ -152,7 +152,7 @@ class CurrencyFormatterTest {
             mapOf("PKR" to Money(BigDecimal(500), "PKR"), "LKR" to Money(BigDecimal(500), "LKR"))
         )
         assertTrue("expected the PKR symbol, got: $out", out.contains("Rs"))
-        assertTrue("expected the LKR symbol, got: $out", out.contains("රු"))
+        assertTrue("expected the LKR symbol, got: $out", out.contains("Rs."))
     }
 
     @Test

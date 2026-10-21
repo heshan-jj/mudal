@@ -270,7 +270,7 @@ fun FAQScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/sarim2000/pennywiseai-tracker/issues/new/choose"))
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("${com.pennywiseai.tracker.core.Constants.Links.GITHUB_URL}/issues"))
                         context.startActivity(intent)
                     }
             ) {

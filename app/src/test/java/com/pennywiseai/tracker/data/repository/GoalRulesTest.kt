@@ -129,9 +129,9 @@ class GoalRulesTest {
     }
 
     @Test
-    fun freeTierAllowsOneActiveGoal_proIsUnlimited() {
+    fun goalsAreUnlimited() {
         assertTrue(GoalRules.canCreateGoal(isPro = false, activeGoalCount = 0))
-        assertFalse(GoalRules.canCreateGoal(isPro = false, activeGoalCount = 1))
+        assertTrue(GoalRules.canCreateGoal(isPro = false, activeGoalCount = 1))
         assertTrue(GoalRules.canCreateGoal(isPro = true, activeGoalCount = 7))
     }
 

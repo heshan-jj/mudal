@@ -143,7 +143,7 @@ class GoalRepositoryTest {
         assertTrue(repo.canCreateGoal(isPro = false, today = today))
 
         coEvery { goalDao.observeGoals() } returns flowOf(listOf(reached, goal))
-        assertFalse(repo.canCreateGoal(isPro = false, today = today))
+        assertTrue(repo.canCreateGoal(isPro = false, today = today))
         assertTrue(repo.canCreateGoal(isPro = true, today = today))
     }
 

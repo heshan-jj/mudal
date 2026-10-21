@@ -79,12 +79,12 @@ object ShareCardExporter {
             config.hero == ShareHero.SUBSCRIPTIONS && subscriptions > 0
         val lead = if (heroIsSubscriptions) {
             val subs = if (subscriptions == 1) "1 subscription" else "$subscriptions subscriptions"
-            "PennyWise found $subs I'd forgotten I was paying for."
+            "Mudal found $subs I'd forgotten I was paying for."
         } else {
-            "PennyWise tracked $transactions transactions for me without me typing in a single one."
+            "Mudal tracked $transactions transactions for me without me typing in a single one."
         }
         return "$lead It reads bank SMS on your phone — nothing gets uploaded. " +
-            "https://$SHARE_CARD_URL"
+            com.pennywiseai.tracker.core.Constants.Links.GITHUB_URL
     }
 
     fun shareIntent(

@@ -26,7 +26,7 @@ import com.pennywiseai.tracker.ui.theme.Spacing
 fun WebhooksScreen(onNavigateBack: () -> Unit, viewModel: WebhooksViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isPro by viewModel.isProEntitled.collectAsStateWithLifecycle()
-    var showUpgrade by remember { mutableStateOf(false) }
+
     val listState = remember(state.editor != null, state.editor?.id, state.historyId) { LazyListState() }
     var deleteProfile by remember { mutableStateOf<WebhookProfileEntity?>(null) }
     val back: () -> Unit = {
@@ -55,10 +55,6 @@ fun WebhooksScreen(onNavigateBack: () -> Unit, viewModel: WebhooksViewModel = hi
                 state.message?.let { message -> item { Text(message, style = MaterialTheme.typography.bodyMedium) } }
             }
             when {
-                !isPro -> {
-                    item { Text("Webhook sync is a Pro feature. Send selected financial data to your own endpoint automatically.") }
-                    item { Button(onClick = { showUpgrade = true }) { Text("Unlock with Pro") } }
-                }
                 state.editor != null -> {
                     item { WebhookEditor(state.editor!!, state.intervalHours, viewModel::updateEditor) }
                     state.message?.let { message -> item { Text(message, color = MaterialTheme.colorScheme.error) } }
@@ -120,7 +116,7 @@ fun WebhooksScreen(onNavigateBack: () -> Unit, viewModel: WebhooksViewModel = hi
             }
         }
     }
-    if (showUpgrade) com.pennywiseai.tracker.presentation.paywall.UpgradeSheet(onDismiss = { showUpgrade = false })
+
     deleteProfile?.let { profile ->
         AlertDialog(onDismissRequest = { deleteProfile = null }, title = { Text("Delete webhook?") },
             text = { Text("Delete ${profile.name} and its delivery history?") },

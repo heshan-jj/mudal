@@ -49,7 +49,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pennywiseai.tracker.core.Constants
 import com.pennywiseai.tracker.ui.UiText
 import com.pennywiseai.tracker.ui.components.CustomTitleTopAppBar
-import com.pennywiseai.tracker.ui.components.SupportDevelopmentDialog
 import com.pennywiseai.tracker.ui.components.cards.GroupedColumn
 import com.pennywiseai.tracker.domain.loan.UpiRequest
 import com.pennywiseai.tracker.presentation.split.UpiIdDialog
@@ -149,11 +148,6 @@ fun SettingsScreen(
     val exportIncludeReceipts by settingsViewModel.exportIncludeReceipts.collectAsStateWithLifecycle(initialValue = true)
     val folderBackupIncludeReceipts by settingsViewModel.folderBackupIncludeReceipts.collectAsStateWithLifecycle(initialValue = false)
     val requestFolderPicker by settingsViewModel.requestFolderPicker.collectAsStateWithLifecycle()
-    var showUpgradeSheet by remember { mutableStateOf(false) }
-    var showSupportDialog by remember { mutableStateOf(false) }
-    // F-Droid builds have no Play billing, so they show a "Support development"
-    // tip jar instead of the (un-buyable) Pro upsell. Play builds keep Pro.
-    val isFdroidBuild = com.pennywiseai.tracker.BuildConfig.IS_FDROID_BUILD
     // Launches the runtime permission request. If granted, we flip the
     // preference on; if denied, leave the switch off so the user can try
     // again without us silently turning the feature on later.
@@ -254,46 +248,6 @@ fun SettingsScreen(
                 .padding(Dimensions.Padding.content),
             verticalArrangement = Arrangement.spacedBy(Spacing.sm)
         ) {
-            // ── PennyWise Pro / Support development ──
-            // Top of Settings on purpose: highest-discoverability slot.
-            // F-Droid builds have no Play billing (everything is already
-            // unlocked), so instead of an un-buyable Pro upsell they get a
-            // "Support development" tip jar. Play builds keep the Pro upgrade.
-            if (isFdroidBuild) {
-                SectionHeaderV2(title = stringResource(R.string.support_title))
-                SettingsGroup {
-                    SettingsNavItem(
-                        icon = Icons.Default.Favorite,
-                        iconBgColor = yellow_light,
-                        iconTint = yellow_dark,
-                        title = stringResource(R.string.support_title),
-                        subtitle = stringResource(R.string.support_subtitle),
-                        onClick = { showSupportDialog = true },
-                        position = ListItemPosition.Single,
-                    )
-                }
-            } else {
-                // Row content adapts to entitlement state — paid users see
-                // "Active" so the row reads as status, free users see "Upgrade"
-                // so it reads as a call-to-action.
-                SectionHeaderV2(title = stringResource(R.string.settings_pro_section))
-                SettingsGroup {
-                    SettingsNavItem(
-                        icon = Icons.Default.AutoAwesome,
-                        iconBgColor = yellow_light,
-                        iconTint = yellow_dark,
-                        title = if (isProEntitled) stringResource(R.string.settings_pro_title_active) else stringResource(R.string.settings_pro_title_upgrade),
-                        subtitle = if (isProEntitled) {
-                            stringResource(R.string.settings_pro_subtitle_active)
-                        } else {
-                            stringResource(R.string.settings_pro_subtitle_upgrade)
-                        },
-                        onClick = { showUpgradeSheet = true },
-                        position = ListItemPosition.Single,
-                    )
-                }
-            }
-
             // ── Personalization ──
             SectionHeaderV2(title = stringResource(R.string.settings_personalization_section))
             SettingsGroup {
@@ -647,21 +601,12 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_folder_backup_title),
                     subtitle = if (scheduledFolderBackupEnabled) {
                         stringResource(R.string.settings_folder_backup_subtitle_enabled)
-                    } else if (!isProEntitled) {
-                        stringResource(R.string.settings_folder_backup_subtitle_pro)
                     } else {
                         stringResource(R.string.settings_folder_backup_subtitle_disabled)
                     },
                     checked = scheduledFolderBackupEnabled,
-                    // Scheduling daily backups is a Pro feature. Turning it ON while
-                    // free routes to the paywall; turning it OFF is always allowed so
-                    // a lapsed/downgraded user can still stop scheduled backups.
                     onCheckedChange = { enabled ->
-                        if (enabled && !isProEntitled) {
-                            showUpgradeSheet = true
-                        } else {
-                            settingsViewModel.setScheduledFolderBackupEnabled(enabled)
-                        }
+                        settingsViewModel.setScheduledFolderBackupEnabled(enabled)
                     },
                     position = ListItemPosition.Middle
                 )
@@ -814,7 +759,7 @@ fun SettingsScreen(
                     iconTint = teal_dark,
                     title = "Webhooks",
                     subtitle = if (isProEntitled) "Send selected data to your endpoint" else "Pro · Send selected data to your endpoint",
-                    onClick = { if (isProEntitled) onNavigateToWebhooks() else showUpgradeSheet = true },
+                    onClick = onNavigateToWebhooks,
                     position = ListItemPosition.Top
                 )
                 SettingsSwitchRow(
@@ -842,25 +787,26 @@ fun SettingsScreen(
                     position = ListItemPosition.Top
                 )
                 SettingsNavItem(
-                    icon = Icons.AutoMirrored.Filled.MenuBook,
-                    iconBgColor = teal_light,
-                    iconTint = teal_dark,
-                    title = stringResource(R.string.settings_user_guide_title),
-                    subtitle = stringResource(R.string.settings_user_guide_subtitle),
-                    onClick = {
-                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constants.Links.USER_GUIDE_URL)))
-                    },
-                    position = ListItemPosition.Middle,
-                    trailingIcon = Icons.AutoMirrored.Filled.OpenInNew
-                )
-                SettingsNavItem(
                     icon = Icons.Default.BugReport,
                     iconBgColor = blue_light,
                     iconTint = blue_dark,
                     title = stringResource(R.string.settings_report_issue_title),
                     subtitle = stringResource(R.string.settings_report_issue_subtitle),
                     onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/sarim2000/pennywiseai-tracker/issues/new/choose"))
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/heshan-jj/pennywiseai-tracker/issues/new"))
+                        context.startActivity(intent)
+                    },
+                    position = ListItemPosition.Middle,
+                    trailingIcon = Icons.AutoMirrored.Filled.OpenInNew
+                )
+                SettingsNavItem(
+                    icon = Icons.Default.Code,
+                    iconBgColor = teal_light,
+                    iconTint = teal_dark,
+                    title = "Source code & licenses",
+                    subtitle = "AGPL-3.0 · heshan-jj/pennywiseai-tracker",
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/heshan-jj/pennywiseai-tracker"))
                         context.startActivity(intent)
                     },
                     position = ListItemPosition.Bottom,
@@ -1413,16 +1359,6 @@ fun SettingsScreen(
                 }
             }
         )
-    }
-
-    if (showUpgradeSheet) {
-        com.pennywiseai.tracker.presentation.paywall.UpgradeSheet(
-            onDismiss = { showUpgradeSheet = false },
-        )
-    }
-
-    if (showSupportDialog) {
-        SupportDevelopmentDialog(onDismiss = { showSupportDialog = false })
     }
 }
 

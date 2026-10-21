@@ -78,7 +78,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.pennywiseai.tracker.data.share.SharePeriod
 import com.pennywiseai.tracker.presentation.share.ShareCardSheet
 import com.pennywiseai.tracker.ui.components.ShareMonthBanner
-import com.pennywiseai.tracker.ui.components.ProHomeCard
 import androidx.navigation.NavController
 import com.pennywiseai.tracker.R
 import com.pennywiseai.tracker.core.Constants
@@ -156,16 +155,13 @@ fun HomeScreen(
     onFabPositioned: (Rect) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val isProEntitled by viewModel.isProEntitled.collectAsState()
     val currentCycleWindow by viewModel.currentCycleWindow.collectAsState()
-    var showUpgradeSheet by rememberSaveable { mutableStateOf(false) }
     val deletedTransaction by viewModel.deletedTransaction.collectAsState()
     val smsScanWorkInfo by viewModel.smsScanWorkInfo.collectAsState()
     val groupSummaries by viewModel.groupSummaries.collectAsState()
     val goals by viewModel.goals.collectAsStateWithLifecycle()
     val homeSectionLayout by viewModel.homeSectionLayout.collectAsStateWithLifecycle()
     val showSharePrompt by viewModel.showSharePrompt.collectAsState()
-    val showProHomeCard by viewModel.showProHomeCard.collectAsStateWithLifecycle()
     val activity = LocalActivity.current
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -309,35 +305,6 @@ fun HomeScreen(
                         modifier = Modifier.padding(end = Dimensions.Padding.content),
                         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                     ) {
-                        // Subtle Pro discovery chip — yellow sparkle that ties
-                        // back to the Settings → PennyWise Pro entry. Hidden
-                        // for already-entitled users so it's never pushy.
-                        // Tap → opens the same UpgradeSheet as Settings.
-                        if (!isProEntitled) {
-                            Box(
-                                modifier = Modifier
-                                    .size(Dimensions.Component.iconButton)
-                                    .clip(CircleShape)
-                                    .background(
-                                        color = com.pennywiseai.tracker.ui.theme.yellow_light,
-                                        shape = CircleShape,
-                                    )
-                                    .clickable(
-                                        onClick = { showUpgradeSheet = true },
-                                        interactionSource = remember { MutableInteractionSource() },
-                                        indication = null,
-                                    ),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.AutoAwesome,
-                                    contentDescription = stringResource(R.string.home_upgrade_pro),
-                                    tint = com.pennywiseai.tracker.ui.theme.yellow_dark,
-                                    modifier = Modifier.size(Dimensions.Icon.inline),
-                                )
-                            }
-                        }
-
                         // Business/Personal filter dropdown
                         Box {
                             Box(
@@ -405,8 +372,6 @@ fun HomeScreen(
                         profiles = uiState.profiles,
                         selectedProfileId = uiState.selectedProfileId,
                         onProfileSelected = { viewModel.updateSelectedProfile(it) },
-                        isProEntitled = isProEntitled,
-                        onUpgradeClick = { showUpgradeSheet = true },
                         cycleEnd = currentCycleWindow.second
                     )
                 }
@@ -519,19 +484,6 @@ fun HomeScreen(
                             showShareSheet = true
                         },
                         onDismiss = { viewModel.markSharePromptHandled() },
-                        modifier = Modifier.padding(horizontal = Dimensions.Padding.content),
-                    )
-                }
-            } else if (showProHomeCard) {
-                // 1.3. One-time Pro card (#945). Shares the share banner's slot and
-                // never stacks with it (the eligibility check also excludes it).
-                item {
-                    ProHomeCard(
-                        onSeePro = {
-                            viewModel.markProHomeCardHandled()
-                            showUpgradeSheet = true
-                        },
-                        onDismiss = { viewModel.markProHomeCardHandled() },
                         modifier = Modifier.padding(horizontal = Dimensions.Padding.content),
                     )
                 }
@@ -1245,49 +1197,14 @@ fun HomeScreen(
                     }
                 )
 
-                // Edit home screen (Middle) — reorder / hide Home sections (#770)
+                // Edit home screen (Bottom) — reorder / hide Home sections (#770)
                 MenuListItem(
                     headline = stringResource(R.string.home_menu_edit_home),
                     icon = { Icon(Icons.Default.Tune, contentDescription = null) },
-                    position = ListItemPosition.Middle,
-                    onClick = {
-                        showMenuSheet = false
-                        showEditWidgetsSheet = true
-                    }
-                )
-
-                // Join Discord (Middle)
-                MenuListItem(
-                    headline = stringResource(R.string.home_menu_discord),
-                    icon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_discord),
-                            contentDescription = null,
-                            modifier = Modifier.size(Dimensions.Icon.medium)
-                        )
-                    },
-                    position = ListItemPosition.Middle,
-                    onClick = {
-                        showMenuSheet = false
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(Constants.Links.DISCORD_URL))
-                        context.startActivity(intent)
-                    }
-                )
-
-                // Rate on Play Store (Bottom)
-                MenuListItem(
-                    headline = stringResource(R.string.home_menu_rate),
-                    icon = { Icon(Icons.Default.Star, contentDescription = null) },
                     position = ListItemPosition.Bottom,
                     onClick = {
                         showMenuSheet = false
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${context.packageName}"))
-                            context.startActivity(intent)
-                        } catch (_: android.content.ActivityNotFoundException) {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}"))
-                            context.startActivity(intent)
-                        }
+                        showEditWidgetsSheet = true
                     }
                 )
 
@@ -1377,13 +1294,7 @@ fun HomeScreen(
         }
     }
 
-    // Pro upgrade sheet — triggered from the subtle ✨ chip in the top bar
-    // for free users; reuses the same composable Settings uses.
-    if (showUpgradeSheet) {
-        com.pennywiseai.tracker.presentation.paywall.UpgradeSheet(
-            onDismiss = { showUpgradeSheet = false },
-        )
-    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -54,7 +54,7 @@ fun RulesScreen(
     val dryRunResult by viewModel.dryRunResult.collectAsStateWithLifecycle()
     val canCreateMoreRules by viewModel.canCreateMoreRules.collectAsStateWithLifecycle()
     val sharingMessage by viewModel.sharingMessage.collectAsStateWithLifecycle()
-    var showUpgradeSheet by remember { mutableStateOf(false) }
+
     var showOverflowMenu by remember { mutableStateOf(false) }
 
     // Rule sharing (#741). CreateDocument/OpenDocument keep the file in the
@@ -147,8 +147,7 @@ fun RulesScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (canCreateMoreRules) onNavigateToCreateRule()
-                    else showUpgradeSheet = true
+                    onNavigateToCreateRule()
                 },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
@@ -343,12 +342,6 @@ fun RulesScreen(
             onApplyToUncategorized = {
                 viewModel.applyRuleToPastTransactions(selectedRuleForBatch!!, applyToUncategorizedOnly = true)
             }
-        )
-    }
-
-    if (showUpgradeSheet) {
-        com.pennywiseai.tracker.presentation.paywall.UpgradeSheet(
-            onDismiss = { showUpgradeSheet = false },
         )
     }
 }

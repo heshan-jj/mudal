@@ -18,7 +18,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.pennywiseai.tracker"
+        applicationId = "com.heshan.moneytracker"
         minSdk = 26
         targetSdk = 36
         versionCode = 107
@@ -26,86 +26,30 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        // Load RSA public key from local.properties
-        val localPropertiesFile = rootProject.file("local.properties")
-        if (localPropertiesFile.exists()) {
-            val localProperties = Properties()
-            localProperties.load(localPropertiesFile.inputStream())
-
-            val rsaPublicKey = localProperties.getProperty("RSA_PUBLIC_KEY", "")
-            buildConfigField("String", "RSA_PUBLIC_KEY", "\"$rsaPublicKey\"")
-            // Cloudflare Worker that frees a license key's activation so it
-            // can move to a new phone. Empty = "Move to this device" hidden.
-            val licenseMoveUrl = localProperties.getProperty("LICENSE_MOVE_URL", "")
-            buildConfigField("String", "LICENSE_MOVE_URL", "\"$licenseMoveUrl\"")
-        } else {
-            // Fallback empty key for CI/CD builds
-            buildConfigField("String", "RSA_PUBLIC_KEY", "\"\"")
-            buildConfigField("String", "LICENSE_MOVE_URL", "\"\"")
+        buildConfigField("boolean", "IS_FDROID_BUILD", "true")
+        
+        ndk {
+            abiFilters += setOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
     }
 
     signingConfigs {
-        // Only create signing config for non-F-Droid builds
-        if (!gradle.startParameter.taskNames.any { it.contains("fdroid", ignoreCase = true) }) {
-            val localPropertiesFile = rootProject.file("local.properties")
-            if (localPropertiesFile.exists()) {
-                create("release") {
-                    val localProperties = Properties()
-                    localProperties.load(localPropertiesFile.inputStream())
-                    
-                    val keystorePath = localProperties.getProperty("RELEASE_STORE_FILE", "")
-                    if (keystorePath.isNotEmpty()) {
-                        storeFile = file(keystorePath)
-                        storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD", "")
-                        keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS", "")
-                        keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD", "")
-                    }
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            create("release") {
+                val localProperties = Properties()
+                localProperties.load(localPropertiesFile.inputStream())
+                
+                val keystorePath = localProperties.getProperty("RELEASE_STORE_FILE", "")
+                if (keystorePath.isNotEmpty()) {
+                    storeFile = file(keystorePath)
+                    storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD", "")
+                    keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS", "")
+                    keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD", "")
                 }
             }
         }
     }
-    
-    flavorDimensions += "version"
-    productFlavors {
-        create("fdroid") {
-            dimension = "version"
-            // F-Droid builds will use their own signing
-            // Only include ARM architectures for F-Droid (no x86 emulator support)
-            ndk {
-                abiFilters += setOf("arm64-v8a", "armeabi-v7a")
-            }
-            // Type-safe flavor check for code that adapts to F-Droid (everything
-            // unlocked, tip-jar instead of Pro). Beats matching BuildConfig.FLAVOR
-            // against the "fdroid" string literal, which a typo would silently break.
-            buildConfigField("boolean", "IS_FDROID_BUILD", "true")
-        }
-        create("standard") {
-            dimension = "version"
-            isDefault = true
-            // Standard flavor includes all architectures (including x86 for emulators)
-            buildConfigField("boolean", "IS_FDROID_BUILD", "false")
-        }
-    }
-
-    splits {
-        abi {
-            // Disable splits for F-Droid builds and bundle builds
-            //noinspection WrongGradleMethod
-            val runTasks = gradle.startParameter.taskNames.map { it.lowercase() }
-            //noinspection WrongGradleMethod
-            val isBundleBuild = runTasks.any { it.contains("bundle") }   // e.g., :app:bundleRelease
-            //noinspection WrongGradleMethod
-            val isFdroidBuild = runTasks.any { it.contains("fdroid") }
-
-            isEnable = !(isBundleBuild || isFdroidBuild)
-
-            reset()
-            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-            isUniversalApk = true
-        }
-    }
-
 
     buildTypes {
         debug {
@@ -123,16 +67,9 @@ android {
                 "proguard-rules.pro"
             )
             
-            // Only apply signing config to standard flavor
-            for (flavor in productFlavors) {
-                if (flavor.name == "standard") {
-                    // Check if release signing config exists
-                    val releaseSigningConfig = signingConfigs.findByName("release")
-                    // Only use release signing if keystore is configured
-                    if (releaseSigningConfig != null && releaseSigningConfig.storeFile != null) {
-                        signingConfig = releaseSigningConfig
-                    }
-                }
+            val releaseSigningConfig = signingConfigs.findByName("release")
+            if (releaseSigningConfig != null && releaseSigningConfig.storeFile != null) {
+                signingConfig = releaseSigningConfig
             }
             
             // Include debug symbols for native crashes
@@ -291,14 +228,6 @@ dependencies {
     // LiteRT-LM for on-device LLM inference
     implementation(libs.litertlm.android)
     
-    // Google Play In-App Updates (only for standard flavor)
-    "standardImplementation"(libs.app.update)
-    "standardImplementation"(libs.app.update.ktx)
-    
-    // Google Play In-App Reviews (only for standard flavor)
-    "standardImplementation"(libs.review)
-    "standardImplementation"(libs.review.ktx)
-    
     testImplementation(libs.mockk)
     testImplementation(libs.ktor.client.mock)
     testImplementation(libs.junit)
@@ -333,10 +262,7 @@ dependencies {
     // PDFBox Android for PDF statement parsing
     implementation(libs.pdfbox.android)
 
-    // Google Play Billing — STANDARD FLAVOR ONLY. F-Droid forbids the
-    // proprietary library; its build keeps Pro features unlocked via the
-    // FdroidBillingGateway stub and does not need the dep.
-    "standardImplementation"(libs.billing.ktx)
+
 
     testImplementation(kotlin("test"))
 }

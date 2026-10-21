@@ -72,15 +72,16 @@ class AccountBalanceRepositoryAccountTypeTest {
             when (method.name) {
                 "insertBalance" -> {
                     val entity = args[0] as AccountBalanceEntity
-                    balanceRows.add(entity)
-                    balanceRows.size.toLong()
+                    val id = balanceRows.size.toLong() + 1
+                    balanceRows.add(entity.copy(id = id))
+                    id
                 }
                 "getLatestBalance" -> {
                     val bankName = args[0] as String
                     val accountLast4 = args[1] as String
                     balanceRows
                         .filter { it.bankName == bankName && it.accountLast4 == accountLast4 }
-                        .maxByOrNull { it.timestamp }
+                        .maxWithOrNull(compareBy<AccountBalanceEntity> { it.timestamp }.thenBy { it.id })
                 }
                 "updateAccountType" -> {
                     val (bankName, accountLast4, type, isCredit) = args

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- ══ App lock ══ -->
-    <string name="applock_prompt_title">Unlock PennyWise</string>
+    <string name="applock_prompt_title">Unlock Mudal</string>
     <string name="applock_prompt_subtitle">Authenticate to access your expense data</string>
     <string name="applock_prompt_description">Use your biometric credential or device PIN</string>
     <string name="applock_icon_cd">App Locked</string>
-    <string name="applock_title">PennyWise is Locked</string>
+    <string name="applock_title">Mudal is Locked</string>
     <string name="applock_subtitle">Authenticate to access your expense data</string>
     <string name="applock_unlock">Unlock</string>
     <string name="applock_biometric_unavailable">Biometric authentication unavailable</string>
@@ -26,11 +26,11 @@
     <string name="biometric_error_unknown">Unknown biometric status</string>
     <!-- ══ SMS permission screen ══ -->
     <string name="permission_title">Enable Automatic Transaction Detection</string>
-    <string name="permission_description">PennyWise can automatically detect and categorize your bank transactions from SMS messages, saving you time and effort.</string>
+    <string name="permission_description">Mudal can automatically detect and categorize your bank transactions from SMS messages, saving you time and effort.</string>
     <string name="permission_privacy_title">Your Privacy Matters</string>
     <string name="permission_privacy_points">• Only transaction messages are processed\n• All data stays on your device\n• No personal messages are read\n• You can revoke access anytime in Settings</string>
     <string name="permission_notification_title">Enable Bank Notification Access</string>
-    <string name="permission_notification_description">Allow PennyWise to read transaction notifications from supported banking apps. This helps capture purchases when SMS is delayed or unavailable.</string>
+    <string name="permission_notification_description">Allow Mudal to read transaction notifications from supported banking apps. This helps capture purchases when SMS is delayed or unavailable.</string>
     <string name="permission_notification_enabled">Notification access enabled</string>
     <string name="permission_notification_open_settings">Open Notification Access Settings</string>
     <string name="permission_rationale">Without SMS access, you\'ll need to manually add all your transactions. We only read bank transaction messages, not personal conversations.</string>

@@ -221,3 +221,46 @@ git branch -d sync-test
   ```
 - **Screenshot Evidence:** Saved to session artifact directory `phase_0_emulator_sms_success.png`.
 
+---
+
+# Phase 1: Identity, De-commercialisation, Privacy Cleanup & LKR Defaults
+
+**Date:** 2026-10-21  
+**Status:** Completed & Verified  
+
+## 1. Summary of Changes
+
+- **Identity & Package ID:**
+  - Application ID changed to `com.heshan.moneytracker` (debug build: `com.heshan.moneytracker.debug`).
+  - App display name updated to **Mudal**.
+  - Generated original launcher icons (monogram geometric 'M' icon with `#0F1F1C` dark emerald background).
+  - Preserved internal Kotlin package structure (`com.pennywiseai.tracker.*`) to maintain clean upstream git compatibility.
+- **Single Unified Build Flavor:**
+  - Flattened `standard` and `fdroid` build variants into a single unified build.
+  - Retained `x86_64`, `arm64-v8a`, and `armeabi-v7a` ABIs.
+  - Stripped Play Billing, Play In-App Updates, and Play In-App Review dependencies and permissions (`com.android.vending.BILLING` completely removed from merged manifest).
+- **De-commercialisation & Feature Unlocking:**
+  - Deleted Dodo Payments integration, RSA public key verification, `LicenseClient`, `LicenseManager`, and `LicensePolicy`.
+  - Deleted paywall UI components: `UpgradeSheet`, `UpgradeViewModel`, `LicenseKeyDialog`, `ProHomeCard`, and `SupportDevelopment` dialogs.
+  - Unlocked all previously gated features to 100% capacity: unlimited rules, statement imports, CSV export rows, recurring templates, financial goals, account merges, webhooks, and analytics groupings.
+- **Privacy & Upstream Decoupling:**
+  - Decoupled upstream endpoints (`pennywise.zynth.dev`, upstream Discord server).
+  - Replaced remote SMS issue reporting with local regex anonymization (`SmsReportUrlBuilder`) that masks digit sequences, card numbers, amounts, and emails/VPA into GitHub issue links for `heshan-jj/pennywiseai-tracker`.
+  - Created `docs/PRIVACY.md` detailing every remaining network interaction (exchange rates, model downloads, webhooks, and GitHub reporting).
+  - Added `ATTRIBUTION.md` retaining AGPL-3.0 attribution for Mohammad Sarim and PennyWise.
+  - Updated `README.md` to reflect Mudal identity.
+- **Sri Lankan Defaults:**
+  - Changed default currency from `INR` to `LKR`.
+  - Added `Rs.` currency symbol mapping for `LKR` and updated Sri Lankan locale resolution.
+
+## 2. Test & Verification Evidence
+
+- **Unit Tests:**
+  - `:parser-core:test`: 1,927 tests passed (0 failures).
+  - `:app:testDebugUnitTest`: 692 tests passed (0 failures).
+- **Build:**
+  - `:app:assembleDebug`: Clean build completed; APK generated at `app/build/outputs/apk/debug/app-debug.apk`.
+- **Side-by-Side Coexistence on Pixel 8 Emulator:**
+  - Installed `com.heshan.moneytracker.debug` alongside existing `com.pennywiseai.tracker.debug`. Both apps run independently with isolated data stores.
+
+

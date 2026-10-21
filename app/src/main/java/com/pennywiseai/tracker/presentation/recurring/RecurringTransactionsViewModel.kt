@@ -7,13 +7,15 @@ import com.pennywiseai.tracker.data.database.entity.RecurringFrequency
 import com.pennywiseai.tracker.data.database.entity.RecurringTransactionEntity
 import com.pennywiseai.tracker.data.database.entity.TransactionType
 import com.pennywiseai.tracker.billing.EntitlementGate
-import com.pennywiseai.tracker.billing.FreeTierLimits
+
 import com.pennywiseai.tracker.data.preferences.UserPreferencesRepository
 import com.pennywiseai.tracker.data.repository.RecurringTransactionRepository
 import com.pennywiseai.tracker.domain.usecase.GetCategoriesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -38,15 +40,9 @@ class RecurringTransactionsViewModel @Inject constructor(
     val isProEntitled: StateFlow<Boolean> = entitlementGate.isProEntitled
 
     /**
-     * True when the user may create another template — Pro (unlimited) or under
-     * [FreeTierLimits.MAX_RECURRING_TEMPLATES]. The screen's Add FAB checks this
-     * to decide between opening the editor and showing the paywall (#706).
-     * Editing existing templates is always allowed.
+     * True when the user may create another template — always true in Mudal (unlimited).
      */
-    val canAddMore: StateFlow<Boolean> =
-        combine(templates, isProEntitled) { list, pro ->
-            pro || list.size < FreeTierLimits.MAX_RECURRING_TEMPLATES
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    val canAddMore: StateFlow<Boolean> = MutableStateFlow(true).asStateFlow()
 
     val categories: StateFlow<List<CategoryEntity>> =
         getCategoriesUseCase.execute()

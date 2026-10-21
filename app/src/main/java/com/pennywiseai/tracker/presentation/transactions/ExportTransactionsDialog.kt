@@ -23,8 +23,6 @@ import kotlinx.coroutines.launch
 import com.pennywiseai.tracker.BuildConfig
 import com.pennywiseai.tracker.data.database.entity.TransactionEntity
 import com.pennywiseai.tracker.data.export.ExportResult
-import com.pennywiseai.tracker.ui.components.SupportDevelopmentDialog
-import com.pennywiseai.tracker.ui.components.SupportNudgeCard
 import com.pennywiseai.tracker.ui.components.cards.PennyWiseCardV2
 import com.pennywiseai.tracker.ui.theme.Dimensions
 import com.pennywiseai.tracker.ui.theme.Spacing
@@ -41,29 +39,7 @@ fun ExportTransactionsDialog(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var exportState by remember { mutableStateOf<ExportState>(ExportState.Ready) }
-    val isProEntitled by viewModel.isProEntitled.collectAsState()
-    var showUpgradeSheet by remember { mutableStateOf(false) }
-    // F-Droid support nudge: on the open build there's no Pro to sell, so a
-    // successful export (a Pro-equivalent power feature) is a natural, capped
-    // moment to invite a tip. Never shown on Play builds.
-    var showSupportNudge by remember { mutableStateOf(false) }
-    var showSupportDialog by remember { mutableStateOf(false) }
-    LaunchedEffect(exportState) {
-        if (exportState is ExportState.Success &&
-            BuildConfig.IS_FDROID_BUILD &&
-            viewModel.claimSupportNudge()
-        ) {
-            showSupportNudge = true
-        }
-    }
-    val csvLimit = com.pennywiseai.tracker.billing.FreeTierLimits.MAX_CSV_EXPORT_ROWS_PER_MONTH
-    // Free users get the FIRST `csvLimit` rows on every export — never a
-    // hard block. The advertised free tier is "first 100 rows," so we
-    // actually deliver them when the selection exceeds the limit. Pro is
-    // unlimited. Truncation is surfaced in the summary card + CTA label so
-    // it's never a silent surprise.
-    val willTruncate = !isProEntitled && transactions.size > csvLimit
-    val transactionsToExport = if (willTruncate) transactions.take(csvLimit) else transactions
+    val transactionsToExport = transactions
     
     Dialog(onDismissRequest = {
         if (exportState !is ExportState.Exporting) {
@@ -176,36 +152,6 @@ fun ExportTransactionsDialog(
                                     }
                                 }
                         }
-
-                        // Free-tier truncation notice. Shown ONLY when we're
-                        // about to truncate; surfaces what the user will
-                        // actually receive and offers a one-tap upgrade.
-                        if (willTruncate) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.txn_export_free_limit_notice, csvLimit, transactions.size),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.weight(1f),
-                                )
-                                TextButton(
-                                    onClick = { showUpgradeSheet = true },
-                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.txn_export_unlock_all),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Medium,
-                                    )
-                                }
-                            }
-                        }
                     }
 
                     is ExportState.Exporting -> {
@@ -266,12 +212,6 @@ fun ExportTransactionsDialog(
                                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                 )
                             }
-                        }
-
-                        // F-Droid-only, frequency-capped tip-jar nudge.
-                        if (showSupportNudge) {
-                            Spacer(modifier = Modifier.height(12.dp))
-                            SupportNudgeCard(onClick = { showSupportDialog = true })
                         }
                     }
 
@@ -336,9 +276,7 @@ fun ExportTransactionsDialog(
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text(
-                                    if (willTruncate) stringResource(R.string.txn_export_action_export_first, csvLimit) else stringResource(R.string.txn_export_action_export)
-                                )
+                                Text(stringResource(R.string.txn_export_action_export))
                             }
                         }
                         
@@ -398,16 +336,6 @@ fun ExportTransactionsDialog(
                 }
             }
         }
-    }
-
-    if (showUpgradeSheet) {
-        com.pennywiseai.tracker.presentation.paywall.UpgradeSheet(
-            onDismiss = { showUpgradeSheet = false },
-        )
-    }
-
-    if (showSupportDialog) {
-        SupportDevelopmentDialog(onDismiss = { showSupportDialog = false })
     }
 }
 

@@ -57,7 +57,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pennywiseai.tracker.R
 import com.pennywiseai.tracker.data.repository.GoalProgress
 import com.pennywiseai.tracker.data.repository.GoalStatus
-import com.pennywiseai.tracker.presentation.paywall.UpgradeSheet
+
 import com.pennywiseai.tracker.ui.components.cards.GroupedList
 import com.pennywiseai.tracker.ui.components.cards.GroupedRow
 import com.pennywiseai.tracker.ui.components.cards.ListItemPosition
@@ -269,8 +269,7 @@ fun GoalCard(progress: GoalProgress, onClick: () -> Unit, modifier: Modifier = M
 }
 
 /**
- * The Goals section at the top of the Budgets screen. Owns the Pro gate for
- * "New goal" (#914): free users get [com.pennywiseai.tracker.billing.FreeTierLimits.MAX_ACTIVE_GOALS].
+ * The Goals section at the top of the Budgets screen.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -368,7 +367,7 @@ fun GoalsSection(
         }
     }
 
-    if (showUpgrade) UpgradeSheet(onDismiss = { showUpgrade = false })
+
 }
 
 @Composable

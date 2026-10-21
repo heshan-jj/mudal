@@ -199,23 +199,8 @@ class HomeViewModel @Inject constructor(
     private val _showSharePrompt = MutableStateFlow(false)
     val showSharePrompt: StateFlow<Boolean> = _showSharePrompt.asStateFlow()
 
-    /** The one-time Home card pointing engaged free users to Pro (#945). */
-    val showProHomeCard: StateFlow<Boolean> = combine(
-        entitlementGate.resolvedProEntitlement,
-        userPreferencesRepository.proHomeCardHandled,
-        transactionRepository.observeActiveTransactionCount(),
-        _showSharePrompt,
-    ) { isPro, handled, count, sharePromptShowing ->
-        shouldShowProHomeCard(
-            isPro = isPro,
-            handled = handled,
-            installedAtMillis = context.packageManager
-                .getPackageInfo(context.packageName, 0).firstInstallTime,
-            nowMillis = System.currentTimeMillis(),
-            transactionCount = count,
-            sharePromptShowing = sharePromptShowing,
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
+    /** The one-time Home card pointing engaged free users to Pro (#945) - disabled in Mudal. */
+    val showProHomeCard: StateFlow<Boolean> = MutableStateFlow(false).asStateFlow()
 
     init {
         loadUnifiedModePreferences()

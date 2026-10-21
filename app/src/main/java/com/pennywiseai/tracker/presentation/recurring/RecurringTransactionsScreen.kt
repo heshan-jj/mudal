@@ -53,7 +53,7 @@ fun RecurringTransactionsScreen(
     // Null = editor closed. Non-null = editing this form (id 0 for a fresh add).
     var editing by remember { mutableStateOf<RecurringFormState?>(null) }
     // Free tier allows a limited number of templates; adding beyond it opens the paywall (#706).
-    var showUpgradeSheet by rememberSaveable { mutableStateOf(false) }
+
 
     val active = templates.filter { it.isActive }
     val paused = templates.filterNot { it.isActive }
@@ -68,8 +68,7 @@ fun RecurringTransactionsScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (canAddMore) editing = RecurringFormState(currency = baseCurrency)
-                    else showUpgradeSheet = true
+                    editing = RecurringFormState(currency = baseCurrency)
                 },
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -132,12 +131,6 @@ fun RecurringTransactionsScreen(
             categoryNames = categories.map { it.name },
             onDismiss = { editing = null },
             onSave = { viewModel.save(it); editing = null }
-        )
-    }
-
-    if (showUpgradeSheet) {
-        com.pennywiseai.tracker.presentation.paywall.UpgradeSheet(
-            onDismiss = { showUpgradeSheet = false },
         )
     }
 }

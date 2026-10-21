@@ -28,8 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pennywiseai.tracker.ui.components.CustomTitleTopAppBar
-import com.pennywiseai.tracker.ui.components.SupportDevelopmentDialog
-import com.pennywiseai.tracker.ui.components.SupportNudgeCard
 import com.pennywiseai.tracker.ui.theme.Dimensions
 import com.pennywiseai.tracker.ui.theme.Spacing
 import dev.chrisbanes.haze.HazeState
@@ -42,10 +40,6 @@ fun ImportStatementScreen(
     viewModel: ImportStatementViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val canImportThisMonth by viewModel.canImportThisMonth.collectAsStateWithLifecycle()
-    val showSupportNudge by viewModel.showSupportNudge.collectAsStateWithLifecycle()
-    var showUpgradeSheet by remember { mutableStateOf(false) }
-    var showSupportDialog by remember { mutableStateOf(false) }
 
     val pdfPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -54,12 +48,8 @@ fun ImportStatementScreen(
         }
     )
 
-    // Free users get 1 import / calendar month; Pro is unlimited. Centralising
-    // the gate here means all three "select PDF" entry points (Idle / Success /
-    // Error) share the same enforcement without sprinkling checks.
     val onTryLaunchPicker: () -> Unit = {
-        if (canImportThisMonth) pdfPicker.launch("application/pdf")
-        else showUpgradeSheet = true
+        pdfPicker.launch("application/pdf")
     }
 
     val scrollBehaviorSmall = TopAppBarDefaults.pinnedScrollBehavior()
@@ -124,11 +114,6 @@ fun ImportStatementScreen(
                 is ImportStatementUiState.Loading -> LoadingContent()
                 is ImportStatementUiState.Success -> SuccessContent(
                     result = state.result,
-                    showSupportNudge = showSupportNudge,
-                    onSupportClick = {
-                        showSupportDialog = true
-                        viewModel.dismissSupportNudge()
-                    },
                     onImportAnother = {
                         viewModel.resetState()
                         onTryLaunchPicker()
@@ -152,16 +137,6 @@ fun ImportStatementScreen(
                 )
             }
         }
-    }
-
-    if (showUpgradeSheet) {
-        com.pennywiseai.tracker.presentation.paywall.UpgradeSheet(
-            onDismiss = { showUpgradeSheet = false },
-        )
-    }
-
-    if (showSupportDialog) {
-        SupportDevelopmentDialog(onDismiss = { showSupportDialog = false })
     }
 }
 
@@ -239,8 +214,6 @@ private fun LoadingContent() {
 @Composable
 private fun SuccessContent(
     result: com.pennywiseai.tracker.data.statement.StatementImportResult.Success,
-    showSupportNudge: Boolean = false,
-    onSupportClick: () -> Unit = {},
     onImportAnother: () -> Unit,
     onDone: () -> Unit
 ) {
@@ -326,11 +299,6 @@ private fun SuccessContent(
                 }
             }
         }
-    }
-
-    if (showSupportNudge) {
-        Spacer(modifier = Modifier.height(Spacing.md))
-        SupportNudgeCard(onClick = onSupportClick)
     }
 
     Spacer(modifier = Modifier.height(Spacing.lg))

@@ -1,6 +1,6 @@
 package com.pennywiseai.tracker.data.repository
 
-import com.pennywiseai.tracker.billing.FreeTierLimits
+
 import com.pennywiseai.tracker.data.database.entity.GoalContributionEntity
 import com.pennywiseai.tracker.data.database.entity.GoalEntity
 import java.math.BigDecimal
@@ -86,9 +86,8 @@ object GoalRules {
         goals.filter { it.status != GoalStatus.ARCHIVED }
             .sortedWith(compareBy<GoalProgress>({ it.status == GoalStatus.REACHED }, { it.goal.dueDate }, { it.goal.id }))
 
-    /** Free users get [FreeTierLimits.MAX_ACTIVE_GOALS] active goals. Existing goals are never locked. */
-    fun canCreateGoal(isPro: Boolean, activeGoalCount: Int): Boolean =
-        isPro || activeGoalCount < FreeTierLimits.MAX_ACTIVE_GOALS
+    /** All users can create unlimited active goals in this fork. */
+    fun canCreateGoal(isPro: Boolean, activeGoalCount: Int): Boolean = true
 
     /** How much of a transaction a contribution uses, in the transaction's currency. */
     fun allocation(c: GoalContributionEntity): BigDecimal = (c.originalAmount ?: c.amount).abs()

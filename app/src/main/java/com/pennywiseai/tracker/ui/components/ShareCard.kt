@@ -61,7 +61,7 @@ object ShareCardColors {
 val ShareCardWidth = 360.dp
 val ShareCardHeight = 450.dp
 
-const val SHARE_CARD_URL = "pennywise.zynth.dev"
+const val SHARE_CARD_URL = "Mudal"
 
 @Composable
 fun ShareCard(

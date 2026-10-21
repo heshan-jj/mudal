@@ -9,7 +9,6 @@ import android.util.Log
 import androidx.room.withTransaction
 import com.pennywiseai.tracker.data.database.PennyWiseDatabase
 import com.pennywiseai.tracker.data.database.entity.*
-import com.pennywiseai.tracker.billing.license.LicenseManager
 import com.pennywiseai.tracker.data.preferences.IgnoredAccountsStore
 import com.pennywiseai.tracker.data.preferences.UserPreferencesRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -29,7 +28,6 @@ class BackupImporter @Inject constructor(
     @ApplicationContext private val context: Context,
     private val database: PennyWiseDatabase,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val licenseManager: LicenseManager,
     private val ignoredAccountsStore: IgnoredAccountsStore
 ) {
     
@@ -1018,14 +1016,6 @@ class BackupImporter @Inject constructor(
         // Like the license: fills in a missing UPI ID, never replaces one set here (#346).
         preferences.app.upiId?.takeIf { com.pennywiseai.tracker.domain.loan.UpiRequest.isValidUpiId(it) }?.let { id ->
             if (userPreferencesRepository.upiId.first() == null) userPreferencesRepository.setUpiId(id)
-        }
-
-        // A license in the backup only overrides when this install has none —
-        // never clobber a key the user already activated here.
-        preferences.app.licenseKey?.let { key ->
-            if (userPreferencesRepository.storedLicense.first() == null) {
-                licenseManager.restore(key, preferences.app.licenseInstanceId)
-            }
         }
     }
 }

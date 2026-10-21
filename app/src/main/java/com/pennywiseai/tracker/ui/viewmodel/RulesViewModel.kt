@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.pennywiseai.tracker.R
 import com.pennywiseai.tracker.billing.EntitlementGate
 import com.pennywiseai.tracker.data.database.entity.AccountBalanceEntity
-import com.pennywiseai.tracker.billing.FreeTierLimits
+
 import com.pennywiseai.tracker.data.repository.AccountBalanceRepository
 import com.pennywiseai.tracker.data.rules.RuleSharingCodec
 import com.pennywiseai.tracker.domain.model.rule.TransactionRule
@@ -83,18 +83,9 @@ class RulesViewModel @Inject constructor(
         )
 
     /**
-     * True when the user is allowed to create another rule — either Pro
-     * (unlimited) or under [FreeTierLimits.MAX_RULES]. The Rules screen's
-     * FAB checks this to decide between opening the create flow and
-     * triggering the paywall.
+     * True when the user is allowed to create another rule — always true in Mudal (unlimited).
      */
-    val canCreateMoreRules: StateFlow<Boolean> = combine(rules, isProEntitled) { all, pro ->
-        pro || all.size < FreeTierLimits.MAX_RULES
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = true,
-    )
+    val canCreateMoreRules: StateFlow<Boolean> = MutableStateFlow(true).asStateFlow()
 
     /**
      * Non-hidden accounts from `hidden_accounts` SharedPreferences key.
@@ -267,30 +258,15 @@ class RulesViewModel @Inject constructor(
                 val fresh = decoded.rules.filterNot { it.name.trim().lowercase() in existingNames }
                 val duplicates = decoded.rules.size - fresh.size
 
-                val allowance = if (isProEntitled.value) {
-                    fresh.size
-                } else {
-                    (FreeTierLimits.MAX_RULES - existing.size).coerceAtLeast(0)
-                }
-                val toImport = fresh.take(allowance)
+                val toImport = fresh
                 // One insert, so a failure can't leave the set half-applied.
                 ruleRepository.insertRules(toImport)
 
-                val blocked = fresh.size - toImport.size
                 val skipped = decoded.duplicatedInFile
                 _sharingMessage.value = buildList {
                     add(UiText.Plural(R.plurals.rules_imported, toImport.size))
                     if (duplicates > 0) add(UiText.Plural(R.plurals.rules_import_already_existed, duplicates))
                     if (skipped > 0) add(UiText.Plural(R.plurals.rules_import_collapsed, skipped))
-                    if (blocked > 0) {
-                        add(
-                            UiText.Plural(
-                                R.plurals.rules_import_blocked_by_limit,
-                                blocked,
-                                listOf(blocked, FreeTierLimits.MAX_RULES)
-                            )
-                        )
-                    }
                 }
             } catch (e: Exception) {
                 _sharingMessage.value = listOf(e.message?.let { UiText.Plain(it) } ?: UiText.Res(R.string.rules_import_failed))

@@ -104,7 +104,7 @@ fun AnalyticsScreen(
     val accountOptions by viewModel.accountOptions.collectAsStateWithLifecycle()
     val isProEntitled by viewModel.isProEntitled.collectAsStateWithLifecycle()
     val groupBy by viewModel.groupBy.collectAsStateWithLifecycle()
-    var showUpgradeSheet by remember { mutableStateOf(false) }
+
     var showDateRangePicker by rememberSaveable { mutableStateOf(false) }
     var categoryViewType by rememberSaveable { mutableStateOf(CategoryViewType.CHART) }
     var tagViewType by rememberSaveable { mutableStateOf(CategoryViewType.CHART) }
@@ -225,12 +225,7 @@ fun AnalyticsScreen(
                 onGroupByDismiss = { showGroupByMenu = false },
                 onGroupBySelected = { option ->
                     showGroupByMenu = false
-                    // A Pro grouping without Pro opens the upgrade sheet; the view stays put.
-                    if (option.allowedFor(isProEntitled) == option) {
-                        viewModel.setGroupBy(option)
-                    } else {
-                        showUpgradeSheet = true
-                    }
+                    viewModel.setGroupBy(option)
                 },
                 onPeriodClick = { showPeriodMenu = true },
                 onPeriodDismiss = { showPeriodMenu = false },
@@ -666,12 +661,6 @@ fun AnalyticsScreen(
             },
             initialStartDate = customDateRange?.first,
             initialEndDate = customDateRange?.second
-        )
-    }
-
-    if (showUpgradeSheet) {
-        com.pennywiseai.tracker.presentation.paywall.UpgradeSheet(
-            onDismiss = { showUpgradeSheet = false }
         )
     }
 }
