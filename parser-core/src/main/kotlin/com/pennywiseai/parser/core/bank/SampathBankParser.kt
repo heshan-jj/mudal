@@ -16,7 +16,7 @@ import java.math.BigDecimal
  * - POS with hyphenated merchant: "LKR 440.00 debited from AC **7700 via POS at PERERA - SONS BAKERS ( MA 51001413"
  * - eCom debit: "LKR 377.75 debited from AC **7700 for eCom PickMe Co 76134439"
  * - eCom refund/reversal: "LKR 346.54 credited to AC **7700 for eCom/REV Microsoft*Store MASTTERM"
- * - Transfer out: "LKR 20,000.00 debited from AC **7700 for TFR Vishwa -000086201821"
+ * - Transfer out: "LKR 20,000.00 debited from AC **7700 for TFR OWNER -000086201821"
  * - Transfer in (CEFT/TRRR): "LKR .56 credited to AC **9786 for TRRR/000000554871/14-10-2026 13:20:43/IF"
  * - Visa recurring payment: "LKR 50.00 debited from AC **7700 for VSRPMT-000018281730"
  * - Bank interest: "LKR 155.05 credited to AC **9786 for Interest: 1xxx9786:Int.Pd:20-08-2026 to 19-09-2026"
@@ -130,7 +130,7 @@ class SampathBankParser : BankParser() {
             if (merchant.isNotEmpty()) return merchant
         }
 
-        // Outward transfer: "for TFR Vishwa -000086201821" / "for TFR Vishwa cash-000086472616"
+        // Outward transfer: "for TFR OWNER -000086201821" / "for TFR OWNER cash-000086472616"
         val tfrPattern = Regex("""\bfor\s+TFR\s+(.+?)(?:-\d+|\n|$)""", RegexOption.IGNORE_CASE)
         tfrPattern.find(message)?.let { match ->
             val name = match.groupValues[1].trim()
@@ -157,7 +157,7 @@ class SampathBankParser : BankParser() {
             return "Bank Interest"
         }
 
-        // General account note fallback: "for PICKME - 37419306" / "for cash" / "for Vishwa-"
+        // General account note fallback: "for PICKME - 37419306" / "for cash" / "for OWNER-"
         val forPattern = Regex("""\bfor\s+(.+?)(?:\n|$)""", RegexOption.IGNORE_CASE)
         forPattern.find(message)?.let { match ->
             var merchant = match.groupValues[1].trim()
@@ -183,7 +183,7 @@ class SampathBankParser : BankParser() {
         val remittancePattern = Regex("""Remittance\s+ID\s*:\s*\[([^\]]+)\]""", RegexOption.IGNORE_CASE)
         remittancePattern.find(message)?.let { return it.groupValues[1].trim() }
 
-        // TFR ref: "for TFR Vishwa -000086201821" / "cash-000086472616"
+        // TFR ref: "for TFR OWNER -000086201821" / "cash-000086472616"
         val tfrRefPattern = Regex("""\bfor\s+TFR\s+.*?-(\d+)""", RegexOption.IGNORE_CASE)
         tfrRefPattern.find(message)?.let { return it.groupValues[1].trim() }
 
