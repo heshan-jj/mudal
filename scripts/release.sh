@@ -58,7 +58,7 @@ for arg in "$@"; do
         -y|--yes)          AUTO_YES="true" ;;
         --play)            DO_PLAY="true" ;;
         --no-claude)       NO_CLAUDE="true" ;;
-        --web)             DO_WEB="true" ;;
+        --web)             DO_WEB="true"; echo -e "\033[1;33m⚠️  --web is not available in the Mudal fork (the web parser tool is not deployed by this project).\033[0m" ;;
         --dry-run)         DRY_RUN="true"; echo -e "${YELLOW}🔍 DRY RUN MODE${NC}" ;;
         *) echo -e "${RED}Unknown argument: $arg${NC}"
            echo "Usage: $0 [patch|minor|major] [--yes] [--play] [--no-claude] [--web] [--dry-run]"
@@ -211,7 +211,7 @@ if [ "$USE_CLAUDE" = false ]; then
     else
         echo "## Initial Release" >> RELEASE_NOTES.md
         echo "" >> RELEASE_NOTES.md
-        echo "First release of PennyWise" >> RELEASE_NOTES.md
+        echo "First release of Mudal." >> RELEASE_NOTES.md
     fi
 
     echo "" >> RELEASE_NOTES.md
@@ -338,55 +338,46 @@ if ! ./gradlew :parser-core:build; then
 fi
 echo -e "${GREEN}✅ Parser-core module built${NC}"
 
-if ! ./gradlew assembleStandardRelease; then
-    revert_changes
-fi
-
-if ! ./gradlew assembleFdroidRelease; then
+if ! ./gradlew assembleRelease; then
     revert_changes
 fi
 
 echo -e "${GREEN}✅ APKs built${NC}"
 
 # 7. Rename APKs (matching GitHub Actions)
-STANDARD_PATH="app/build/outputs/apk/standard/release"
-FDROID_PATH="app/build/outputs/apk/fdroid/release"
+STANDARD_PATH="app/build/outputs/apk/release"
 
 # Rename universal APK
-if [ -f "$STANDARD_PATH/app-standard-universal-release.apk" ]; then
-    mv "$STANDARD_PATH/app-standard-universal-release.apk" \
-       "$STANDARD_PATH/PennyWise-v${NEXT_VERSION}-universal.apk"
+if [ -f "$STANDARD_PATH/app-universal-release.apk" ]; then
+    mv "$STANDARD_PATH/app-universal-release.apk" \
+       "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-universal.apk"
+elif [ -f "$STANDARD_PATH/app-universal-release-unsigned.apk" ]; then
+    mv "$STANDARD_PATH/app-universal-release-unsigned.apk" \
+       "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-universal.apk"
 fi
 
 # Rename architecture-specific APKs
 for arch in armeabi-v7a arm64-v8a x86 x86_64; do
-    if [ -f "$STANDARD_PATH/app-standard-${arch}-release.apk" ]; then
-        mv "$STANDARD_PATH/app-standard-${arch}-release.apk" \
-           "$STANDARD_PATH/PennyWise-v${NEXT_VERSION}-${arch}.apk"
+    if [ -f "$STANDARD_PATH/app-${arch}-release.apk" ]; then
+        mv "$STANDARD_PATH/app-${arch}-release.apk" \
+           "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-${arch}.apk"
+    elif [ -f "$STANDARD_PATH/app-${arch}-release-unsigned.apk" ]; then
+        mv "$STANDARD_PATH/app-${arch}-release-unsigned.apk" \
+           "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-${arch}.apk"
     fi
 done
-
-# Rename F-Droid APK
-if [ -f "$FDROID_PATH/app-fdroid-release-unsigned.apk" ]; then
-    mv "$FDROID_PATH/app-fdroid-release-unsigned.apk" \
-       "$FDROID_PATH/PennyWise-fdroid-v${NEXT_VERSION}.apk"
-fi
 
 echo -e "${GREEN}✅ APKs renamed${NC}"
 
 # 8. Calculate SHA256
 ORIGINAL_DIR="$PWD"
 cd "$STANDARD_PATH"
-for apk in PennyWise-v${NEXT_VERSION}*.apk; do
+for apk in Mudal-v${NEXT_VERSION}*.apk; do
     if [ -f "$apk" ]; then
         sha256sum "$apk" > "${apk}.sha256"
     fi
 done
 
-cd "$ORIGINAL_DIR/$FDROID_PATH"
-if [ -f "PennyWise-fdroid-v${NEXT_VERSION}.apk" ]; then
-    sha256sum "PennyWise-fdroid-v${NEXT_VERSION}.apk" > "PennyWise-fdroid-v${NEXT_VERSION}.apk.sha256"
-fi
 cd "$ORIGINAL_DIR"
 
 echo -e "${GREEN}✅ SHA256 calculated${NC}"
@@ -431,43 +422,39 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         gh release create "v$NEXT_VERSION" \
             --title "Release v$NEXT_VERSION" \
             --notes-file RELEASE_NOTES.md \
-            "$STANDARD_PATH/PennyWise-v${NEXT_VERSION}-universal.apk" \
-            "$STANDARD_PATH/PennyWise-v${NEXT_VERSION}-universal.apk.sha256" \
-            "$STANDARD_PATH/PennyWise-v${NEXT_VERSION}-arm64-v8a.apk" \
-            "$STANDARD_PATH/PennyWise-v${NEXT_VERSION}-arm64-v8a.apk.sha256" \
-            "$STANDARD_PATH/PennyWise-v${NEXT_VERSION}-armeabi-v7a.apk" \
-            "$STANDARD_PATH/PennyWise-v${NEXT_VERSION}-armeabi-v7a.apk.sha256" \
-            "$FDROID_PATH/PennyWise-fdroid-v${NEXT_VERSION}.apk" \
-            "$FDROID_PATH/PennyWise-fdroid-v${NEXT_VERSION}.apk.sha256"
+            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-universal.apk" \
+            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-universal.apk.sha256" \
+            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-arm64-v8a.apk" \
+            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-arm64-v8a.apk.sha256" \
+            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-armeabi-v7a.apk" \
+            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-armeabi-v7a.apk.sha256"
         echo -e "${GREEN}✅ GitHub release created${NC}"
     else
         echo -e "${YELLOW}gh CLI not found. Create release manually at:${NC}"
-        echo "https://github.com/sarim2000/pennywiseai-tracker/releases/new?tag=v$NEXT_VERSION"
+        echo "https://github.com/heshan-jj/mudal/releases/new?tag=v$NEXT_VERSION"
     fi
 fi
 
 # 11. Build Play Store Bundle (and optionally upload to Play Console)
 # --play implies building the bundle (we need the .aab to upload).
-if [ -n "$AUTO_YES" ] || [ -n "$DO_PLAY" ]; then
+if [ -n "$DO_PLAY" ]; then
     REPLY=y
 else
-    echo ""
-    read -p "Build Play Store Bundle (.aab)? (y/n) " -n 1 -r
-    echo
+    REPLY=n
 fi
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo -e "${YELLOW}🔨 Building App Bundle for Play Store...${NC}"
-    ./gradlew bundleStandardRelease
+    ./gradlew bundleRelease
     
     # Rename AAB file
-    AAB_PATH="app/build/outputs/bundle/standardRelease"
+    AAB_PATH="app/build/outputs/bundle/release"
     if [ -f "$AAB_PATH/app-standard-release.aab" ]; then
-        mv "$AAB_PATH/app-standard-release.aab" \
-           "$AAB_PATH/PennyWise-v${NEXT_VERSION}.aab"
-        echo -e "${GREEN}✅ App Bundle created: $AAB_PATH/PennyWise-v${NEXT_VERSION}.aab${NC}"
+        mv "$AAB_PATH/app-release.aab" \
+           "$AAB_PATH/Mudal-v${NEXT_VERSION}.aab"
+        echo -e "${GREEN}✅ App Bundle created: $AAB_PATH/Mudal-v${NEXT_VERSION}.aab${NC}"
         
         # Show file size
-        SIZE=$(du -h "$AAB_PATH/PennyWise-v${NEXT_VERSION}.aab" | cut -f1)
+        SIZE=$(du -h "$AAB_PATH/Mudal-v${NEXT_VERSION}.aab" | cut -f1)
         echo "Size: $SIZE"
         
         if [ -n "$DO_PLAY" ]; then
@@ -485,10 +472,10 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
             echo ""
             echo -e "${YELLOW}📱 Play Store Upload Instructions:${NC}"
             echo "1. Go to https://play.google.com/console"
-            echo "2. Select PennyWise app"
+            echo "2. Select Mudal app"
             echo "3. Go to Release > Production (or Testing)"
             echo "4. Create new release"
-            echo "5. Upload: $AAB_PATH/PennyWise-v${NEXT_VERSION}.aab"
+            echo "5. Upload: $AAB_PATH/Mudal-v${NEXT_VERSION}.aab"
             echo "6. Add release notes from RELEASE_NOTES.md"
         fi
     fi
