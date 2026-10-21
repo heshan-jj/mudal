@@ -83,3 +83,41 @@ One-shot headless release with a Play draft:
 Release notes are generated from commit messages, so use conventional commits
 (`feat:`, `fix:`, `docs:`, `chore:` …). Better commit messages → better
 auto-generated changelog and GitHub release notes.
+
+---
+
+## Mudal fork notes
+
+### Before you release
+1. Be on `main`, up to date, with a clean working tree:
+   `git checkout main && git pull --ff-only && git status --porcelain`
+2. Confirm the signing key is present and matches the one in the fork's
+   Actions secrets (`local.properties` → `RELEASE_STORE_FILE` and the three
+   password/alias keys). The keystore file is gitignored — never commit it.
+3. Preview: `./scripts/release.sh minor --dry-run`
+
+### Supported banks
+The release notes must state plainly which banks are supported. Mudal ships
+parsers for **Sampath Bank, Commercial Bank of Ceylon, National Development
+Bank, National Savings Bank and Nations Trust Bank** — nothing else. If a
+parser is added, regenerate the catalogue first
+(`./scripts/update-supported-banks.sh`) so the README, the store listing and
+`docs/supported-banks.json` match the code.
+
+### Reproducibility notes
+- The build is a plain Gradle build with no proprietary steps: JDK 21,
+  Android SDK Platform 37, `./scripts/release.sh`.
+- The release APK is signed with the project's own key. Anyone rebuilding from
+  source gets a *different* signature (a different key) and therefore a
+  different package identity — which is why the key is backed up separately
+  and must never be rotated.
+- Version numbers and changelogs are owned by `scripts/release.sh`; never edit
+  `versionCode` / `versionName` or `fastlane/.../changelogs/<code>.txt` by hand.
+- The Play Store bundle is not built unless `--play` is passed. Mudal is
+  distributed through GitHub Releases and F-Droid.
+
+### F-Droid
+The `fastlane/metadata/android/` folder is the F-Droid listing. It carries a
+unique application ID (`com.mudal.tracker`), the store title, description and
+changelogs. The listing images are still upstream's screenshots and must be
+replaced with Mudal's own before the F-Droid submission.

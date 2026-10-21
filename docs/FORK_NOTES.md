@@ -373,3 +373,54 @@ upstream's `TRADEMARKS.md` before the first public push.
   generator's country pluralisation was fixed ("1 country", not "1 countries").
 - `docs/issue-tracker.md` (upstream's issue list) was removed; the fork tracks its own
   issues.
+
+---
+
+## 11. Release preparation and upstream sync dry run (2026-10-22)
+
+### Upstream sync dry run
+`git fetch upstream` then a merge of `upstream/main` onto a scratch branch
+(`upstream/main` was 10 commits ahead of us at the time). The merge produced
+**4 conflicts**, all in files the fork has deliberately changed:
+
+| File | Why the fork differs |
+|---|---|
+| `app/src/main/java/.../data/repository/LlmRepository.kt` | the fork replaced the on-device model with the Gemini assistant |
+| `app/src/main/java/.../presentation/statement/ImportStatementScreen.kt` | fork UI/branding changes |
+| `app/src/main/java/.../utils/CurrencyFormatter.kt` | LKR formatting for the fork |
+| `app/src/main/res/values-ar-rSA/strings_rules.xml` | the fork's re-brand sweep touched the translations |
+
+Everything else auto-merged, including `app/build.gradle.kts`,
+`AndroidManifest.xml` and `UserPreferencesRepository.kt`. The merge was
+aborted after the dry run and the scratch branch deleted — **no upstream commit
+has been merged yet.** Rule 2 still stands: keep the diff small so these four
+files stay the only points of friction.
+
+### Signing key
+The fork has its own Android release signing key, created 2026-10-22
+(4096-bit RSA, alias `mudal`, valid 10,000 days). It is **not** in the
+repository: the keystore file is gitignored and the credentials live in
+`local.properties` (gitignored) plus a backup outside the repo. The same
+keystore is also stored in the fork's GitHub Actions secrets
+(`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`) so the
+release workflow can sign.
+
+> The key must never be rotated. A different key means Android treats the next
+> build as a different app: users would have to uninstall, and with the
+> database encrypted that deletes their transaction history.
+
+### Release script
+`scripts/release.sh` still built the `standard` and `fdroid` flavours that
+Phase 1 removed, so a release would have failed. It now builds the single
+release variant, renames the APKs `Mudal-v<version>-*`, publishes those, and
+only builds the Play bundle when `--play` is passed. The `--web` flag is a
+no-op in this fork.
+
+### Line endings
+The repository stores LF. A Windows checkout with `core.autocrlf=true` puts
+CRLF in the working tree, which made the supported-banks staleness check
+(report: "README supported-banks block is stale") fail on Windows even when
+the content was identical — and that check runs inside the release. The
+comparison now normalises line endings, so the release works on both
+platforms. Set `core.autocrlf=false` in a fresh clone to keep the working
+tree byte-identical to the repository.
