@@ -24,11 +24,12 @@ Mudal only makes network calls for user-requested, explicit functionality:
 - **Payload:** Standard HTTP GET with the base currency code (e.g., `LKR`, `USD`). No user identifiers, device metadata, or transaction amounts are transmitted.
 - **Frequency:** Cached locally; refreshed periodically when multi-currency is active.
 
-### 2. On-Device AI Model Download (Optional)
-- **Endpoint:** `https://pub-fcfb3ffddb184540a758a7fe68249908.r2.dev/models/v1/Qwen2.5-1.5B-Instruct-q8-ekv4096.litertlm`
-- **Trigger:** Initiated only when the user explicitly taps "Download AI model" in Settings.
-- **Integrity Verification:** Downloaded binary is verified on-device against pinned SHA-256 (`faa60663b333290c1496c499828b21d3e3254a788cacd8cce917ce0f761a2dc9`) prior to loading into MediaPipe / LiteRT.
-- **Payload:** Plain HTTP GET for the static `.litertlm` weights file. Zero user data sent.
+### 2. AI Assistant (Optional, opt-in)
+- **Endpoint:** `https://generativelanguage.googleapis.com/` (Google Gemini API)
+- **Trigger:** Only used when the user configures their own Gemini API key in Settings and starts a chat.
+- **Key handling:** The API key is entered by the user, stored locally in the app's private DataStore, and sent only to Google. Mudal has no key of its own and no server in between.
+- **Payload:** The chat text plus the transaction context the assistant needs to answer questions about your spending (merchant names, amounts, categories and dates from your own database). Nothing is sent until the user enables the assistant and starts a conversation.
+- **Note:** This is the one place where data can leave the device. Everything else in Mudal — SMS parsing, categorisation, budgets, storage and the encrypted database — stays on the phone. If you do not configure a key, the assistant stays off and the app makes no AI requests.
 
 ### 3. User Webhooks (Custom Automation)
 - **Endpoint:** User-configured URLs (e.g., self-hosted n8n, Home Assistant, personal servers).

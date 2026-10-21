@@ -72,7 +72,7 @@ part of the gate — don't use them to verify.
 ## Architecture at a glance
 - **Stack:** Kotlin · Jetpack Compose + Material 3 · MVVM + Clean Architecture ·
   StateFlow (unidirectional data flow) · Hilt DI · Room · WorkManager (background
-  SMS scanning) · Google AI Edge LiteRT-LM (Qwen 2.5) for on-device AI.
+  SMS scanning) · optional Google Gemini API assistant (user-supplied key).
 - **Modules:** `app` (Android) · `parser-core` (pure-Kotlin bank SMS parsers, no
   Android deps) · `shared` (KMP) · `iosApp` · `pennywise-web`.
 - **UI:** Material You dynamic color (Android 12+), full light/dark with semantic

@@ -47,12 +47,11 @@ Mudal forks PennyWise AI to provide a focused, privacy-first personal finance tr
 | Dagger Hilt | Apache 2.0 |
 | Ktor Client | Apache 2.0 |
 | Haze & Haze Materials (Chris Banes) | Apache 2.0 |
-| MediaPipe / LiteRT / LiteRT-LM (Google) | Apache 2.0 |
 | **SQLCipher (`net.zetetic:sqlcipher-android`)** — *added by Mudal* | **BSD-3-Clause** |
 | Google Sans (app font) | Apache 2.0 |
 | Open Exchange Rates API (`open.er-api.com`) | Open data |
 
-The on-device AI assistant uses **Qwen2.5-1.5B-Instruct** (Apache 2.0), distributed in Google's LiteRT-LM `.litertlm` format.
+The optional AI assistant calls the **Google Gemini API** using the user's own API key. No model is bundled or downloaded, and Mudal has no key of its own.
 
 ---
 

@@ -20,14 +20,14 @@ Reading bank SMS is how the app works — it is the entire product. Everything h
 • Recurring transactions and subscriptions, so you can see what is coming before it lands
 • Smart rules to auto-categorize transactions your way
 
-★ On-device AI assistant
-Ask "what did I spend on food last month?" and get a real answer. The AI model (Qwen 2.5) runs locally on your phone — no API calls, no cloud, works offline.
+★ Optional AI assistant
+Ask "what did I spend on food last month?" and get a real answer. Mudal talks to Google Gemini using your own free API key, which you enter in Settings. Without a key the assistant stays switched off and the app makes no AI requests.
 
 ★ Private by design
 • No account, no login, no email required
 • No ads, no trackers, no analytics on your financial data
 • Your database is encrypted on the device
-• Nothing leaves your device
+• SMS parsing, categorisation and budgets never leave the device
 • Open source (AGPL-3.0) — read the code yourself
 
 ★ Completely free

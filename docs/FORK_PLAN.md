@@ -102,7 +102,7 @@ Acceptance: green baseline proven, or an exact error and the minimal fix. Owner 
 2. **Remove billing:** ship a single flavor derived from the `fdroid` flavor. Delete Dodo Payments code, license activation (`LICENSE_MOVE_URL`, `RSA_PUBLIC_KEY`), upgrade sheets and Pro UI. Remove `FreeTierLimits` and `EntitlementGate` usage so no limit exists anywhere (rules, imports, CSV rows, recurring templates, goals, merge, webhooks, analytics groupings, profiles). Verify with grep that no limit constants or billing dependencies remain, and that the merged manifest has no billing permissions.
 3. **Upstream-server dependencies:**
    - Replace the "report unrecognised SMS" flow (sends SMS body to pennywise.zynth.dev) with a local flow: show a masked preview (digit runs, names, balances masked, user-editable) and copy it to the clipboard or open a pre-filled issue on OUR repo. Sender and date only unless the user explicitly confirms the masked body.
-   - Model download: do not use upstream's R2 bucket. Find an official host for the same `.litertlm` model (e.g. Hugging Face litert-community) with SHA-256 verification, or support importing a model file via the file picker. Document the choice.
+   - Model download: the on-device LiteRT-LM model and its upstream R2 host were removed on 2026-10-22. The optional AI assistant now calls the Google Gemini API with a user-supplied key, so the app no longer depends on any upstream-hosted file.
    - Exchange rates: keep, but make it clearly optional and off until the user enables multi-currency. Note the endpoint in PRIVACY.md.
 4. Add `docs/PRIVACY.md` listing every network endpoint that remains, when it is used, and what is sent.
 5. Add `ATTRIBUTION.md`, in-app licenses screen, update README.
@@ -111,7 +111,7 @@ Acceptance: app installs side by side with the original under the new applicatio
 
 ### Phase 1 leftovers (still open)
 
-- [ ] **Model host.** The on-device LLM weights (`Qwen2.5-1.5B-Instruct-q8-ekv4096.litertlm`) are still fetched from **upstream's** Cloudflare R2 bucket — `Constants.ModelDownload.MODEL_URL` is byte-identical to upstream's. Either mirror the file to a host the project controls (the pinned SHA-256 keeps the verification intact) or add a file-picker import that verifies the same SHA-256. Until then the fork has one live dependency on upstream's infrastructure, which contradicts "no dependence on upstream servers".
+- [x] **Model host** — resolved on 2026-10-22: the on-device model and its upstream R2 download were removed outright. The optional AI assistant uses the user's own Gemini API key, so there is no longer any dependency on upstream-hosted files.
 - [ ] **Backup encryption.** Manual export writes plaintext JSON, and the scheduled folder backup writes it unattended. Rule 11 says no plaintext transaction file may reach shared storage without an explicit user action — the scheduled backup needs encrypting with the device key, or switching off.
 
 ---

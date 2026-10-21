@@ -118,10 +118,10 @@ Upstream contains 4 pre-existing Sri Lankan bank parsers under `parser-core/src/
 
 ## 5. Network Touchpoints Inventory
 
-1. **On-Device AI Model Weights:**
-   - URL: `https://pub-fcfb3ffddb184540a758a7fe68249908.r2.dev/models/v1/Qwen2.5-1.5B-Instruct-q8-ekv4096.litertlm`
-   - File: `app/src/main/kotlin/com/pennywiseai/tracker/data/ai/ModelDownloader.kt`
-   - Behavior: Downloads 1.5B quantized parameter model (~1GB) from upstream Cloudflare R2 bucket.
+1. **AI assistant (optional):**
+   - Endpoint: `https://generativelanguage.googleapis.com/` (Google Gemini API)
+   - File: `app/src/main/java/com/pennywiseai/tracker/data/service/GeminiLlmServiceImpl.kt`
+   - Behavior: Only active once the user configures their own Gemini API key. Sends the chat text plus the transaction context the assistant needs. Off by default; no Mudal-hosted key, no model download. (The upstream LiteRT-LM download from `r2.dev` was removed on 2026-10-22.)
 2. **Exchange Rates API:**
    - URL: `https://open.er-api.com/v6/latest/{currency}`
    - File: `app/src/main/kotlin/com/pennywiseai/tracker/data/remote/ExchangeRateApi.kt`

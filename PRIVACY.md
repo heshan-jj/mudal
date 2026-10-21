@@ -9,13 +9,13 @@ Mudal is built with privacy as the core principle. We believe your financial dat
 
 ## On-Device Processing
 
-**Transaction processing and AI run locally on your device.** AI features use an on-device LLM (Qwen 2.5, via Google AI Edge LiteRT-LM). The only data that ever leaves your device goes through the explicit outbound requests listed under Internet Permission below:
+**Transaction processing runs locally on your device.** Parsing, categorisation, budgets and storage never leave the phone. The only data that ever leaves your device goes through the explicit outbound requests listed under Internet Permission below (the optional AI assistant is the one feature that sends transaction context to a server — and only if you turn it on with your own API key):
 
-- ✅ **On-device AI** - Parsing and AI processing run locally; your transaction database never uploads anywhere
+- ✅ **Local by default** - Parsing, categorisation and budgets run on your device; your transaction database never uploads anywhere. The optional AI assistant is off unless you give it your own API key.
 - ✅ **No data collection** - No analytics, telemetry, or accounts; the one exception is the parse-report flow (see Internet Permission)
 - ✅ **No tracking** - No analytics, no telemetry, no user tracking
 - ✅ **No ads** - No advertising networks or tracking pixels
-- ✅ **Offline AI** - Once downloaded, AI works completely offline
+- ✅ **Offline core** - Everything except the optional AI assistant works with no internet connection at all
 
 ## Data Storage
 
@@ -53,11 +53,11 @@ Mudal is built with privacy as the core principle. We believe your financial dat
 - The lookup runs on-device and the feature stays dormant until you enable it in Settings
 
 ### Internet Permission
-- **Model Download**: One-time download of the ~1.5GB Qwen 2.5 model from a public Cloudflare R2 bucket, verified against a SHA-256 checksum before use
+- **AI assistant**: Optional. Uses the Google Gemini API (`https://generativelanguage.googleapis.com/`) with your own API key, stored locally in the app's private storage. Off until you configure a key.
 - **Exchange Rates**: Multi-currency features fetch current rates from open.er-api.com; only the currency code is sent
 - **Parse Reports**: The "report a parsing problem" action opens pennywise.zynth.dev with the SMS text and sender ID pre-filled. The link also carries an encrypted device identifier — your Android device ID plus a timestamp, RSA-encrypted on-device before it leaves. Opening the page sends these details to the server right away to generate a parsed preview; submitting the report itself remains a separate user action
 - **App Updates**: Google Play Store variant uses Play Services for app updates (F-Droid variant does not)
-- **After Model Download**: AI works completely offline, no internet required for core features
+- **Without the AI assistant**: everything works offline, no internet required
 
 No location, camera, or microphone permission is requested.
 
@@ -76,7 +76,7 @@ Mudal does **NOT** use:
 ## AI Features
 
 ### On-Device AI Assistant
-- Uses the Qwen 2.5 model (1.5GB download) via Google AI Edge LiteRT-LM
+- Uses the Google Gemini API with your own API key; Mudal runs no model locally and downloads nothing
 - Model runs entirely on your device; inference needs no network
 - After initial download, no internet connection required
 - Chat history is saved locally in the app's database so conversations survive restarts; it's never transmitted
