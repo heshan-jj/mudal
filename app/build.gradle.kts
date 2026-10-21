@@ -229,8 +229,6 @@ dependencies {
     // coroutines >= 1.11.0 provides it (see the litertlm note in libs.versions.toml, #599).
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
-    // LiteRT-LM for on-device LLM inference
-    implementation(libs.litertlm.android)
     
     testImplementation(libs.mockk)
     testImplementation(libs.ktor.client.mock)

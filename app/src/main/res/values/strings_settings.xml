@@ -345,8 +345,8 @@
 
     <!-- AI Features -->
     <string name="faq_ai_section">AI Features</string>
-    <string name="faq_ai_download_question">Why do I need to download the AI model?</string>
-    <string name="faq_ai_download_answer">The 750MB model enables on-device chat about your expenses without sending data to any server, ensuring complete privacy.</string>
+    <string name="faq_ai_download_question">How does the AI assistant work?</string>
+    <string name="faq_ai_download_answer">Mudal connects directly to Google Gemini (gemini-3.5-flash-lite) using your personal free API key. Your key is stored securely on your device.</string>
     <string name="faq_ai_ask_question">What can I ask the AI assistant?</string>
     <string name="faq_ai_ask_answer">You can ask about spending patterns, budget advice, transaction summaries, and general financial questions based on your data.</string>
 

@@ -326,7 +326,7 @@ class LlmRepository @Inject constructor(
 
         return """
         $PROMPT_MARKER
-        You are PennyWise AI, a friendly assistant inside an expense tracker. Today is ${context.currentDate}.
+        You are Mudal AI, a friendly assistant inside an expense tracker. Today is ${context.currentDate}.
         This month so far: ${CurrencyFormatter.formatCurrency(monthSummary.totalExpense, currency)} spent, ${CurrencyFormatter.formatCurrency(monthSummary.totalIncome, currency)} income, ${monthSummary.transactionCount} transactions.
 
         When the user tells you about money they spent, paid, bought or received, call addTransaction. Use EXPENSE unless they clearly received money.
@@ -357,7 +357,7 @@ class LlmRepository @Inject constructor(
         val currency = userPreferencesRepository.baseCurrency.first()
 
         return """
-        Hi! I'm PennyWise AI.
+        Hi! I'm Mudal AI.
 
         Tell me what you spent and I'll add it after you confirm — e.g. "coffee 120 at Starbucks" or "got 50000 salary". Ask "how much on groceries this month?" for a total.
 

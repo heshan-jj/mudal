@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+private val Context.defaultDataStore: DataStore<Preferences> by preferencesDataStore(
     name = "user_preferences",
     produceMigrations = { _ ->
         listOf(
@@ -61,7 +61,7 @@ open class UserPreferencesRepository(
     @Inject
     constructor(@ApplicationContext context: Context) : this(context, null)
 
-    private val activeDataStore: DataStore<Preferences> = customDataStore ?: context.run { dataStore }
+    private val activeDataStore: DataStore<Preferences> = customDataStore ?: context.defaultDataStore
     private val Context.dataStore: DataStore<Preferences> get() = activeDataStore
 
     private object PreferencesKeys {
@@ -77,7 +77,6 @@ open class UserPreferencesRepository(
         val COUNT_CREDIT_AS_EXPENSE = booleanPreferencesKey("count_credit_as_expense")
         val SYSTEM_PROMPT = stringPreferencesKey("system_prompt")
         val HAS_SHOWN_SCAN_TUTORIAL = booleanPreferencesKey("has_shown_scan_tutorial")
-        val ACTIVE_DOWNLOAD_ID = longPreferencesKey("active_download_id")
         val SMS_SCAN_MONTHS = intPreferencesKey("sms_scan_months")
         val SMS_SCAN_ALL_TIME = booleanPreferencesKey("sms_scan_all_time")
         val SMS_SCAN_USE_CUSTOM_DATE = booleanPreferencesKey("sms_scan_use_custom_date")
@@ -379,24 +378,6 @@ open class UserPreferencesRepository(
     suspend fun markScanTutorialShown() {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.HAS_SHOWN_SCAN_TUTORIAL] = true
-        }
-    }
-    
-    suspend fun saveActiveDownloadId(id: Long) {
-        context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.ACTIVE_DOWNLOAD_ID] = id
-        }
-    }
-    
-    suspend fun getActiveDownloadId(): Long? {
-        return context.dataStore.data
-            .map { preferences -> preferences[PreferencesKeys.ACTIVE_DOWNLOAD_ID] }
-            .first()
-    }
-    
-    suspend fun clearActiveDownloadId() {
-        context.dataStore.edit { preferences ->
-            preferences.remove(PreferencesKeys.ACTIVE_DOWNLOAD_ID)
         }
     }
     

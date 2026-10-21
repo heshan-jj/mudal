@@ -35,14 +35,6 @@ pdfboxAndroid = "2.0.27.0"
 review = "2.0.2"
 reviewKtx = "2.0.2"
 roomVersion = "2.8.4"
-# litertlm >= 0.14 is compiled with -Xjvm-default=all and calls
-# SendChannel.close$default as an interface static. kotlinx-coroutines only
-# ships that static from 1.11.0 (built with jvm-default statics); app/build.gradle.kts
-# pins coroutines-core/-android to 1.11.0 for exactly this reason. Verified on the
-# emulator: chat + generation complete without the #599 NoSuchMethodError, and
-# generation is ~3x faster than 0.13.1. 0.17.0 additionally needs a Hilt bump
-# (Kotlin 2.4 metadata) — not done yet.
-litertlm = "0.16.1"
 visionInternalVkp = "18.2.3"
 workVersion = "2.11.2"
 coil = "2.7.0"
@@ -110,7 +102,6 @@ opencsv = { module = "com.opencsv:opencsv", version.ref = "opencsv" }
 pdfbox-android = { module = "com.tom-roush:pdfbox-android", version.ref = "pdfboxAndroid" }
 review = { module = "com.google.android.play:review", version.ref = "review" }
 review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "reviewKtx" }
-litertlm-android = { module = "com.google.ai.edge.litertlm:litertlm-android", version.ref = "litertlm" }
 vision-internal-vkp = { group = "com.google.mlkit", name = "vision-internal-vkp", version.ref = "visionInternalVkp" }
 
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
