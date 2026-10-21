@@ -30,7 +30,7 @@ for none.
 | 5 | Sinhala localisation | optional, post-v1.0 |
 | 6 | Budget rollover + alerts | optional, post-v1.0 |
 | 7 | Offline build variant | optional, post-v1.0 |
-| 8 | Release (F-Droid + GitHub Releases) | not started |
+| 8 | Release (F-Droid + GitHub Releases) | **v2.24.0 published** — https://github.com/heshan-jj/mudal/releases/tag/v2.24.0 |
 
 **Next phase: finish Phase 2.** Outstanding items are listed in the Phase 2
 section — they are the known blockers, not a wish list.

@@ -424,3 +424,49 @@ the content was identical — and that check runs inside the release. The
 comparison now normalises line endings, so the release works on both
 platforms. Set `core.autocrlf=false` in a fresh clone to keep the working
 tree byte-identical to the repository.
+
+---
+
+## 12. v2.24.0 — first public release (2026-10-22)
+
+**Release:** https://github.com/heshan-jj/mudal/releases/tag/v2.24.0
+(`Mudal-v2.24.0-universal.apk`, 25.4 MB, plus its `.sha256`)
+
+### What was verified before publishing
+- `:parser-core:jvmTest` — 60 tests, 0 failures.
+- `:app:testDebugUnitTest` — 703 tests, 0 failures.
+- Release build with R8 minification: `assembleRelease` succeeded (10m13s).
+- Signature: verified with `apksigner` (v2 scheme), signer
+  `CN=Mudal, OU=Mobile, O=Mudal, L=Colombo, ST=Western Province, C=LK`.
+- Manifest: `com.mudal.tracker`, versionCode 108, versionName 2.24.0, minSdk 26,
+  targetSdk 36, no `BILLING` permission, not debuggable, label "Mudal".
+- Native libraries: `libsqlcipher.so` is bundled for arm64-v8a, armeabi-v7a and
+  x86_64.
+- On-device: installed the release APK on the Pixel 8 emulator, completed
+  onboarding, and a real Sampath SMS was parsed into a transaction
+  (`Pickme · 21 Oct · Income · +Rs.5,000`).
+- On-disk encryption: the database file's first 16 bytes are not
+  `SQLite format 3` — the file is encrypted, not a readable SQLite database.
+- Security pass: exported components are the launcher activity, the
+  `BIND_QUICK_SETTINGS_TILE` service, the `BROADCAST_SMS` receiver and the
+  app-widget receivers — each is either required to be exported or protected by
+  a system permission. Release builds strip `Log.d`/`Log.v`/`Log.i` via
+  ProGuard, so transaction amounts and merchant names never reach logcat in a
+  release. No SMS body is logged anywhere. The Maven Central dependencies
+  (Ktor, Gson, zxing, OpenCSV, SQLCipher, kotlinx-serialization, Hilt) were
+  checked against GitHub's advisory database: no known advisories at the
+  pinned versions.
+
+### Two things that broke on the way, and are now fixed
+1. `scripts/release.sh` and the CI workflow still built the `standard` and
+   `fdroid` flavours that Phase 1 removed.
+2. The project builds a single universal APK, so the per-ABI rename matched
+   nothing and `gh release create` failed. The release object was created by
+   hand; the script and the workflow are fixed for next time.
+
+### Not done (deliberately)
+- **F-Droid submission** is still blocked: the listing images in
+  `fastlane/metadata/android/en-US/images/` are still upstream's screenshots
+  and show the old branding. They need replacing with Mudal's own.
+- No Play Store submission: the plan does not target the Play SMS-permission
+  policy yet, and the store build is only produced with `--play`.
