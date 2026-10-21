@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.heshan.moneytracker"
+        applicationId = "com.mudal.tracker"
         minSdk = 26
         targetSdk = 36
         versionCode = 107

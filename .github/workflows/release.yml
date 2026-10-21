@@ -350,7 +350,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1.1.3
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
-          packageName: com.heshan.moneytracker
+          packageName: com.mudal.tracker
           releaseFiles: app/build/outputs/bundle/release/Mudal-v${{ steps.next_version.outputs.version }}.aab
           track: ${{ inputs.play_store_track }}
           status: ${{ inputs.play_store_status }}

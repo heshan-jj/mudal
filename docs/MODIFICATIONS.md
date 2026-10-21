@@ -18,7 +18,7 @@ Generated: 2026-10-21.
 
 ## 1. Phase 1 — Identity, de-commercialisation, privacy cleanup
 
-- Rebrand to **Mudal** (`com.heshan.moneytracker`), own launcher icon, splash screen and font.
+- Rebrand to **Mudal** (`com.mudal.tracker`), own launcher icon, splash screen and font.
 - Removed the billing/licensing stack, paywall UI and all feature limits (`EntitlementGate` now
   reports Pro unconditionally; `FreeTierLimits` deleted).
 - Replaced the remote unrecognised-SMS report flow with local masking (`SmsReportUrlBuilder`).

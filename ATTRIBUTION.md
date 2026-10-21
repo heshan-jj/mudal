@@ -16,7 +16,7 @@ Mudal is an independent fork of [PennyWise AI](https://github.com/sarim2000/penn
 Mudal forks PennyWise AI to provide a focused, privacy-first personal finance tracker tailored for Sri Lankan users. Every modified source file carries a `Mudal fork:` notice; the summary below is the human-readable version.
 
 ### Phase 1 — Identity, de-commercialisation, privacy cleanup
-1. **Rebranding:** App renamed to **Mudal** (මුදල්), with its own launcher icon, splash screen and font under application ID `com.heshan.moneytracker`. The Kotlin package namespace `com.pennywiseai.tracker` is deliberately left unchanged to keep the diff against upstream small and reviewable.
+1. **Rebranding:** App renamed to **Mudal** (මුදල්), with its own launcher icon, splash screen and font under application ID `com.mudal.tracker`. The Kotlin package namespace `com.pennywiseai.tracker` is deliberately left unchanged to keep the diff against upstream small and reviewable.
 2. **Complete de-commercialisation:** Removed all billing code (Play Billing, Dodo Payments, licence activation, RSA device fingerprinting), paywall UI, `FreeTierLimits` and every `EntitlementGate` limit. All capabilities (rules, statement imports, CSV export, recurring templates, goals, account merge, webhooks, analytics groupings) are unlocked.
 3. **Privacy decoupling:** The remote "report unrecognised SMS" flow (which sent the SMS body to `pennywise.zynth.dev`) was replaced with local, on-device regex masking plus a user-reviewed GitHub issue link. No raw SMS leaves the device.
 4. **Sri Lankan defaults:** Base currency `LKR`, `Rs.` formatting, locale-aware numbers and dates.

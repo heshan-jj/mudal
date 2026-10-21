@@ -60,7 +60,7 @@ See [NOTICE](NOTICE), [ATTRIBUTION.md](ATTRIBUTION.md), [docs/MODIFICATIONS.md](
 ```
 
 Output APK is generated at:
-`app/build/outputs/apk/debug/app-debug.apk` — application ID `com.heshan.moneytracker` (`.debug` suffix on debug builds).
+`app/build/outputs/apk/debug/app-debug.apk` — application ID `com.mudal.tracker` (`.debug` suffix on debug builds).
 
 > The Kotlin package namespace is still `com.pennywiseai.tracker` and the
 > `parser-core` module keeps its upstream layout. That is deliberate: it keeps

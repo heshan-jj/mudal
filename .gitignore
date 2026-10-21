@@ -104,3 +104,6 @@ iosApp/fastlane/report.xml
 
 # git worktrees (superpowers SDD)
 .worktrees/
+
+# Agent scratch directories
+/.superpowers/

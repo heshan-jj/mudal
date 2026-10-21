@@ -3,7 +3,7 @@ package com.pennywiseai.tracker.presentation.navigation
 import com.pennywiseai.tracker.R
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Home
@@ -35,7 +35,7 @@ sealed class BottomNavItem(
     data object Chat : BottomNavItem(
         route = "chat",
         titleRes = R.string.nav_chat,
-        icon = Icons.AutoMirrored.Filled.Chat
+        icon = Icons.Default.AutoAwesome
     )
 
     companion object {
