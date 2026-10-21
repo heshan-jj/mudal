@@ -1,10 +1,11 @@
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 # Privacy Policy
 
 **Last Updated: August 2026**
 
 ## Our Commitment to Privacy
 
-PennyWise AI is built with privacy as the core principle. We believe your financial data should remain yours alone.
+Mudal is built with privacy as the core principle. We believe your financial data should remain yours alone.
 
 ## On-Device Processing
 
@@ -26,7 +27,7 @@ PennyWise AI is built with privacy as the core principle. We believe your financ
 ### Where It's Stored
 - All data is stored in a local SQLite database on your device
 - Database is protected by Android's app sandboxing
-- Data is only accessible to PennyWise AI app
+- Data is only accessible to Mudal app
 
 ### Data Deletion
 - Uninstalling the app completely removes all data
@@ -48,7 +49,7 @@ PennyWise AI is built with privacy as the core principle. We believe your financ
 - Optional app lock via fingerprint or face unlock
 
 ### Contacts (`READ_CONTACTS`, off by default)
-- PennyWise ships this permission for one opt-in feature: contact lookup, which can resolve a UPI VPA like `merchant@ybl` into a name from your address book so merchant lists read naturally
+- Mudal ships this permission for one opt-in feature: contact lookup, which can resolve a UPI VPA like `merchant@ybl` into a name from your address book so merchant lists read naturally
 - The lookup runs on-device and the feature stays dormant until you enable it in Settings
 
 ### Internet Permission
@@ -62,7 +63,7 @@ No location, camera, or microphone permission is requested.
 
 ## Third-Party Services
 
-PennyWise AI does **NOT** use:
+Mudal does **NOT** use:
 - ❌ Cloud storage, backup, or sync of your transaction data
 - ❌ Analytics services (Google Analytics, Firebase, etc.)
 - ❌ Crash reporting services
@@ -91,14 +92,14 @@ When you export your data:
 
 ## Open Source Transparency
 
-PennyWise AI is fully open source:
-- Review our code at [GitHub](https://github.com/sarim2000/pennywiseai-tracker)
+Mudal is fully open source:
+- Review our code at [GitHub](https://github.com/heshan-jj/mudal)
 - Verify our privacy claims yourself
 - Contribute to make it even better
 
 ## Children's Privacy
 
-PennyWise AI is not directed at children under 13. We do not knowingly collect information from children.
+Mudal is not directed at children under 13. We do not knowingly collect information from children.
 
 ## Changes to Privacy Policy
 
@@ -110,13 +111,13 @@ Any changes to this privacy policy will be:
 ## Contact
 
 For privacy concerns or questions:
-- Open an issue on [GitHub](https://github.com/sarim2000/pennywiseai-tracker/issues)
+- Open an issue on [GitHub](https://github.com/heshan-jj/mudal/issues)
 - Join our [Discord community](https://discord.gg/H3xWeMWjKQ)
 
 ## Summary
 
-**Your financial data lives on your phone.** Transactions, balances, budgets, and chat history all sit in a local database inside the app sandbox, and uninstalling removes everything. PennyWise has no analytics or cloud-sync backend; the outbound requests listed under Internet Permission are the complete list.
+**Your financial data lives on your phone.** Transactions, balances, budgets, and chat history all sit in a local database inside the app sandbox, and uninstalling removes everything. Mudal has no analytics or cloud-sync backend; the outbound requests listed under Internet Permission are the complete list.
 
 ---
 
-*PennyWise AI - Privacy-first expense tracking with on-device AI*
+*Mudal - Privacy-first expense tracking with on-device AI*

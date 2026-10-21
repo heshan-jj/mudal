@@ -1,8 +1,10 @@
+<!-- Mudal fork: new file in Mudal, a fork of PennyWise AI (AGPL-3.0-only), 2026-10-21 - see NOTICE. -->
 # Fork plan: Sri Lankan SMS expense tracker (fork of PennyWise AI)
 
-**Revision 2** — trimmed to a shippable v1.0 scope, with the Phase 2 gaps
-filled in (plaintext→encrypted upgrade, key-loss handling, backup rules) and the
-optional phases demoted. What changed and why is listed at the end.
+**Revision 3** — trimmed to a shippable v1.0 scope, with the Phase 2 gaps
+filled in (plaintext→encrypted upgrade, key-loss handling, backup rules), the
+optional phases demoted, and Phase 4 added for SMS-aware recurring transactions
+and subscriptions. What changed and why is listed at the end.
 
 **How to use:** this file lives at `docs/FORK_PLAN.md` in the fork. Give the agent
 one phase at a time: "Do Phase N from docs/FORK_PLAN.md." Each phase ends with a
@@ -12,7 +14,7 @@ stop-and-report. Do not let it run ahead.
 
 ## Release scope (read this first)
 
-**v1.0 = Phase 1 + Phase 2 + Phase 3 (Sampath + Commercial Bank only) + Phase 7.**
+**v1.0 = Phase 1 + Phase 2 + Phase 3 (Sampath + Commercial Bank only) + Phase 4 (recurring transactions & subscriptions) + Phase 8 (release).**
 
 Everything else in this document is **post-v1.0** and optional. If time is
 short, stop at v1.0 and ship. A working app for two banks beats a complete app
@@ -23,11 +25,12 @@ for none.
 | 0 | Fork + baseline verification | done — `phase-0-done` |
 | 1 | Identity, de-commercialise, privacy cleanup | done — `phase-1-done` (`8c26effa`) |
 | 2 | Database encryption (SQLCipher) | **in progress** — see outstanding items below |
-| 3 | Parsers: Sampath + Commercial Bank | samples collected, parsers not started |
-| 4 | Sinhala localisation | optional, post-v1.0 |
-| 5 | Budget rollover + alerts | optional, post-v1.0 |
-| 6 | Offline build variant | optional, post-v1.0 |
-| 7 | Release (F-Droid + GitHub Releases) | not started |
+| 3 | Parsers: Sampath + Commercial Bank | done — parsers implemented, audited against real samples, tests green |
+| 4 | Recurring transactions & subscriptions (SMS-aware) | **must-have for v1.0** |
+| 5 | Sinhala localisation | optional, post-v1.0 |
+| 6 | Budget rollover + alerts | optional, post-v1.0 |
+| 7 | Offline build variant | optional, post-v1.0 |
+| 8 | Release (F-Droid + GitHub Releases) | not started |
 
 **Next phase: finish Phase 2.** Outstanding items are listed in the Phase 2
 section — they are the known blockers, not a wish list.
@@ -47,6 +50,7 @@ Take `sarim2000/pennywiseai-tracker` (Kotlin, Jetpack Compose, Room, Hilt, KMP p
 - Network touchpoints upstream: Dodo Payments licensing, a Cloudflare Worker license URL, exchange rates (open.er-api.com), model download from upstream's own R2 bucket, "report SMS" flow that sends SMS body + sender to pennywise.zynth.dev.
 - `TRADEMARKS.md` reserves the PennyWise name, logo and banner. Forks must rebrand.
 - Cashiro is a downstream fork of PennyWise that diverged around v2.15.43 and then fell far behind (834 upstream commits since). Lesson: keep our diff small so we can keep pulling upstream.
+- **Recurring transactions and subscriptions already exist** upstream (`RecurringTransactionsScreen`, `SubscriptionsScreen`) and are ungated after Phase 1. They were built for a manual-entry workflow, not an SMS-first one, and today they double-count charges and miss price changes — see Phase 4.
 
 ## Non-negotiable rules
 1. **Keep the diff small.** Add new files instead of editing existing ones where possible. Do NOT rename Kotlin packages. Change `applicationId`, app name, icons and strings only. Leave `iosApp` and KMP structure alone (just don't build iOS).
@@ -61,6 +65,7 @@ Take `sarim2000/pennywiseai-tracker` (Kotlin, Jetpack Compose, Room, Hilt, KMP p
 10. No secrets in git. Release signing comes from `local.properties`/CI secrets only.
 11. **Backups and exports are part of the privacy boundary.** No plaintext transaction file may be written to shared storage without an explicit user action, and every export format must be documented in `PRIVACY.md`.
 12. **Record deviations.** If the agent does something other than what this plan says, write it down in `docs/FORK_NOTES.md` (short, dated) before reporting the phase done. A silent deviation is a bug.
+13. **One real-world event = one transaction.** A charge that arrives as an SMS must not also be created by a recurring template, and a transfer between the user's own accounts must not be counted as income and spending at the same time. Reconciliation lives in the app layer, not in the parser — the parser only reports what the bank said.
 
 ## Working agreement
 - Work autonomously inside the phase. Record decisions in `docs/FORK_NOTES.md` (short, dated).
@@ -104,6 +109,11 @@ Acceptance: green baseline proven, or an exact error and the minimal fix. Owner 
 
 Acceptance: app installs side by side with the original under the new applicationId; no reference to Pro/billing/Dodo remains (grep evidence); network audit lists only the documented endpoints; tests still green.
 
+### Phase 1 leftovers (still open)
+
+- [ ] **Model host.** The on-device LLM weights (`Qwen2.5-1.5B-Instruct-q8-ekv4096.litertlm`) are still fetched from **upstream's** Cloudflare R2 bucket — `Constants.ModelDownload.MODEL_URL` is byte-identical to upstream's. Either mirror the file to a host the project controls (the pinned SHA-256 keeps the verification intact) or add a file-picker import that verifies the same SHA-256. Until then the fork has one live dependency on upstream's infrastructure, which contradicts "no dependence on upstream servers".
+- [ ] **Backup encryption.** Manual export writes plaintext JSON, and the scheduled folder backup writes it unattended. Rule 11 says no plaintext transaction file may reach shared storage without an explicit user action — the scheduled backup needs encrypting with the device key, or switching off.
+
 ---
 
 # Phase 2: Database encryption — IN PROGRESS
@@ -137,7 +147,7 @@ users; it does not protect the owner's device.
 - [ ] Plaintext→encrypted upgrade path + test (item 3) — **the owner's device hits this on first launch**
 - [ ] Remove the in-memory fallback; fail loudly into the error screen (item 4)
 - [ ] Close-before-delete in `resetDatabaseAndKey()`; rebuild the instance after (item 5)
-- [ ] `allowBackup=false` or explicit `data_extraction_rules.xml` exclusions (item 6)
+- [x] `allowBackup=false` — already set in `AndroidManifest.xml`; `data_extraction_rules.xml` / `backup_rules.xml` are inert while it is (item 6)
 - [ ] Decide and document the backup-encryption story (item 7)
 - [ ] Delete the now-dead `PennyWiseDatabase.getInstance()` path — it builds a second Room instance with a separate key manager, so key-loss detected there never reaches the UI
 - [ ] `System.loadLibrary("sqlcipher")` must not be swallowed by a bare `catch (Throwable)` — log and rethrow, so "library missing" is not reported as "file is not a database"
@@ -161,7 +171,7 @@ collection, not the code, so do not treat the list below as a backlog.
 **Owner still to confirm for the two sampled banks:** the real sender IDs (Sampath assumed `SAMPATHTXN`; Commercial Bank unknown), and whether the two Commercial Bank "Credit for Rs." messages are income or something else.
 
 The agent:
-1. Audit the Sampath parser against the owner's real samples; fix gaps and add fixtures. Known gaps from the samples: `via ATM at <loc> CASH SET`, `via POS at <merchant> <ref>`, `for TFR <name> -<ref>`, `for TRRR/…`, `for CEFTLV-01-…`, `for VSRPMT-<ref>`, `for Interest: …`, `for eCom/REV <merchant>` (reversal credits), amounts written `LKR .56` with no leading zero, and merchant strings where the trailing `" - <ref>"` strip mangles `PERERA - SONS BAKERS ( MA 51001413`.
+1. Audit the Sampath parser against the owner's real samples; fix gaps and add fixtures. Known gaps from the samples: `via ATM at <loc> CASH SET`, `via POS at <merchant> <ref>`, `for TFR <name> -<ref>`, `for TRRR/…`, `for CEFTLV-01-…`, `for VSRPMT-<ref>`, `for Interest: …`, `for eCom/REV <merchant>` (reversal credits), amounts written `LKR .56` with no leading zero, and merchant strings where the trailing `" - <ref>"` strip mangles `PERERA - SONS BAKERS ( MA 51001413`. **Note, and do not "fix" in the parser:** a `"credited to AC **NNNN for <note>"` message is syntactically a credit, but the note is often the user's own transfer label (`Netflix`, `Seylan card`, `Expenses`, `Vishwa-Cash`), so it is often an internal move or a payment out, not income. The parser reports what the bank said; Phase 4 item 6 reconciles it.
 2. Add a Commercial Bank parser following the smallest existing pattern (`BankParser` base, `getBankName`, `getCurrency` = LKR, `canHandle(sender)` from the real sender ID, amount/type/merchant/balance/account-last4 extraction). Three message shapes to cover: card purchase (`Dear Cardholder, Purchase at … has been authorised on your debit card ending #4101.`), ATM withdrawal (`Withdrawal at … from card ending #4101.`), and branch credit (`Credit for Rs. … at <hh:mm> at DIGITAL BANKING DIVISION` — no date in the body). Currency prefixes differ (`LKR` vs `Rs.`), dates are `dd/MM/yy hh:mm AM/PM`, and "authorised" still means a spend.
 3. Handle Sri Lankan formats: `Rs.` / `Rs ` / `LKR` prefixes, comma thousands, two-decimal amounts, date formats actually seen in samples, masked card numbers, multi-line messages, trailing promo or OTP text.
 4. Fixtures use the owner's masked real samples plus negative cases. Use the existing `ParserTestUtils` dynamic tests.
@@ -177,7 +187,39 @@ Optional: offer the Sri Lankan parsers upstream as PRs to PennyWise (smaller for
 
 ---
 
-# Phase 4: Sinhala localisation — OPTIONAL, post-v1.0
+# Phase 4: Recurring transactions & subscriptions (SMS-aware) — MUST-HAVE for v1.0
+
+**Do not build this from scratch.** Both features already exist upstream and are ungated after Phase 1:
+- **Subscriptions** — `SubscriptionsScreen` (`MainScreen.kt`), `SubscriptionEntity`/`SubscriptionDao`/`SubscriptionRepository`, `MarkSubscriptionPaidUseCase`, `SubscriptionTabContent`. The SMS path already matches a parsed charge to a subscription (`SmsTransactionProcessor` → `matchTransactionToSubscription`).
+- **Recurring templates** — `RecurringTransactionsScreen` (`PennyWiseNavHost.kt`), `RecurringTransactionEntity`/`Dao`/`Repository`, `RecurringTransactionWorker` → `RecurringTransactionRepository.materializeDue()`.
+
+**What is missing is the part that matters for an SMS-first tracker: the bank already tells us when a recurring charge happens, so the app must not book it twice, and it must keep recognising it when the price changes.**
+
+1. **Recurring templates must be matched by the SMS path, not only subscriptions.** Today `SmsTransactionProcessor` checks `matchTransactionToSubscription` and never looks at templates. So a template for "CEB electricity, LKR 4,000, due on the 5th" plus the bank's SMS for that same charge books **two** transactions in one cycle. Fix: match parsed charges against active templates as well.
+2. **The bank's charge wins.** When an SMS matches a template or subscription for a cycle, that SMS transaction is the real one — real amount, real timestamp, real merchant. The template must then **not** materialise a second transaction for that cycle: advance its next due date and skip that cycle. The template's existing deterministic hash (`RECURRING_{id}_{amount}_{merchant}_{dueDate}`) only stops the template double-posting *itself*; it does nothing about the SMS.
+3. **Matching must survive real bank strings.**
+   - *Merchant*: case-insensitive, tolerant of bank noise (`eCom`, `REV`, `Mo MASTTERM`, `Co 76134439`, trailing refs). Compare normalised tokens, not exact strings.
+   - *Amount*: the current subscription match is exact within 5% (`SubscriptionRepository.areAmountsEqual`). Real prices change — the owner's own samples show Netflix at LKR 1,000.00 (19/09) then LKR 1,500.00 (21/10). Use a wider tolerance (e.g. ±15%) or "same merchant within the billing window". Never match on amount alone.
+   - *Date*: the charge must fall inside the cycle's window (due date ±N days), so a charge months later cannot match a stale template.
+4. **Link the charge to what it fulfils.** `TransactionEntity` has `is_recurring` but no link column. Add a nullable `recurring_template_id` / `subscription_id` (migration + migration test, rule 9), set it on a match, and drive "upcoming vs paid" from the link instead of re-matching by string.
+5. **Separate the two concepts in the data and the UI.**
+   - *Subscription* = a recurring charge billed by someone else (Netflix, Dialog, CEB) — tracked against the real charge.
+   - *Recurring template* = spend the user schedules themselves (rent in cash, allowance) — materialised by the app when no bank SMS arrives.
+   Let the user create either one from an existing transaction or a parsed SMS, and state plainly which one the SMS path reconciles against.
+6. **Own-account transfers must not distort income and spending.** The Sampath samples contain matching debit/credit pairs for one transfer seconds apart (17/09 10:05:33, 20/10 09:34:48, 20/10 09:42:02, 18/10 08:20:13, 13/10 08:48:22). These are internal moves — not income, not spending — yet the bank labels them "credited ... for <note>", so a parser can only call them income. Detect and pair them in the app (same amount, seconds apart, matching reference) and treat them as transfers. This is rule 13, and it is a prerequisite for budget rollover (6a) and the forecast (6b) to mean anything.
+7. **Tests** — fixtures from the owner's samples in `docs/lk-samples/`:
+   - double-count regression: one template + one SMS in the same cycle → exactly one transaction
+   - price change: Netflix LKR 1,000 → LKR 1,500 still matches the subscription and advances it
+   - no cross-match: two different merchants with the same amount must not match each other
+   - transfer pair: debit + credit seconds apart → one transfer, zero net income/spend
+   - unmatched cycle: a template whose SMS never arrives still materialises on the due date
+8. **UI**: show *paid* / *overdue* / *scheduled* per subscription and template, and surface the next expected charge on the Home screen.
+
+Acceptance: no double counting in any scenario above; the owner's real samples replayed through the app produce no duplicate and no phantom income; `:app:testStandardDebugUnitTest` green; migration + migration test for any schema change; `./init.sh app` green with quoted output.
+
+---
+
+# Phase 5: Sinhala localisation — OPTIONAL, post-v1.0
 
 **Deferred on purpose.** Full string translation of a large Compose app, layout
 verification with long strings, and font/rendering checks is weeks of work —
@@ -195,7 +237,7 @@ Acceptance: fresh install defaults to LKR with sensible categories; Sinhala rend
 
 ---
 
-# Phase 5: Budget rollover and alerts — OPTIONAL, post-v1.0
+# Phase 6: Budget rollover and alerts — OPTIONAL, post-v1.0
 
 **Deferred on purpose.** Each item here is a Room migration, a migration test,
 and new UI. Anomaly flags and "committed amounts" are nice-to-haves that upstream
@@ -218,7 +260,7 @@ Acceptance: new tests green, migration tests green, manual flows work on emulato
 
 ---
 
-# Phase 6: Offline build variant — OPTIONAL, lowest priority
+# Phase 7: Offline build variant — OPTIONAL, lowest priority
 
 **Deferred on purpose.** A whole extra flavour — new applicationId suffix,
 merged release manifest, a CI job that fails the build, and double the release
@@ -232,9 +274,9 @@ listing or a privacy-focused buyer makes it worth the release-matrix cost.
 
 ---
 
-# Phase 7: Release
+# Phase 8: Release
 
-1. CI: tests, debug build, lint, offline-manifest check. Fix anything flaky.
+1. CI: tests, debug build, lint, offline-manifest check (only if the optional Phase 7 variant exists). Fix anything flaky.
 2. Signed release APK via CI secrets, GitHub Releases workflow, F-Droid metadata (unique applicationId, fastlane metadata folder, reproducibility notes). Do not target Play Store yet — its SMS-permission policy is a separate project, and F-Droid needs no store account.
 3. Docs: README with screenshots, `PRIVACY.md`, `CONTRIBUTING.md`, "How to add a Sri Lankan bank" guide with a worked example and masking instructions, issue templates ("Add or fix a bank parser" asking for masked samples).
 4. Security pass: manifest exported components, no sensitive logging (grep test), dependency audit, DB encryption verified again on the release build, backup behaviour re-checked against `PRIVACY.md`.
@@ -254,16 +296,24 @@ Acceptance: fresh clone to running app following the README; release APK passes 
 
 ---
 
-# Revision 2 changelog
+# Revision 3 changelog
 
-**Trimmed:**
-- Added a release scope up front: v1.0 = Phases 1+2+3(2 banks)+7. Everything else is marked optional/post-v1.0.
-- Phase 4: Sinhala/Tamil → Sinhala first, needs a native reviewer, post-v1.0.
-- Phase 5: split into 5a–5e; 5a (rollover + alerts) is the only candidate for the next cycle.
-- Phase 6: marked optional/lowest priority.
+**Revision 3 — added Phase 4 (recurring transactions & subscriptions).**
+- New **Phase 4: Recurring transactions & subscriptions (SMS-aware)** — a v1.0 must-have. Both features already exist upstream and are ungated after Phase 1; the phase fixes the parts that break under an SMS-first workflow: templates are not matched by the SMS path (double counting), subscription matching is exact within 5% (misses price changes — Netflix LKR 1,000 → 1,500 in the owner's own samples), there is no link column on the transaction, and own-account transfer pairs are booked as income *and* spending.
+- New rule 13: **one real-world event = one transaction.**
+- Phases 4–7 renumbered to 5–8; the release scope line now reads v1.0 = Phases 1+2+3(2 banks)+4+8.
+- Phase 3 now points at Phase 4 for the "credited ... for &lt;note&gt;" semantics instead of leaving it to the parser.
+
+**Revision 2 — trimmed to a shippable v1.0 scope.**
+
+*Trimmed:*
+- Added a release scope up front. Everything else is marked optional/post-v1.0.
+- Sinhala/Tamil → Sinhala first, needs a native reviewer, post-v1.0.
+- Budget rollover and alerts split into 5a–5e; 5a (rollover + alerts) is the only candidate for the next cycle.
+- Offline build variant marked optional/lowest priority.
 - Phase 3: bank list reduced to the two sampled banks, with the owner's per-bank cost stated so it reads as "as samples arrive", not as a backlog.
 
-**Filled in:**
+*Filled in:*
 - Phase 2: plaintext→encrypted upgrade path (the owner's own device needs it), no in-memory fallback, close-before-delete on reset, explicit `allowBackup` rules, backup threat model, extra tests, and a checklist of outstanding items.
 - Rule 2: sync before every schema-touching phase. New rules 11 (backups are part of the privacy boundary) and 12 (record deviations).
 - Phase 0/1 marked done with the verified test numbers.

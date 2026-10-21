@@ -6,4 +6,4 @@ What's New in v2.15.30
 • Improved Settings and FAQ screen layouts
 • Various performance improvements and bug fixes
 
-Thank you for using PennyWise! Your feedback helps us
+Thank you for using Mudal! Your feedback helps us

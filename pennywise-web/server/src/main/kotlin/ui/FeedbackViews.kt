@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.example.ui
 
 import com.example.feedback.*
@@ -10,7 +11,7 @@ object FeedbackViews {
     suspend fun ApplicationCall.respondFeedbackPage() {
         respondHtml(HttpStatusCode.OK) {
             head {
-                SharedComponents.apply { commonHead("PennyWise AI - Feedback", htmx = true) }
+                SharedComponents.apply { commonHead("Mudal - Feedback", htmx = true) }
                 style {
                     unsafe {
                         +SharedComponents.commonStyles
@@ -23,7 +24,7 @@ object FeedbackViews {
 
                 div(classes = "container") {
                     h1 { +"Submit Feedback" }
-                    p(classes = "muted") { +"Report bugs or suggest new features to help improve PennyWise." }
+                    p(classes = "muted") { +"Report bugs or suggest new features to help improve Mudal." }
 
                     div(classes = "feedback-layout") {
                         div(classes = "form-section") {

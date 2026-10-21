@@ -40,7 +40,7 @@ jobs:
     - uses: gradle/actions/setup-gradle@v4
 
     - name: Run parser-core tests
-      run: ./gradlew :parser-core:test --continue
+      run: ./gradlew :parser-core:jvmTest --continue
 
     - name: Upload parser test results
       uses: actions/upload-artifact@v4
@@ -71,24 +71,17 @@ jobs:
 
     - uses: gradle/actions/setup-gradle@v4
 
-    - name: Compile standard debug app
-      run: ./gradlew :app:compileStandardDebugKotlin --build-cache
+    - name: Compile debug app
+      run: ./gradlew :app:compileDebugKotlin --build-cache
 
     - name: Build debug APK
       run: ./gradlew :app:assembleDebug --build-cache
 
-    - name: Upload standard debug APK
+    - name: Upload debug APK
       uses: actions/upload-artifact@v4
       with:
-        name: standard-debug-apk
-        path: app/build/outputs/apk/standard/debug/*.apk
-        retention-days: 7
-
-    - name: Upload fdroid debug APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: fdroid-debug-apk
-        path: app/build/outputs/apk/fdroid/debug/*.apk
+        name: debug-apk
+        path: app/build/outputs/apk/debug/*.apk
         retention-days: 7
 
     - name: Upload compile report
@@ -120,8 +113,8 @@ jobs:
 
     - uses: gradle/actions/setup-gradle@v4
 
-    - name: Run standard debug unit tests
-      run: ./gradlew :app:testStandardDebugUnitTest --build-cache --continue
+    - name: Run debug unit tests
+      run: ./gradlew :app:testDebugUnitTest --build-cache --continue
 
     - name: Upload test results
       uses: actions/upload-artifact@v4

@@ -1,18 +1,23 @@
-Your bank already texts you every transaction. PennyWise reads those SMS on your phone and turns them into an automatic expense tracker — no manual entry, no sign-up, nothing uploaded.
+Your bank already texts you every transaction. Mudal reads those SMS on your phone and turns them into an automatic expense tracker — no manual entry, no sign-up, nothing uploaded.
 
-★ Why PennyWise asks for SMS permission
+★ Why Mudal asks for SMS permission
 Reading bank SMS is how the app works — it is the entire product. Everything happens on your device: no server ever receives a message, there is no account to create, and the complete source code is public (AGPL-3.0) so anyone can verify exactly what it does. Would rather not grant it? You can still add transactions by hand or import a PDF statement.
 
 ★ Automatic expense tracking
-• Every UPI payment, card swipe, ATM withdrawal and bank transfer becomes a categorized transaction
-• 167 banks and payment services across 26 countries, with multi-currency support
-• Works with any UPI app — it reads your bank's SMS, not the app
+• Every card payment, ATM withdrawal and bank transfer becomes a categorized transaction
+• 5 banks and payment services across 1 country, with multi-currency support
+• Works with any bank app — it reads your bank's SMS, not the app
 • A clean, searchable spending timeline that stays up to date on its own
+
+★ Built for Sri Lanka
+• Parses Sampath Bank, Commercial Bank of Ceylon, National Development Bank, National Savings Bank and Nations Trust Bank
+• Rupee amounts, dates and number formats the way Sri Lankan banks send them
+• Defaults to LKR, with your own categories and rules on top
 
 ★ Budgets and insights
 • Set monthly budgets per category and watch progress as you spend
 • Spending trends, category breakdowns and month-on-month comparisons
-• Automatic subscription detection — finds the recurring payments you forgot about
+• Recurring transactions and subscriptions, so you can see what is coming before it lands
 • Smart rules to auto-categorize transactions your way
 
 ★ On-device AI assistant
@@ -21,10 +26,11 @@ Ask "what did I spend on food last month?" and get a real answer. The AI model (
 ★ Private by design
 • No account, no login, no email required
 • No ads, no trackers, no analytics on your financial data
+• Your database is encrypted on the device
 • Nothing leaves your device
 • Open source (AGPL-3.0) — read the code yourself
 
-★ Free, with an optional Pro upgrade
-PennyWise is free to use. An optional Pro license adds unlimited custom rules, PDF statement imports, CSV export, duplicate-account merge and scheduled daily backups — and directly supports a solo developer building PennyWise independently. Already have a license key? Enter it under Settings → PennyWise Pro.
+★ Completely free
+Every feature is unlocked: unlimited rules, PDF statement imports, CSV export, duplicate-account merge and scheduled daily backups. No paywall, no in-app purchases, no Pro tier.
 
 A money manager, budget planner and spending tracker in one — for people who hate typing in expenses.

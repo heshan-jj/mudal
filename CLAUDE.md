@@ -1,6 +1,7 @@
-# PennyWise — Agent Guide
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
+# Mudal — Agent Guide
 
-PennyWise is a privacy-first, AI-powered expense tracker that extracts
+Mudal is a privacy-first, AI-powered expense tracker that extracts
 transactions from bank SMS **entirely on-device**. The primary app is Android
 (Jetpack Compose + Material 3); the repo also contains a Kotlin Multiplatform
 `shared` module, an `iosApp`, and a `pennywise-web` frontend.

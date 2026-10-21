@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.example.ui
 
 import com.example.ui.SharedComponents.commonHead
@@ -9,7 +10,7 @@ import io.ktor.server.html.*
 import kotlinx.html.*
 
 /**
- * /pro — the only place PennyWise Pro is sold now that Play checkout is
+ * /pro — the only place Mudal Pro is sold now that Play checkout is
  * unavailable. Checkout is Dodo Payments (merchant of record: they invoice,
  * collect GST, handle refunds) and fulfils with a license key the app
  * activates. The app itself never links here (Play anti-steering), so this
@@ -48,8 +49,8 @@ object ProViews {
             lang = "en"
             head {
                 commonHead(
-                    "PennyWise Pro — ₹2,000 lifetime, ₹699 a year or ₹149 a month",
-                    "Unlock every PennyWise feature with a license key. Pay once on the web, " +
+                    "Mudal Pro — ₹2,000 lifetime, ₹699 a year or ₹149 a month",
+                    "Unlock every Mudal feature with a license key. Pay once on the web, " +
                         "enter the key in the app. Prices include GST; no account, no tracking.",
                     "/pro",
                 )
@@ -58,7 +59,7 @@ object ProViews {
             body {
                 siteHeader(currentPage = "pro")
                 div(classes = "container prose") {
-                    span(classes = "eyebrow") { +"PennyWise Pro" }
+                    span(classes = "eyebrow") { +"Mudal Pro" }
                     h1 { +"Everything the app can do, unlocked." }
                     p(classes = "lede") {
                         +"Buy on this page, get a license key by email, paste it in the app. "
@@ -94,7 +95,7 @@ object ProViews {
                         li {
                             b { +"Activate" }
                             +" — in the app open "
-                            span(classes = "path") { +"Settings → PennyWise Pro → Enter license key" }
+                            span(classes = "path") { +"Settings → Mudal Pro → Enter license key" }
                             +", paste the key, done."
                         }
                     }
@@ -102,7 +103,7 @@ object ProViews {
                     h2 { +"Questions" }
                     div(classes = "faq") {
                         faq("Which devices can I use it on?") {
-                            +"One phone at a time. Restoring a PennyWise backup on a new phone moves Pro with it. "
+                            +"One phone at a time. Restoring a Mudal backup on a new phone moves Pro with it. "
                             +"No backup? Enter the key on the new phone and choose \"Move to this device\"."
                         }
                         faq("I already bought Pro on Google Play.") {
@@ -124,7 +125,7 @@ object ProViews {
                     }
 
                     div(classes = "footnote") {
-                        +"PennyWise is open source — "
+                        +"Mudal is open source — "
                         a(href = "https://github.com/sarim2000/pennywiseai-tracker") { +"read the code" }
                         +". Pro pays for the time to keep adding banks and features."
                     }

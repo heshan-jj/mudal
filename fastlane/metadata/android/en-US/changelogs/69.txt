@@ -4,4 +4,4 @@ What's New in v2.15.34
 • Improved app stability and performance
 • Bug fixes and enhancements
 
-Thank you for using PennyWise! Keep tracking your expenses effortlessly.
+Thank you for using Mudal! Keep tracking your expenses effortlessly.

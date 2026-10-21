@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.example.ui
 
 import kotlinx.html.*
@@ -69,8 +70,8 @@ object SharedComponents {
             div(classes = "header-content") {
                 div(classes = "logo-section") {
                     a(href = "/") {
-                        img(src = "/static/logo.png", alt = "PennyWise AI", classes = "logo")
-                        span(classes = "logo-text") { +"PennyWise AI" }
+                        img(src = "/static/logo.png", alt = "Mudal", classes = "logo")
+                        span(classes = "logo-text") { +"Mudal" }
                     }
                 }
                 nav(classes = "nav-links") {
@@ -108,7 +109,7 @@ object SharedComponents {
      */
     fun FlowContent.proBanner() {
         a(href = "/pro", classes = "pro-banner") {
-            span(classes = "pro-banner-title") { +"PennyWise Pro" }
+            span(classes = "pro-banner-title") { +"Mudal Pro" }
             span(classes = "pro-banner-prices") { +"₹2,000 lifetime · ₹699 / year · ₹149 / month" }
             span(classes = "pro-banner-cta") { +"Get Pro →" }
         }

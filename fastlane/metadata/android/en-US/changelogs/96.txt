@@ -7,5 +7,5 @@ What's New in v2.15.59
 • Link an existing transaction to a subscription in a tap
 • 'Paid' badge so you can see at a glance what's already covered this cycle
 • Smarter sorting + a counter for upcoming subscriptions
-• PennyWise Pro — new founder pricing and a cleaner upgrade screen
+• Mudal Pro — new founder pricing and a cleaner upgrade screen
 • Polish and reliability 

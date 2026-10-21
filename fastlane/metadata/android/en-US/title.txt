@@ -1,1 +1,1 @@
-PennyWise: SMS Expense Tracker
+Mudal: SMS Expense Tracker

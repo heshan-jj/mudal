@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.example.ui
 
 import com.pennywiseai.parser.core.ParsedTransaction
@@ -22,9 +23,9 @@ object ParseViews {
                 // carry its own copy of the header markup and ~50 lines of the same CSS,
                 // which is why nav additions never reached the site's most-visited page.
                 commonHead(
-                    "Bank SMS parser — see what PennyWise reads",
+                    "Bank SMS parser — see what Mudal reads",
                     "Paste any bank SMS and see precisely which transaction details " +
-                        "PennyWise extracts from it. Runs the same parser that ships in the app.",
+                        "Mudal extracts from it. Runs the same parser that ships in the app.",
                     "/",
                     htmx = true,
                 )

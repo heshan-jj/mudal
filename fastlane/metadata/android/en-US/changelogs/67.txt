@@ -7,4 +7,4 @@ What's New in v2.15.32
 • Enhanced Colombian currency format support
 • Performance improvements and bug fixes
 
-Thanks to our contributors for making PennyWise better!
+Thanks to our contributors for making Mudal better!

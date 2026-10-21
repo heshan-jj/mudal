@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.example.ui
 
 import com.example.ui.SharedComponents.commonHead
@@ -50,12 +51,12 @@ object GuideViews {
     private val guides: List<Guide> = listOf(
         // ── Get started ────────────────────────────────────────────────────────
         Guide(
-            "set-up", "Get started", "Set up PennyWise",
+            "set-up", "Get started", "Set up Mudal",
             "Give it SMS access and it builds your history from the bank messages already on your phone.",
             listOf(
                 Step("onboarding-welcome", "Open the app", "Tap Get Started. Setup takes about a minute and has four steps."),
                 Step("onboarding-permissions", "Allow SMS access", "Tap Enable Permissions, then Allow. Only bank messages are read; your chats are never touched.", 50, 67),
-                Step("onboarding-scan", "Let it scan", "PennyWise reads the bank SMS already on your phone and turns them into transactions."),
+                Step("onboarding-scan", "Let it scan", "Mudal reads the bank SMS already on your phone and turns them into transactions."),
                 Step("onboarding-account", "Pick your main account", "This balance shows on Home. Tap Finish.", 83, 92),
                 Step("home-sync", "You're done", "New bank SMS are added automatically. Tap the sync button any time to check now.", 89, 86),
             ),
@@ -63,7 +64,7 @@ object GuideViews {
             cover = "onboarding-account",
         ) {
             p {
-                +"PennyWise reads messages from 140+ banks and wallets across 20+ countries. Check yours on the "
+                +"Mudal reads messages from 140+ banks and wallets across 20+ countries. Check yours on the "
                 a(href = "/banks") { +"supported banks" }
                 +" list."
             }
@@ -82,7 +83,7 @@ object GuideViews {
             "home tabs navigation menu overview recap share",
         ) {
             dl(classes = "defs") {
-                def("Transactions tab", "Everything PennyWise has found, with search and filters.")
+                def("Transactions tab", "Everything Mudal has found, with search and filters.")
                 def("Analytics tab", "Where your money goes, by category, merchant and account.")
                 def("Chat tab", "An AI assistant that runs on your phone.")
             }
@@ -91,7 +92,7 @@ object GuideViews {
             "pro", "Get started", "Free vs Pro",
             "Almost everything is free. Pro lifts a few limits and pays for new banks and features.",
             listOf(
-                Step("pro-sheet", "Open PennyWise Pro", "Settings → Upgrade to PennyWise Pro, then tap Enter license key.", 50, 75),
+                Step("pro-sheet", "Open Mudal Pro", "Settings → Upgrade to Mudal Pro, then tap Enter license key.", 50, 75),
                 Step("license-key", "Paste your key", "Paste the key from your purchase email and tap Activate. Pro turns on right away.", 50, 51),
             ),
             "license key upgrade premium buy activate price",
@@ -118,7 +119,7 @@ object GuideViews {
         // ── Everyday ───────────────────────────────────────────────────────────
         Guide(
             "add-transaction", "Everyday", "Add a transaction yourself",
-            "For cash, or a bank PennyWise can't read yet.",
+            "For cash, or a bank Mudal can't read yet.",
             listOf(
                 Step("home", "Tap +", "From Home or Transactions, the + button opens the add screen.", 90, 78),
                 Step("add-transaction", "Enter the amount", "Type the amount, then a merchant like “Chai stall”. Expense is already selected.", 67, 19),
@@ -128,7 +129,7 @@ object GuideViews {
             ),
             "manual cash expense add record",
         ) {
-            p { +"The Add Transaction widget and Quick Settings tile open the same form. You can also share a message from another app to PennyWise and it fills the form for you." }
+            p { +"The Add Transaction widget and Quick Settings tile open the same form. You can also share a message from another app to Mudal and it fills the form for you." }
             h3 { +"The five types" }
             div(classes = "types") {
                 type("Expense", "Money out of a bank account.")
@@ -306,7 +307,7 @@ object GuideViews {
         ) {
             dl(classes = "defs") {
                 def("App Lock", "Fingerprint or face unlock, with a lock timeout. Set up biometrics in Android first.")
-                def("Widgets", "Long-press your home screen → Widgets → PennyWise: Add Transaction, Budget Overview, Spending Pie, Recent Transactions.")
+                def("Widgets", "Long-press your home screen → Widgets → Mudal: Add Transaction, Budget Overview, Spending Pie, Recent Transactions.")
                 def("Notifications", "Each new transaction can notify you, with buttons to change its category right there.")
                 def("Bank Notification Access", "Also read bank app notifications, for banks that notify instead of texting.")
                 def("Contacts", "Show a contact's name instead of their UPI ID.")
@@ -321,7 +322,7 @@ object GuideViews {
             "There's no cloud, so a backup file is your only copy outside the phone.",
             listOf(
                 Step("settings-data", "Back up", "Settings → Export Data saves one file with everything. Keep it on Drive, email or a computer.", 40, 23),
-                Step("settings-data", "Restore on the new phone", "Install PennyWise, finish setup, then Settings → Import Data and pick the file. Pro comes with it.", 40, 51),
+                Step("settings-data", "Restore on the new phone", "Install Mudal, finish setup, then Settings → Import Data and pick the file. Pro comes with it.", 40, 51),
             ),
             "backup restore export import transfer switch device new phone",
         ) {
@@ -355,7 +356,7 @@ object GuideViews {
         ) {
             p {
                 path("Settings → Import Transactions (CSV)")
-                +" reads a PennyWise CSV back in, or any sheet with Date, Amount and Type columns. Free exports are capped at 100 rows a month."
+                +" reads a Mudal CSV back in, or any sheet with Date, Amount and Type columns. Free exports are capped at 100 rows a month."
             }
         },
     )
@@ -377,7 +378,7 @@ object GuideViews {
         Faq("Older transactions are missing.", "old history scan rescan past") {
             +"Set "
             path("Settings → SMS Scan Period")
-            +" to All Time, then long-press the sync button for a full rescan. PennyWise can only see SMS still on your phone."
+            +" to All Time, then long-press the sync button for a full rescan. Mudal can only see SMS still on your phone."
         },
         Faq("A transaction shows up twice.", "duplicate double twice repeated") {
             +"Some banks send two messages for one payment. Most duplicates are skipped; delete any that slip through."
@@ -388,13 +389,13 @@ object GuideViews {
             +"."
         },
         Faq("New transactions stop appearing in the background.", "background battery stopped not updating notification") {
-            +"Some phones (Xiaomi, Oppo, Vivo, Samsung) stop background apps. Set PennyWise's battery usage to Unrestricted, or tap sync when you open the app."
+            +"Some phones (Xiaomi, Oppo, Vivo, Samsung) stop background apps. Set Mudal's battery usage to Unrestricted, or tap sync when you open the app."
         },
         Faq("The AI model won't download, or chat is slow.", "ai model download slow chat stuck") {
             +"The download is about 1.5 GB, but it needs about 3 GB of free space while downloading, and a steady connection, so try Wi-Fi. Replies take a few seconds, longer on older phones."
         },
         Faq("A backup won't restore.", "restore import backup failed error") {
-            +"Update PennyWise first; new versions always read older backups. If it still fails, ask on Discord with the error."
+            +"Update Mudal first; new versions always read older backups. If it still fails, ask on Discord with the error."
         },
         Faq("Is my data private?", "privacy secure safe data server") {
             +"Yes. SMS and transactions are processed and stored only on your phone, and the AI runs there too. No account, no servers holding your data, and the "
@@ -416,11 +417,11 @@ object GuideViews {
 
     suspend fun ApplicationCall.respondGuideHub() {
         respondGuideHtml { app ->
-            page(app, "PennyWise help: step-by-step guides with screenshots",
-                "Step-by-step help for every part of PennyWise: setup, budgets, rules, AI chat, backups and more.", "/guide") {
+            page(app, "Mudal help: step-by-step guides with screenshots",
+                "Step-by-step help for every part of Mudal: setup, budgets, rules, AI chat, backups and more.", "/guide") {
                 header(classes = "hub-hero") {
                     h1 { +"How can we help?" }
-                    p(classes = "hub-sub") { +"Step-by-step guides for every part of PennyWise, with screenshots." }
+                    p(classes = "hub-sub") { +"Step-by-step guides for every part of Mudal, with screenshots." }
                     search(large = true)
                     p(classes = "popular") {
                         span { +"Popular:" }
@@ -446,7 +447,7 @@ object GuideViews {
                         a(href = "/guide/troubleshooting", classes = "more") { +"All troubleshooting" }
                     }
                     div(classes = "stuck-ask") {
-                        p { b { +"Ask a person." }; +" Other PennyWise users and the developer answer on Discord." }
+                        p { b { +"Ask a person." }; +" Other Mudal users and the developer answer on Discord." }
                         a(href = "https://discord.gg/H3xWeMWjKQ", classes = "btn-solid") { +"Ask on Discord" }
                         a(href = "https://github.com/sarim2000/pennywiseai-tracker/issues", classes = "btn-line") { +"Report a bug" }
                     }
@@ -462,7 +463,7 @@ object GuideViews {
         if (i < 0) return false
         val g = guides[i]
         respondGuideHtml { app ->
-            page(app, "${g.title}: PennyWise guide", g.intro, url(g)) {
+            page(app, "${g.title}: Mudal guide", g.intro, url(g)) {
                 articleHead(g.group, g.title, g.intro)
                 player(g)
                 section(classes = "know") {
@@ -477,7 +478,7 @@ object GuideViews {
 
     private suspend fun ApplicationCall.respondTroubleshooting() {
         respondGuideHtml { app ->
-            page(app, "Troubleshooting: PennyWise guide", "Fixes for the PennyWise questions people ask most.", "/guide/troubleshooting") {
+            page(app, "Troubleshooting: Mudal guide", "Fixes for the Mudal questions people ask most.", "/guide/troubleshooting") {
                 articleHead(null, "Troubleshooting", "Fixes for the questions people ask most.")
                 div(classes = "faq faq-page") {
                     faqs.forEachIndexed { i, f ->
@@ -534,7 +535,7 @@ object GuideViews {
             div(classes = "header-content") {
                 div(classes = "logo-section") {
                     img(src = "/static/logo.png", alt = "", classes = "logo")
-                    span(classes = "logo-text") { +"PennyWise guide" }
+                    span(classes = "logo-text") { +"Mudal guide" }
                 }
                 nav(classes = "nav-links") { a(href = "/guide") { +"All guides" } }
             }

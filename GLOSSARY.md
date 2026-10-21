@@ -1,4 +1,5 @@
-# PennyWise
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
+# Mudal
 
 A privacy-first expense tracker that reads transactions from bank SMS on the device and helps people plan what they spend and save.
 

@@ -1,6 +1,7 @@
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 # Bundled webfonts
 
-These fonts are self-hosted rather than loaded from Google Fonts. PennyWise's whole
+These fonts are self-hosted rather than loaded from Google Fonts. Mudal's whole
 claim is that your data stays on your device, and a third-party font request would
 hand every visitor's IP address, User-Agent and Referer to Google before the page even
 finished rendering — on the marketing site for a privacy-first app. Self-hosting also

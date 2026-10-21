@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.example.ui
 
 import com.example.BankPage
@@ -177,7 +178,7 @@ object BankViews {
         div(classes = "parse") {
             // Plural, no article — "a HDFC Bank" / "an ICICI Bank" can't both be right
             // from one template, and the a/an choice varies across all 141 names.
-            div(classes = "eyebrow") { +"What PennyWise reads from your ${bank.name} messages" }
+            div(classes = "eyebrow") { +"What Mudal reads from your ${bank.name} messages" }
             div(classes = "sms") {
                 div(classes = "sms-from") {
                     span(classes = "sms-dot") {}
@@ -251,10 +252,10 @@ object BankViews {
         div(classes = "cta-row") {
             a(href = PLAY_STORE_URL, classes = "btn btn-primary") {
                 attributes["rel"] = "noopener"
-                +"Get PennyWise on Google Play"
+                +"Get Mudal on Google Play"
             }
             a(
-                href = "https://github.com/sarim2000/pennywiseai-tracker",
+                href = "https://github.com/heshan-jj/mudal",
                 classes = "btn btn-secondary"
             ) {
                 attributes["rel"] = "noopener"
@@ -265,7 +266,7 @@ object BankViews {
 
     private fun FlowContent.pageFooter() {
         div(classes = "footnote") {
-            +"PennyWise is a free, open-source (AGPL-3.0) expense tracker. Bank SMS are parsed "
+            +"Mudal is a free, open-source (AGPL-3.0) expense tracker. Bank SMS are parsed "
             +"entirely on your device — nothing is uploaded, and there is no account to create. "
             a(href = "/banks") { +"Browse all supported banks" }
             +"."
@@ -278,16 +279,16 @@ object BankViews {
         val name = bank.name
         val currency = bank.country.currency
         return listOf(
-            "Does PennyWise work with $name?" to
+            "Does Mudal work with $name?" to
                 "Yes. $name is one of ${SupportedBanks.catalogue.totalBanks} banks and payment " +
-                "services PennyWise recognises. Transaction alerts from $name are detected " +
+                "services Mudal recognises. Transaction alerts from $name are detected " +
                 "automatically and turned into categorised transactions in $currency.",
             "Do I have to type my $name transactions in by hand?" to
-                "No. PennyWise reads the transaction SMS $name already sends you and creates the " +
+                "No. Mudal reads the transaction SMS $name already sends you and creates the " +
                 "entry itself — amount, merchant, date, account and running balance where the " +
                 "message includes it.",
-            "Does PennyWise need my $name net-banking login or password?" to
-                "Never. PennyWise has no login to your bank and no connection to $name at all. It " +
+            "Does Mudal need my $name net-banking login or password?" to
+                "Never. Mudal has no login to your bank and no connection to $name at all. It " +
                 "only reads the SMS already sitting on your phone, which is why it needs SMS " +
                 "permission and nothing else.",
             "Is my $name transaction data sent anywhere?" to
@@ -296,7 +297,7 @@ object BankViews {
                 "verified.",
             "What if a message from $name is read incorrectly?" to
                 "You can paste the message into the parser tool on this site to see exactly what " +
-                "PennyWise extracts, and report it in one click if it is wrong. Parser fixes ship " +
+                "Mudal extracts, and report it in one click if it is wrong. Parser fixes ship " +
                 "in the next release.",
         )
     }
@@ -330,7 +331,7 @@ object BankViews {
 
                         h1 { +"How to track $name transactions automatically" }
                         p(classes = "lede") {
-                            +"$name already texts you every time money moves. PennyWise reads those "
+                            +"$name already texts you every time money moves. Mudal reads those "
                             +"messages on your phone and builds your spending record from them — no "
                             +"manual entry, no bank login, nothing leaves the device."
                         }
@@ -344,11 +345,11 @@ object BankViews {
                         h2 { +"How it works" }
                         ol {
                             li {
-                                +"Install PennyWise and grant SMS permission. That permission is the "
+                                +"Install Mudal and grant SMS permission. That permission is the "
                                 +"whole product — it is how the app sees your $name alerts."
                             }
                             li {
-                                +"PennyWise scans the $name messages already on your phone and "
+                                +"Mudal scans the $name messages already on your phone and "
                                 +"back-fills your transaction history in seconds."
                             }
                             li {
@@ -361,7 +362,7 @@ object BankViews {
                         // it. After the parse strip this is the same information again in
                         // weaker form, and repeating it is what makes a page feel padded.
                         if (sample == null) {
-                            h2 { +"What PennyWise reads from your $name messages" }
+                            h2 { +"What Mudal reads from your $name messages" }
                             ul {
                                 li { +"Amount and whether it was money in or money out" }
                                 li { +"Merchant or counterparty name, cleaned up for readability" }
@@ -390,7 +391,7 @@ object BankViews {
                         h2 { +"Why not just use a bank-login app?" }
                         p {
                             +"Apps that aggregate accounts ask for your net-banking or account "
-                            +"credentials and hold your transaction history on their servers. PennyWise "
+                            +"credentials and hold your transaction history on their servers. Mudal "
                             +"asks for neither. It has no account system, makes no network calls to read "
                             +"your money, and its full source is published under AGPL-3.0 so the claim is "
                             +"checkable rather than promised."
@@ -398,7 +399,7 @@ object BankViews {
 
                         faqSection(bankFaqs(bank))
 
-                        h2 { +"Other banks PennyWise supports in ${country.country}" }
+                        h2 { +"Other banks Mudal supports in ${country.country}" }
                         p(classes = "muted") {
                             +"${country.bankCount} supported in ${country.country} — "
                             a(href = "/banks/country/${SupportedBanks.countrySlug(country.country)}") {
@@ -438,7 +439,7 @@ object BankViews {
         val path = "/banks/country/$slug"
         val pageTitle = "Expense tracker for ${country.country} banks"
         val description = clampDescription(
-            "PennyWise reads SMS alerts from ${country.bankCount} banks in ${country.country} " +
+            "Mudal reads SMS alerts from ${country.bankCount} banks in ${country.country} " +
                 "and tracks your spending in ${country.currency} automatically. Free, open " +
                 "source, fully offline."
         )
@@ -461,7 +462,7 @@ object BankViews {
 
                         h1 { +"${country.flag} Automatic expense tracking for ${country.country}" }
                         p(classes = "lede") {
-                            +"PennyWise recognises transaction messages from ${country.bankCount} "
+                            +"Mudal recognises transaction messages from ${country.bankCount} "
                             +"banks and payment services in ${country.country}, and tracks everything "
                             +"in ${country.currency} (${country.symbol}) without you entering a single "
                             +"amount by hand."
@@ -479,7 +480,7 @@ object BankViews {
 
                         h2 { +"How it works" }
                         p {
-                            +"Your bank already sends an SMS for every transaction. PennyWise reads "
+                            +"Your bank already sends an SMS for every transaction. Mudal reads "
                             +"those messages on your device, extracts the amount, merchant, account and "
                             +"balance, and files each one into a searchable timeline with budgets and "
                             +"spending trends on top."
@@ -491,15 +492,15 @@ object BankViews {
 
                         faqSection(
                             listOf(
-                                "Which ${country.country} banks does PennyWise support?" to
+                                "Which ${country.country} banks does Mudal support?" to
                                     "${country.bankCount} banks and payment services, listed in full on " +
                                     "this page. If yours is missing you can report it and a parser can " +
                                     "usually be added from a couple of sample messages.",
                                 "Does it work in ${country.currency}?" to
                                     "Yes. ${country.country} transactions are tracked in " +
-                                    "${country.currency} (${country.symbol}), and PennyWise handles " +
+                                    "${country.currency} (${country.symbol}), and Mudal handles " +
                                     "multiple currencies at once without ever adding them together.",
-                                "Does PennyWise need an internet connection?" to
+                                "Does Mudal need an internet connection?" to
                                     "No. Reading messages, categorising transactions and the built-in AI " +
                                     "assistant all run on the phone itself, so it works offline.",
                                 "What does it cost?" to
@@ -544,7 +545,7 @@ object BankViews {
         val pageTitle =
             "Supported banks — ${cat.totalBanks} banks, ${cat.totalCountries} countries"
         val description = clampDescription(
-            "Every bank and payment service PennyWise reads SMS from: ${cat.totalBanks} across " +
+            "Every bank and payment service Mudal reads SMS from: ${cat.totalBanks} across " +
                 "${cat.totalCountries} countries, with automatic, offline expense tracking."
         )
 
@@ -562,7 +563,7 @@ object BankViews {
 
                         h1 { +"Supported banks and payment services" }
                         p(classes = "lede") {
-                            +"PennyWise turns transaction SMS into tracked spending for "
+                            +"Mudal turns transaction SMS into tracked spending for "
                             +"${cat.totalBanks} banks and payment services across "
                             +"${cat.totalCountries} countries — all parsed on your own device."
                         }

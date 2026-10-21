@@ -1,6 +1,7 @@
-# PennyWise Web - SMS Parser Tool
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
+# Mudal Web - SMS Parser Tool
 
-A web-based tool for testing and reporting SMS parsing issues for the PennyWise AI app.
+A web-based tool for testing and reporting SMS parsing issues for the Mudal app.
 
 ## Features
 
@@ -18,8 +19,8 @@ A web-based tool for testing and reporting SMS parsing issues for the PennyWise 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/sarim2000/pennywiseai-tracker.git
-   cd pennywiseai-tracker/pennywise-web/server
+   git clone https://github.com/heshan-jj/mudal.git
+   cd mudal/pennywise-web/server
    ```
 
 2. **Set up environment variables**
@@ -71,7 +72,7 @@ docker run -p 8080:8080 -e DATABASE_PASSWORD=your_password pennywise-web
 1. Create a service file at `/etc/systemd/system/pennywise-web.service`:
    ```ini
    [Unit]
-   Description=PennyWise Web SMS Parser
+   Description=Mudal Web SMS Parser
    After=network.target
 
    [Service]

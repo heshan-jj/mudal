@@ -1,8 +1,9 @@
+# Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 blank_issues_enabled: false
 contact_links:
-  - name: 💬 Discord Community
-    url: https://discord.gg/H3xWeMWjKQ
-    about: Get help and chat with other PennyWise users
   - name: 📖 Documentation
-    url: https://github.com/sarim2000/pennywiseai-tracker
-    about: Check out the README for setup and usage instructions
+    url: https://github.com/heshan-jj/mudal#readme
+    about: Setup, build and usage instructions
+  - name: 📷 Report a parsing problem
+    url: https://github.com/heshan-jj/mudal/issues/new?labels=parser&template=bug_report.md
+    about: Bank SMS that Mudal fails to parse - masked samples are the fastest fix

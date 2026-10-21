@@ -1,12 +1,13 @@
-# Contributing to PennyWise AI
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
+# Contributing to Mudal
 
-Thank you for your interest in contributing to PennyWise AI! We welcome contributions from the community.
+Thank you for your interest in contributing to Mudal! We welcome contributions from the community.
 
 ## How to Contribute
 
 ### 🐛 Reporting Bugs
 
-1. Check if the bug has already been reported in [Issues](https://github.com/sarim2000/pennywiseai-tracker/issues)
+1. Check if the bug has already been reported in [Issues](https://github.com/heshan-jj/mudal/issues)
 2. If not, create a new issue using the bug report template
 3. Include:
    - Device model and Android version
@@ -17,7 +18,7 @@ Thank you for your interest in contributing to PennyWise AI! We welcome contribu
 
 ### 💡 Suggesting Features
 
-1. Check [existing issues](https://github.com/sarim2000/pennywiseai-tracker/issues) for similar suggestions
+1. Check [existing issues](https://github.com/heshan-jj/mudal/issues) for similar suggestions
 2. Create a new issue using the feature request template
 3. Describe the problem it solves and how it would work
 
@@ -77,7 +78,7 @@ Full walkthrough: [docs/adding-bank-parsers.md](docs/adding-bank-parsers.md)
 
 ```bash
 # Clone the repo
-git clone https://github.com/sarim2000/pennywiseai-tracker.git
+git clone https://github.com/heshan-jj/mudal.git
 cd pennywiseai-tracker
 
 # Build debug APK
@@ -92,7 +93,7 @@ cd pennywiseai-tracker
 
 ### Project Structure
 
-PennyWise is a multi-module project (`settings.gradle.kts` includes `:app`, `:parser-core`, `:shared`, and `:iosApp`; the tree below also shows non-module directories):
+Mudal is a multi-module project (`settings.gradle.kts` includes `:app`, `:parser-core`, `:shared`, and `:iosApp`; the tree below also shows non-module directories):
 
 ```
 app/                  # Android app (Compose UI, Room, Hilt)
@@ -120,7 +121,7 @@ pennywise-web/        # Web deployment (Cloudflare Worker + Ktor server)
 ## Community
 
 - Join our [Discord](https://discord.gg/H3xWeMWjKQ) for discussions
-- Follow development updates on [GitHub](https://github.com/sarim2000/pennywiseai-tracker)
+- Follow development updates on [GitHub](https://github.com/heshan-jj/mudal)
 
 ## Code of Conduct
 
@@ -141,4 +142,4 @@ Feel free to:
 - Ask in our [Discord](https://discord.gg/H3xWeMWjKQ)
 - Reach out to maintainers
 
-Thank you for helping make PennyWise AI better! 🚀
+Thank you for helping make Mudal better! 🚀

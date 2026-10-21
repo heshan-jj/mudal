@@ -1,9 +1,9 @@
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 ---
 name: Feature request
-about: Suggest an idea for PennyWise
+about: Suggest an idea for Mudal
 title: '[FEATURE] '
 labels: enhancement
-assignees: 'sarim2000'
 
 ---
 

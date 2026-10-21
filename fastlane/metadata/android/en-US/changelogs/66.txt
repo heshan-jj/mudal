@@ -1,8 +1,8 @@
 What's New in v2.15.31
 
-• Added support for Bancolombia (Colombia) - PennyWise now recognizes transactions from Colombian banks
+• Added support for Bancolombia (Colombia) - Mudal now recognizes transactions from Colombian banks
 • New BLOCK action in rules - Automatically block and ignore specific transactions based on your custom rules
 • Performance improvements and bug fixes
 
-Thank you for using PennyWise! Your feedback helps us improve.
+Thank you for using Mudal! Your feedback helps us improve.
 

@@ -1,3 +1,4 @@
+<!-- Mudal fork: new file in Mudal, a fork of PennyWise AI (AGPL-3.0-only), 2026-10-21 - see NOTICE. -->
 # Mudal — Privacy Policy & Network Audit
 
 Mudal is designed from the ground up to be a private, offline-first personal finance tracker. All transaction parsing, categorization, and budgeting calculations occur strictly on your device.
@@ -35,7 +36,7 @@ Mudal only makes network calls for user-requested, explicit functionality:
 - **Payload:** Structured JSON payload of transactions sent directly to user-defined destinations. Off by default.
 
 ### 4. GitHub Issue Reporting (User-Initiated)
-- **Endpoint:** `https://github.com/heshan-jj/pennywiseai-tracker/issues/new`
+- **Endpoint:** `https://github.com/heshan-jj/mudal/issues/new`
 - **Trigger:** When user taps "Report format" or "Ask for help" on unrecognized messages.
 - **Protection:** All account numbers, phone numbers, balances, card numbers, and VPAs are masked locally (`[NUMBER]`, `[AMOUNT]`, `[VPA/EMAIL]`) before generating the pre-filled issue link. No data is sent automatically in the background.
 

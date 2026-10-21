@@ -1,5 +1,5 @@
 What's New in v2.15.40
 
-• Real-time transaction tracking - PennyWise now instantly detects and processes your bank SMS messages as they arrive
+• Real-time transaction tracking - Mudal now instantly detects and processes your bank SMS messages as they arrive
 • Improved background processing for more reliable expense tracking
 • Enhanced SMS permissions for seamless automatic transaction capture

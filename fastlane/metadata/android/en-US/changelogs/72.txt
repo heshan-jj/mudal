@@ -4,4 +4,4 @@ What's New in v2.15.37
 • Enhanced parsers for Axis Bank (credit cards), HDFC Bank, ICICI Bank, and Bank of India for better transaction detection
 • Now supporting 40+ banks across multiple countries!
 
-Track your expenses effortlessly with PennyWise.
+Track your expenses effortlessly with Mudal.

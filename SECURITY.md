@@ -1,6 +1,7 @@
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 # Security Policy
 
-We take the security of PennyWise seriously and appreciate responsible disclosure.
+We take the security of Mudal seriously and appreciate responsible disclosure.
 
 ## Reporting a Vulnerability
 

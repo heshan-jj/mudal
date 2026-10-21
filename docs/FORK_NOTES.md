@@ -1,3 +1,4 @@
+<!-- Mudal fork: new file in Mudal, a fork of PennyWise AI (AGPL-3.0-only), 2026-10-21 - see NOTICE. -->
 # Fork Notes: Sri Lankan SMS Expense Tracker
 
 This document records the baseline environment, build verification, audit findings, and operational procedures for this fork of `sarim2000/pennywiseai-tracker`.
@@ -16,7 +17,7 @@ This document records the baseline environment, build verification, audit findin
 - **Android Gradle Plugin (AGP):** 9.2.1
 - **Kotlin Version:** 2.3.0
 - **Git Remotes:**
-  - `origin`: `https://github.com/heshan-jj/pennywiseai-tracker.git`
+  - `origin`: `https://github.com/heshan-jj/mudal.git`
   - `upstream`: `https://github.com/sarim2000/pennywiseai-tracker.git`
 
 ---
@@ -245,7 +246,7 @@ git branch -d sync-test
   - Unlocked all previously gated features to 100% capacity: unlimited rules, statement imports, CSV export rows, recurring templates, financial goals, account merges, webhooks, and analytics groupings.
 - **Privacy & Upstream Decoupling:**
   - Decoupled upstream endpoints (`pennywise.zynth.dev`, upstream Discord server).
-  - Replaced remote SMS issue reporting with local regex anonymization (`SmsReportUrlBuilder`) that masks digit sequences, card numbers, amounts, and emails/VPA into GitHub issue links for `heshan-jj/pennywiseai-tracker`.
+  - Replaced remote SMS issue reporting with local regex anonymization (`SmsReportUrlBuilder`) that masks digit sequences, card numbers, amounts, and emails/VPA into GitHub issue links for `heshan-jj/mudal`.
   - Created `docs/PRIVACY.md` detailing every remaining network interaction (exchange rates, model downloads, webhooks, and GitHub reporting).
   - Added `ATTRIBUTION.md` retaining AGPL-3.0 attribution for Mohammad Sarim and PennyWise.
   - Updated `README.md` to reflect Mudal identity.
@@ -308,5 +309,67 @@ git branch -d sync-test
   - Read raw 32-byte header: `header.startswith(b'SQLite format 3') == False`.
   - Executed SQLite connection on pulled database: `sqlite3.connect(...)` threw `DatabaseError: file is not a database` (proving plaintext reading is impossible).
 
+---
 
+## 10. Repository rename and AGPL compliance pass (2026-10-21)
 
+The owner renamed the GitHub repository to **Mudal**
+(`heshan-jj/pennywiseai-tracker` -> `heshan-jj/mudal`). Everything that pointed at
+the old slug was updated, and the AGPL-3.0 obligations were audited against
+upstream's `TRADEMARKS.md` before the first public push.
+
+### Repository plumbing
+- `origin` remote now points at `https://github.com/heshan-jj/mudal.git`; `upstream`
+  is unchanged (`sarim2000/pennywiseai-tracker`).
+- In-app links: `Constants.Links.GITHUB_URL` and the Settings "Source code &
+  licenses" / "Report an issue" entries now point at `heshan-jj/mudal`.
+- Docs: `docs/PRIVACY.md`, `docs/FORK_NOTES.md` and the issue templates point at the
+  new repository.
+
+### AGPL-3.0 compliance
+- `NOTICE` added: copyright for Mudal (Heshan Jayakody and the Mudal contributors),
+  the upstream copyright, the AGPL-3.0-only grant, the source-offer URL, and the
+  trademark statement.
+- `ATTRIBUTION.md` rewritten: upstream credit, the three modification phases, the
+  third-party licence table (SQLCipher added: BSD-3-Clause), and a trademark section.
+- `docs/MODIFICATIONS.md` added: the AGPL-3.0 section 5(a) record. It lists every
+  added, modified and removed file against `upstream/main` (176 modified, 24 added,
+  342 removed at the time of writing).
+- Every modified source file now carries a `Mudal fork:` notice with the date of
+  modification, at the top of the file. New files carry a "new file in Mudal" notice.
+- The backup **format marker** (`"PennyWise Backup v1.3"`) is deliberately left
+  unchanged: it is an on-disk format identifier, not branding, and renaming it would
+  make every existing backup fail to import. The app's own name never appears in the
+  payload.
+
+### Trademark cleanup (upstream `TRADEMARKS.md` items 1 and 2)
+- Upstream's banner artwork (`banner.png`) removed from the repository.
+- `funding.json` rewritten for Mudal (it previously pointed at upstream's author,
+  project, download statistics and donation page). `.github/FUNDING.yml` removed.
+- Issue templates re-pointed at the Mudal repository; upstream's Discord invite
+  removed from `config.yml` and `SECURITY.md`.
+- Release and CI workflows now build the single remaining variant
+  (`assembleRelease` / `bundleRelease` / `:app:testDebugUnitTest` / `:parser-core:jvmTest`);
+  the removed `standard` and `fdroid` flavour tasks are gone.
+- User-facing strings re-branded in every locale (`PennyWise` -> `Mudal`), plus the
+  debug build's app name, the app-switcher theme names, the export file names and the
+  HTTP `User-Agent`. Upstream's own class names (`PennyWiseDatabase`,
+  `PennyWiseApplication`, `PennyWiseApp`, `PennyWiseScaffold`) and the Kotlin
+  package namespace are unchanged on purpose.
+
+### Privacy
+- The repository is public, so `docs/lk-samples/` was scrubbed: personal names that
+  appeared as transfer labels are replaced with `OWNER` / `PERSON A` / `PERSON B`, and
+  the 10-digit identifier in the Commercial Bank samples is already masked. The parser
+  fixtures were updated to match. Merchant names, amounts and timestamps are kept,
+  because the fixtures need them to be realistic.
+- `docs/lk-samples/README.md` records the scope (Sampath + Commercial Bank only) and
+  the open questions (real sender IDs).
+
+### Documentation accuracy
+- `docs/supported-banks.json`, the README bank block, the web resources and the store
+  listing were regenerated with `scripts/update-supported-banks.sh`. The fork now
+  advertises **5 banks in 1 country**, not the 167 banks upstream ships. The
+  generator's country pluralisation was fixed ("1 country", not "1 countries").
+- `docs/issue-tracker.md` (upstream's issue list) was removed; the fork tracks its own
+  issues.

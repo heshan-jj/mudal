@@ -1,4 +1,4 @@
-• Chat with PennyWise to add transactions from natural language — all processed on-device, nothing leaves your phone
+• Chat with Mudal to add transactions from natural language — all processed on-device, nothing leaves your phone
 • On-device AI runs 3x faster and a crash that affected some devices is fixed
 • Sub-categories let you break spending into finer groups, with analytics that correctly filter and label them
 • Balance discrepancy detection flags when an account balance is out of sync and lets you adjust it with one tap
