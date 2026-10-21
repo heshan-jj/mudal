@@ -56,25 +56,43 @@ object DatabaseModule {
      */
     @Provides
     @Singleton
+    fun provideKeyStoreHelper(): com.pennywiseai.tracker.data.database.KeyStoreHelper {
+        return com.pennywiseai.tracker.data.database.AndroidKeyStoreHelper()
+    }
+
+    @Provides
+    @Singleton
     fun providePennyWiseDatabase(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
+        databaseKeyManager: com.pennywiseai.tracker.data.database.DatabaseKeyManager
     ): PennyWiseDatabase {
-        val database = Room.databaseBuilder(
-            context,
-            PennyWiseDatabase::class.java,
-            PennyWiseDatabase.DATABASE_NAME
-        )
-            // Single source of truth lives in PennyWiseDatabase.ALL_MIGRATIONS
-            // so the BroadcastReceiver fallback builder stays in sync.
-            .addMigrations(*PennyWiseDatabase.ALL_MIGRATIONS)
+        try {
+            System.loadLibrary("sqlcipher")
+        } catch (t: Throwable) {
+            android.util.Log.e("DatabaseModule", "Could not load sqlcipher native library: ${t.message}")
+        }
 
-            // Enable auto-migrations
-            // Room will automatically detect schema changes between versions
-
-            // Add callback to seed default data on first creation
-            .addCallback(DatabaseCallback())
-
-            .build()
+        val database = try {
+            val passphrase = databaseKeyManager.getOrCreatePassphrase()
+            val openHelperFactory = net.zetetic.database.sqlcipher.SupportOpenHelperFactory(passphrase)
+            Room.databaseBuilder(
+                context,
+                PennyWiseDatabase::class.java,
+                PennyWiseDatabase.DATABASE_NAME
+            )
+                .openHelperFactory(openHelperFactory)
+                .addMigrations(*PennyWiseDatabase.ALL_MIGRATIONS)
+                .addCallback(DatabaseCallback())
+                .build()
+        } catch (e: Exception) {
+            android.util.Log.e("DatabaseModule", "Failed to open encrypted database, using in-memory fallback to prevent crash loop", e)
+            Room.inMemoryDatabaseBuilder(
+                context,
+                PennyWiseDatabase::class.java
+            )
+                .addMigrations(*PennyWiseDatabase.ALL_MIGRATIONS)
+                .build()
+        }
 
         // Set the singleton instance so BroadcastReceivers can access it
         PennyWiseDatabase.setInstance(database)

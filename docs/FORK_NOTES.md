@@ -263,4 +263,50 @@ git branch -d sync-test
 - **Side-by-Side Coexistence on Pixel 8 Emulator:**
   - Installed `com.heshan.moneytracker.debug` alongside existing `com.pennywiseai.tracker.debug`. Both apps run independently with isolated data stores.
 
+---
+
+# Phase 2: Database Encryption (SQLCipher) & Security Hardening
+
+**Date:** 2026-10-21  
+**Status:** Completed & Verified  
+
+## 1. Summary of Changes
+
+- **SQLCipher Room Integration:**
+  - Integrated `net.zetetic:sqlcipher-android:4.19.1` in `app/build.gradle.kts` and `gradle/libs.versions.toml`.
+  - Configured Room database initialization with `SupportOpenHelperFactory(passphrase)` in both `DatabaseModule.kt` and `PennyWiseDatabase.getInstance()`.
+  - Native library `libsqlcipher.so` automatically bundled and verified for `x86_64` (emulator) and ARM architectures.
+- **Passphrase Generation & Android Keystore Wrapping:**
+  - Implemented `DatabaseKeyManager` and `KeyStoreHelper` / `AndroidKeyStoreHelper`:
+    - Generates 32 cryptographically secure random bytes on first launch.
+    - Master key generated in hardware-backed `AndroidKeyStore` (`AES-256-GCM`, `NoPadding`, user authentication false for headless background workers).
+    - Wrapped key and IV stored securely in private app preferences.
+    - Decrypts and provides cached key at runtime.
+- **Graceful Key Loss & Crash-Loop Prevention:**
+  - If the database file exists on disk but Keystore master key is corrupted/lost:
+    - `DatabaseModule` catches the key error and builds an in-memory database fallback to guarantee Hilt dependency injection never throws during process startup.
+    - `PennyWiseApplication.onCreate()` detects key loss and pauses background jobs touching Room.
+    - `MainActivity` detects key loss and renders `DatabaseErrorScreen` (Material 3).
+    - Offers clear user actions: "Restore from Backup" (via file picker) or "Reset Database (Start Fresh)" with confirmation.
+- **Security Settings & Recents Obscuring:**
+  - `allowBackup="false"` verified in `AndroidManifest.xml`.
+  - Added `FLAG_SECURE` user setting ("Hide content in app switcher") stored in `UserPreferencesRepository`.
+  - Added UI switch in the Security section of `SettingsScreen.kt`.
+  - Dynamically sets `WindowManager.LayoutParams.FLAG_SECURE` in `MainActivity.kt` to block screenshots and obscure previews in the recent apps switcher.
+
+## 2. Test & Verification Evidence
+
+- **Unit Tests:**
+  - `DatabaseKeyManagerTest` (5 tests on JVM): 100% green (tests key generation, wrapping, unwrapping, missing key error, decryption failure, and database reset).
+  - `:app:testDebugUnitTest`: 697 tests passed (0 failures).
+  - `:parser-core:test`: 1,927 tests passed (0 failures).
+- **Connected Instrumentation Tests on Pixel 8 Emulator:**
+  - `SqlCipherEncryptionTest.testEncryptedDatabaseCreationAndRejectionOnWrongKey`: PASSED (verified encrypted database creation, verified raw binary header does NOT contain "SQLite format 3", verified wrong key throws `net.zetetic.database.sqlcipher.SQLiteNotADatabaseException: file is not a database (code 26)`, and verified recovery with correct key).
+  - `SqlCipherEncryptionTest.testBackupRoundTripWithEncryptedDatabase`: PASSED (verified full export of data from encrypted DB, wiping DB, fresh encrypted DB initialization with new key, and full restore via `BackupImporter.REPLACE_ALL`).
+- **Real Device / adb Verification:**
+  - Pulled `pennywise_database` from Pixel 8 emulator running Mudal (`com.heshan.moneytracker.debug`).
+  - Read raw 32-byte header: `header.startswith(b'SQLite format 3') == False`.
+  - Executed SQLite connection on pulled database: `sqlite3.connect(...)` threw `DatabaseError: file is not a database` (proving plaintext reading is impossible).
+
+
 

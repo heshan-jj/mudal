@@ -49,6 +49,9 @@ class PennyWiseApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var goalRepository: com.pennywiseai.tracker.data.repository.GoalRepository
 
+    @Inject
+    lateinit var databaseKeyManager: com.pennywiseai.tracker.data.database.DatabaseKeyManager
+
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var activityReferences = 0
     private var isInForeground = false
@@ -75,6 +78,11 @@ class PennyWiseApplication : Application(), Configuration.Provider {
         CategoryMapping.userStyles
         registerActivityLifecycleCallbacks(AppLockLifecycleObserver())
         lastLocales = resources.configuration.locales
+
+        if (databaseKeyManager.hasKeyError()) {
+            android.util.Log.w("PennyWiseApplication", "Database key error detected on startup; pausing background database jobs")
+            return
+        }
 
         // Re-arm the daily folder backup on process start when the user has it enabled,
         // so scheduled work survives reboots / app updates that clear WorkManager state.

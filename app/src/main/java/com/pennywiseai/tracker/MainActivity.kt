@@ -16,9 +16,22 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import com.pennywiseai.tracker.receiver.SmsBroadcastReceiver
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
+
+    @javax.inject.Inject
+    lateinit var databaseKeyManager: com.pennywiseai.tracker.data.database.DatabaseKeyManager
+
+    @javax.inject.Inject
+    lateinit var backupImporter: com.pennywiseai.tracker.data.backup.BackupImporter
+
+    @javax.inject.Inject
+    lateinit var userPreferencesRepository: com.pennywiseai.tracker.data.preferences.UserPreferencesRepository
 
     companion object {
         const val EXTRA_OPEN_ADD_TRANSACTION = "com.pennywiseai.tracker.OPEN_ADD_TRANSACTION"
@@ -76,17 +89,54 @@ class MainActivity : FragmentActivity() {
 
         registerQuickAddShortcut()
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+                userPreferencesRepository.isSecureScreenEnabled.collect { enabled ->
+                    if (enabled) {
+                        window.setFlags(
+                            android.view.WindowManager.LayoutParams.FLAG_SECURE,
+                            android.view.WindowManager.LayoutParams.FLAG_SECURE
+                        )
+                    } else {
+                        window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+                    }
+                }
+            }
+        }
+
         setContent {
-            PennyWiseApp(
-                editTransactionId = editTransactionId,
-                openAddTransaction = openAddTransaction,
-                onEditComplete = editCompleteCallback,
-                onAddTransactionShortcutHandled = addShortcutCallback,
-                sharedText = sharedText,
-                onSharedTextHandled = sharedTextCallback,
-                widgetDestination = widgetDestination,
-                onWidgetDestinationHandled = { widgetDestination = null }
-            )
+            val keyStatus by databaseKeyManager.keyStatus.collectAsStateWithLifecycle()
+            if (keyStatus is com.pennywiseai.tracker.data.database.DatabaseKeyStatus.Error) {
+                com.pennywiseai.tracker.ui.screens.database.DatabaseErrorScreen(
+                    errorMessage = (keyStatus as com.pennywiseai.tracker.data.database.DatabaseKeyStatus.Error).message,
+                    onRestoreBackup = { uri ->
+                        lifecycleScope.launch {
+                            try {
+                                databaseKeyManager.resetDatabaseAndKey()
+                                backupImporter.importBackup(uri, com.pennywiseai.tracker.data.backup.ImportStrategy.REPLACE_ALL)
+                                recreate()
+                            } catch (e: Exception) {
+                                android.util.Log.e("MainActivity", "Failed to restore backup", e)
+                            }
+                        }
+                    },
+                    onResetDatabase = {
+                        databaseKeyManager.resetDatabaseAndKey()
+                        recreate()
+                    }
+                )
+            } else {
+                PennyWiseApp(
+                    editTransactionId = editTransactionId,
+                    openAddTransaction = openAddTransaction,
+                    onEditComplete = editCompleteCallback,
+                    onAddTransactionShortcutHandled = addShortcutCallback,
+                    sharedText = sharedText,
+                    onSharedTextHandled = sharedTextCallback,
+                    widgetDestination = widgetDestination,
+                    onWidgetDestinationHandled = { widgetDestination = null }
+                )
+            }
         }
     }
 

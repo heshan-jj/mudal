@@ -31,21 +31,19 @@ class AppLockViewModel @Inject constructor(
         combine(
             appLockRepository.isAppLockEnabled,
             appLockRepository.timeoutMinutes,
-            appLockRepository.shouldLockAppFlow()
-        ) { isEnabled, timeoutMinutes, shouldLock ->
-            Triple(isEnabled, timeoutMinutes, shouldLock)
-        }
-            .onEach { (isEnabled, timeoutMinutes, shouldLock) ->
-                _uiState.update {
-                    it.copy(
-                        isLockEnabled = isEnabled,
-                        timeoutMinutes = timeoutMinutes,
-                        isLocked = shouldLock && isEnabled,
-                        checks = it.checks + 1
-                    )
-                }
+            appLockRepository.shouldLockAppFlow(),
+            appLockRepository.isSecureScreenEnabled
+        ) { isEnabled, timeoutMinutes, shouldLock, isSecureScreenEnabled ->
+            _uiState.update {
+                it.copy(
+                    isLockEnabled = isEnabled,
+                    timeoutMinutes = timeoutMinutes,
+                    isLocked = shouldLock && isEnabled,
+                    isSecureScreenEnabled = isSecureScreenEnabled,
+                    checks = it.checks + 1
+                )
             }
-            .launchIn(viewModelScope)
+        }.launchIn(viewModelScope)
     }
 
     private fun checkBiometricCapability() {
@@ -111,6 +109,12 @@ class AppLockViewModel @Inject constructor(
         }
     }
 
+    fun setSecureScreenEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            appLockRepository.setSecureScreenEnabled(enabled)
+        }
+    }
+
     /**
      * Set timeout in minutes (0 = immediately)
      */
@@ -163,6 +167,7 @@ data class AppLockUiState(
     val checks: Int = 0,
     val isLockEnabled: Boolean = false,
     val isLocked: Boolean = false,
+    val isSecureScreenEnabled: Boolean = false,
     val timeoutMinutes: Int = 1,
     val canUseBiometric: Boolean = false,
     val biometricCapability: BiometricCapability = BiometricCapability.Unknown,

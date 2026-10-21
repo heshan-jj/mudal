@@ -487,7 +487,7 @@ fun SettingsScreen(
                     checked = appLockUiState.isLockEnabled,
                     onCheckedChange = { appLockViewModel.setAppLockEnabled(it) },
                     enabled = appLockUiState.canUseBiometric,
-                    position = if (appLockUiState.isLockEnabled) ListItemPosition.Top else ListItemPosition.Single
+                    position = ListItemPosition.Top
                 )
                 AnimatedVisibility(visible = appLockUiState.isLockEnabled) {
                     SettingsNavItem(
@@ -504,9 +504,19 @@ fun SettingsScreen(
                             )
                         },
                         onClick = { showTimeoutDialog = true },
-                        position = ListItemPosition.Bottom
+                        position = ListItemPosition.Middle
                     )
                 }
+                SettingsSwitchRow(
+                    icon = Icons.Default.Security,
+                    iconBgColor = purple_light,
+                    iconTint = purple_dark,
+                    title = stringResource(R.string.settings_secure_screen_title),
+                    subtitle = stringResource(R.string.settings_secure_screen_subtitle),
+                    checked = appLockUiState.isSecureScreenEnabled,
+                    onCheckedChange = { appLockViewModel.setSecureScreenEnabled(it) },
+                    position = ListItemPosition.Bottom
+                )
             }
 
             // ── Data Management ──

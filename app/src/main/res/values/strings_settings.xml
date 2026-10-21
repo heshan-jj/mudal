@@ -76,6 +76,19 @@
         <item quantity="other">%1$d minutes</item>
     </plurals>
 
+    <string name="settings_secure_screen_title">Hide content in app switcher</string>
+    <string name="settings_secure_screen_subtitle">Block screenshots and obscure preview in recents</string>
+
+    <!-- Database Recovery -->
+    <string name="db_error_title">Database Decryption Error</string>
+    <string name="db_error_message">The encryption key for your local database could not be loaded from Android Keystore. You can restore your data from a backup or reset the database to start fresh.</string>
+    <string name="db_error_restore_backup">Restore from Backup</string>
+    <string name="db_error_reset_db">Reset Database (Start Fresh)</string>
+    <string name="db_error_reset_confirm_title">Reset Database?</string>
+    <string name="db_error_reset_confirm_message">This will permanently delete the current encrypted database file on this device and initialize a fresh, empty database. Any unbacked data will be lost.</string>
+    <string name="db_error_reset_confirm_action">Reset</string>
+    <string name="db_error_cancel">Cancel</string>
+
     <!-- Data Management -->
     <string name="settings_data_section">Data Management</string>
     <string name="settings_manage_accounts_title">Manage Accounts</string>

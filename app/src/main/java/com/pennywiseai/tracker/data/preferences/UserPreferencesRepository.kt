@@ -89,6 +89,7 @@ open class UserPreferencesRepository @Inject constructor(
 
         // App Lock preferences
         val APP_LOCK_ENABLED = booleanPreferencesKey("app_lock_enabled")
+        val SECURE_SCREEN_ENABLED = booleanPreferencesKey("secure_screen_enabled")
         val APP_LOCK_TIMEOUT_MINUTES = intPreferencesKey("app_lock_timeout_minutes")
         val LAST_AUTH_TIMESTAMP = longPreferencesKey("last_auth_timestamp")
 
@@ -583,6 +584,17 @@ open class UserPreferencesRepository @Inject constructor(
     }
 
     // App Lock methods
+    val isSecureScreenEnabled: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[PreferencesKeys.SECURE_SCREEN_ENABLED] ?: false
+        }
+
+    suspend fun setSecureScreenEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.SECURE_SCREEN_ENABLED] = enabled
+        }
+    }
+
     val isAppLockEnabled: Flow<Boolean> = context.dataStore.data
         .map { preferences ->
             preferences[PreferencesKeys.APP_LOCK_ENABLED] ?: false

@@ -22,6 +22,15 @@ class AppLockRepository @Inject constructor(
     val isAppLockEnabled: Flow<Boolean> = userPreferencesRepository.isAppLockEnabled
 
     /**
+     * Flow indicating if secure screen (FLAG_SECURE) is enabled
+     */
+    val isSecureScreenEnabled: Flow<Boolean> = userPreferencesRepository.isSecureScreenEnabled
+
+    suspend fun setSecureScreenEnabled(enabled: Boolean) {
+        userPreferencesRepository.setSecureScreenEnabled(enabled)
+    }
+
+    /**
      * Flow indicating timeout duration in minutes
      */
     val timeoutMinutes: Flow<Int> = userPreferencesRepository.appLockTimeoutMinutes

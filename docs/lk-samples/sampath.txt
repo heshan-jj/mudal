@@ -1,0 +1,385 @@
+# Sampath Bank (Sri Lanka) - real transaction SMS samples
+#
+# Source: owner-supplied, personal phone, masked (account numbers reduced to
+# **NNNN, other identifiers left as the bank sent them).
+# Format: one SMS per block, blocks separated by a blank line. Order is exactly
+# as pasted by the owner (NOT chronological).
+#
+# Bank      : Sampath Bank
+# Sender ID : SAMPATHTXN (assumed from the existing parser docs - OWNER TO CONFIRM)
+# Accounts  : **7700 (primary, most traffic), **9786 (secondary)
+# Currency  : LKR
+# Dates     : dd/MM/yyyy hh:mm:ss
+# Samples   : 70 SMS
+# Range     : 11/10/2026 17:06:42 - 21/10/2026 08:28:51
+# Boilerplate: every SMS ends with "To Inq Call 0112303050" +
+#              "Get protected -Do not Share OTP" (the last sample, 11/10/2026
+#              17:06:42, was pasted without the "Get protected" line).
+#
+# Channel variants present (all must parse to the same shape):
+#   - "for <merchant>"                  e.g. eCom PickMe Co 76134439, keels, boat
+#   - "for eCom/REV <merchant>"         reversal/refund credits (Google One, Microsoft Store)
+#   - "via ATM at <location> CASH SET"  cash withdrawal
+#   - "via POS at <merchant> <ref>"     card POS purchase
+#   - "for TFR <name> -<ref>"           own-account transfer out
+#   - "for TRRR/<ref>/<date>/IF"        incoming transfer
+#   - "for CEFTLV-01-..."               interbank transfer
+#   - "for VSRPMT-<ref>"                standing payment
+#   - "for Interest: ..."               interest credit
+#
+# Edge cases to keep in mind when writing fixtures:
+#   - Amounts with no leading zero: "LKR .56" (4 samples).
+#   - Credits that mirror a debit minutes earlier (reverse pair): 150.00 Google One
+#     (14/10), 346.54 Microsoft Store (18/10).
+#   - Transfers show up on BOTH accounts with the same timestamp (e.g. 20/10 09:34:48).
+#   - Merchant text may contain spaces, "*", "/", "-" and trailing refs; the
+#     existing parser strips a trailing " - <ref>".
+
+LKR 1,005.00 debited from AC **7700 via ATM at Makumbura MMC - CASH SET
+08/10/2026 15:42:22
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 3,000.00 credited to AC **9786 for Vishwa-Cash
+08/10/2026 15:07:02
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 377.75 debited from AC **7700 for eCom PickMe Co 76134439
+08/10/2026 11:58:45
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 5,000.00 credited to AC **7700 for Expenses
+07/10/2026 19:30:08
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 9,025.00 debited from AC **7700 for cash
+07/10/2026 13:04:22
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 10,000.00 credited to AC **7700 for Seylan card
+07/10/2026 12:51:40
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 50.00 debited from AC **7700 for eCom Dialog Axiata PLC Co T7064677
+14/09/2026 09:47:15
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 208.74 debited from AC **7700 for eCom PickMe Co 76134439
+14/09/2026 09:54:44
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 2,160.00 debited from AC **7700 via POS at KFC-KURUNEGALA KU 80401564
+14/09/2026 12:49:48
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 690.00 debited from AC **7700 via POS at KFC-KURUNEGALA KU 80401564
+14/09/2026 14:51:07
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 209.20 debited from AC **7700 for eCom PickMe Co 76134439
+14/09/2026 15:01:04
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 375.00 debited from AC **7700 for eCom Google Spotify Music Mo MASTTERM
+14/09/2026 23:34:58
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 80.00 debited from AC **7700 for eCom Dialog Axiata PLC Co T7064677
+16/09/2026 01:24:49
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 1,030.00 debited from AC **7700 via ATM at ICBS CASH SET
+16/09/2026 07:11:03
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 1,000.00 credited to AC **7700 for Vishwa-loan
+16/09/2026 15:22:17
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 5,000.00 credited to AC **7700 for Entertainment
+16/09/2026 18:19:46
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 399.00 debited from AC **7700 via POS at HUTCHISON TELECOM LANKA 76131020
+16/09/2026 18:30:31
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 440.00 debited from AC **7700 via POS at PERERA - SONS BAKERS ( MA 51001413
+17/09/2026 08:04:24
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 20,000.00 credited to AC **7700 for Vishwa-H
+17/09/2026 08:09:18
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 340.00 debited from AC **7700 via POS at PERERA - SONS BAKERS ( MA 51001413
+17/09/2026 09:51:28
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 20,000.00 debited from AC **7700 for TFR Vishwa -000086201821
+17/09/2026 10:05:33
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 20,000.00 credited to AC **9786 for Vishwa-
+17/09/2026 10:05:33
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 107.00 debited from AC **7700 for eCom Dialog Axiata PLC Co T7064677
+17/09/2026 17:36:22
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 9,025.00 debited from AC **9786 for cash
+18/09/2026 10:12:41
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 2,500.00 debited from AC **7700 for TFR Vishwa cash-000086472616
+19/09/2026 13:17:35
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 1,000.00 credited to AC **7700 for Netflix
+19/09/2026 19:37:29
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 1,400.00 debited from AC **7700 for TFR Vishwa -000086520183
+19/09/2026 19:55:40
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 3,600.00 credited to AC **7700 for rex Devil
+19/09/2026 21:24:10
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 3,968.94 debited from AC **7700 for eCom tzploaded Vi NMP20489
+19/09/2026 21:26:22
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 400.00 credited to AC **7700 for rex Devil
+19/09/2026 21:32:26
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 155.05 credited to AC **9786 for Interest: 1xxx9786:Int.Pd:20-08-2026 to 19-09-2026
+20/09/2026 02:38:25
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 247.82 debited from AC **7700 for eCom PickMe Co 76134439
+21/09/2026 16:04:02
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 377.63 debited from AC **7700 for eCom PickMe Co 76134439
+22/09/2026 08:12:13
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 300.00 debited from AC **7700 via POS at RANSARA RESTAURANT KU 55155981
+22/09/2026 08:14:18
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 5,000.00 debited from AC **9786 for TFR Vishwa -000090445607
+20/10/2026 09:42:02
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 5,000.00 credited to AC **7700 for Vishwa-
+20/10/2026 09:42:02
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 25,030.00 debited from AC **7700 via ATM at ICBS CASH SET
+20/10/2026 09:44:01
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 20,000.00 debited from AC **9786 for TFR Vishwa -000090444609
+20/10/2026 09:34:48
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 20,000.00 credited to AC **7700 for Vishwa-
+20/10/2026 09:34:48
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 159.00 debited from AC **7700 for eCom Dialog Axiata PLC Co T7064677
+20/10/2026 12:28:45
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 1,500.00 credited to AC **7700 for Netflix
+21/10/2026 08:28:51
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 1,000.00 debited from AC **7700 for TFR Vishwa -000090583106
+21/10/2026 10:27:22
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 55.00 debited from AC **7700 for eCom Dialog Axiata PLC Co T7064677
+21/10/2026 12:11:38
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 346.54 credited to AC **7700 for eCom/REV Microsoft*Store MASTTERM
+18/10/2026 15:54:30
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 346.54 debited from AC **7700 for eCom Microsoft*Store Si MASTTERM
+18/10/2026 15:54:18
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 50,000.00 credited to AC **9786 for Vishwa-
+18/10/2026 08:20:13
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 50,000.00 debited from AC **7700 for TFR Vishwa -000090203456
+18/10/2026 08:20:13
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 50,000.00 credited to AC **7700 for Rifdhy RM
+18/10/2026 08:14:46
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 460.00 debited from AC **7700 via POS at Ransiri Bake And House KU 40202759
+17/10/2026 15:01:08
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 159.00 debited from AC **7700 for eCom Dialog Axiata PLC Co T7064677
+15/10/2026 22:07:40
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 375.00 debited from AC **7700 for eCom Google Spotify Music Mo MASTTERM
+14/10/2026 23:34:59
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR .56 debited from AC **9786 for CEFTLV-01-22312167-02-6010-03-0000-04-00
+14/10/2026 18:50:42
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR .56 credited to AC **9786 for TRRR/000000554871/14-10-2026 13:20:43/IF
+14/10/2026 18:50:43
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR .56 credited to AC **9786 for TRRR/000000554548/14-10-2026 13:18:36/IF
+14/10/2026 18:48:36
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR .56 debited from AC **9786 for CEFTLV-01-22312167-02-6010-03-0000-04-00
+14/10/2026 18:48:36
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 150.00 credited to AC **7700 for eCom/REV Google One MASTTERM
+14/10/2026 11:02:21
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 150.00 debited from AC **7700 for eCom Google One Mo MASTTERM
+14/10/2026 11:01:10
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 7,030.00 debited from AC **7700 via ATM at NSB BADDEGAMA ATM LK CASH SET
+13/10/2026 19:56:50
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 4,000.00 credited to AC **7700 for Vishwa-bus
+13/10/2026 19:54:46
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 625.00 debited from AC **7700 for keels
+13/10/2026 12:59:28
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 50.00 debited from AC **7700 for VSRPMT-000018281730
+13/10/2026 08:51:26
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 100.00 debited from AC **9786 for VSRPMT-000018281689
+13/10/2026 08:49:45
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 1,127.00 debited from AC **9786 for TFR Vishwa -000089580155
+13/10/2026 08:48:22
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 1,127.00 credited to AC **7700 for Vishwa-
+13/10/2026 08:48:22
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 1,127.33 debited from AC **7700 for eCom MINTPAY Co 40300020
+13/10/2026 00:28:18
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 100.00 debited from AC **7700 for eCom Dialog Axiata PLC Co T7064677
+12/10/2026 21:34:29
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 5,000.00 credited to AC **7700 for Expenses
+12/10/2026 15:37:41
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 1,025.00 debited from AC **7700 for boat
+12/10/2026 14:51:35
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 3,005.00 debited from AC **7700 via ATM at NUWARAELIYA BRANCH CASH SET
+12/10/2026 13:40:06
+To Inq Call 0112303050
+Get protected -Do not Share OTP
+
+LKR 159.00 debited from AC **7700 for eCom Dialog Axiata PLC Co T7064677
+11/10/2026 17:06:42
+To Inq Call 0112303050

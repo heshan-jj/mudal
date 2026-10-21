@@ -192,11 +192,20 @@ abstract class PennyWiseDatabase : RoomDatabase() {
          */
         fun getInstance(context: android.content.Context): PennyWiseDatabase {
             return INSTANCE ?: synchronized(this) {
+                try {
+                    System.loadLibrary("sqlcipher")
+                } catch (t: Throwable) {
+                    // Ignore if already loaded or not on Android runtime
+                }
+                val keyManager = DatabaseKeyManager.getInstance(context.applicationContext)
+                val passphrase = keyManager.getOrCreatePassphrase()
+                val factory = net.zetetic.database.sqlcipher.SupportOpenHelperFactory(passphrase)
                 val instance = androidx.room.Room.databaseBuilder(
                     context.applicationContext,
                     PennyWiseDatabase::class.java,
                     DATABASE_NAME
                 )
+                    .openHelperFactory(factory)
                     .addMigrations(*ALL_MIGRATIONS)
                     .build()
                 INSTANCE = instance

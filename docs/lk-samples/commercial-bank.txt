@@ -1,0 +1,83 @@
+# Commercial Bank of Ceylon (CBC, Sri Lanka) - real transaction SMS samples
+#
+# Source: owner-supplied, personal phone, masked (card reduced to last 4 digits
+# "#4101", the 10-digit identifier in the "Credit for Rs." messages reduced to
+# 8XXXXXXXX15).
+# Format: one SMS per block, blocks separated by a blank line. Order is exactly
+# as pasted by the owner (NOT chronological).
+#
+# Bank      : Commercial Bank of Ceylon (CBC / "combank")
+# Sender ID : not supplied by the owner - CONFIRM (likely COMBANK / CBC / 8000x)
+# Card      : debit card ending #4101
+# Currency  : LKR (card SMS) and "Rs." (branch credit SMS)
+# Dates     : dd/MM/yy hh:mm AM/PM on card SMS; time-only on branch credits
+# Samples   : 18 SMS (15 purchases, 1 ATM withdrawal, 2 branch credits)
+# Range     : 25/11/25 01:44 PM - 07/03/26 04:25 PM
+# Note      : no parser exists for this bank yet - see docs/FORK_PLAN.md
+#             (Phase 3, priority order: Commercial Bank first).
+#
+# Distinct message shapes (all must parse to a transaction):
+#
+#   1) Card purchase - "Dear Cardholder, Purchase at <merchant> for LKR <amt>
+#      on <dd/MM/yy hh:mm AM/PM> has been authorised on your debit card ending
+#      #4101."
+#      -> EXPENSE, merchant = <merchant>, card = 4101
+#      -> NOTE: the bank says "authorised", not "debited". Treat as a spend.
+#
+#   2) ATM withdrawal - "Withdrawal at <location> for LKR <amt> on <dd/MM/yy
+#      hh:mm AM/PM> from card ending #4101."
+#      -> EXPENSE (cash), no merchant name beyond the ATM location.
+#
+#   3) Branch credit - "Credit for Rs. <amt> to <10-digit id> at <hh:mm> at
+#      DIGITAL BANKING DIVISION"
+#      -> INCOME, no date in the body, amount prefix is "Rs." not "LKR".
+#
+# Edge cases to keep in mind when writing fixtures:
+#   - Two different currency prefixes in one bank ("LKR" vs "Rs.").
+#   - Merchant names contain "&", "_" (e.g. "Finagle Minimart _ NSBM"), double
+#     spaces are absent but underscores are, and some names are truncated by the
+#     bank ("Finagle Minimart _ NSBM CHomagama" - note the typo "CHomagama",
+#     and "TERRA LOUNGE CAFE & RESKURUNEGALA KGLK").
+#   - 12-hour clock with AM/PM, two-digit year (yy) - different from Sampath's
+#     dd/MM/yyyy.
+#   - No available balance / "Avl Bal" line in any of these messages.
+#   - Several messages are near-duplicates of the same merchant (SERENTY INN
+#     HOMAGAMA x7, H P H DULANJAYA x2, Finagle Minimart x2).
+#   - The branch-credit messages have no date at all - the SMS timestamp is the
+#     only date source.
+
+Credit for Rs. 400.00 to 8XXXXXXXX15 at 11:17 at DIGITAL BANKING DIVISION
+
+Dear Cardholder, Purchase at TERRA LOUNGE CAFE & RESKURUNEGALA KGLK for LKR 1,144.00 on 07/03/26 04:25 PM has been authorised on your debit card ending #4101.
+
+Withdrawal at ICBS AKUB3 KU BZ3 LK for LKR 1,500.00 on 17/02/26 09:22 AM from card ending #4101.
+
+Dear Cardholder, Purchase at SERENTY INN HOMAGAMA LK for LKR 380.00 on 05/02/26 09:55 AM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at SERENTY INN HOMAGAMA LK for LKR 550.00 on 03/02/26 03:48 PM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at PERERA & SONS BAKERS PVT HOMAGAMA LK for LKR 300.00 on 03/02/26 11:37 AM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at Finagle Minimart _ NSBM CHomagama LK for LKR 290.00 on 02/02/26 02:52 PM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at SERENTY INN HOMAGAMA LK for LKR 350.00 on 22/01/26 01:38 PM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at SERENTY INN HOMAGAMA LK for LKR 100.00 on 22/01/26 10:52 AM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at H P H DULANJAYA PITIPANA LK for LKR 300.00 on 20/01/26 02:22 PM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at SERENTY INN HOMAGAMA LK for LKR 240.00 on 20/01/26 02:00 PM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at HUTCHISON TELECOM LANKA COLOMBO 04 LK for LKR 117.00 on 02/12/25 08:50 PM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at SERENTY INN HOMAGAMA LK for LKR 380.00 on 27/11/25 10:46 AM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at Finagle Minimart _ NSBM CHomagama LK for LKR 130.00 on 26/11/25 03:13 PM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at H P H DULANJAYA PITIPANA LK for LKR 200.00 on 26/11/25 11:37 AM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at SERENTY INN HOMAGAMA LK for LKR 280.00 on 26/11/25 11:15 AM has been authorised on your debit card ending #4101.
+
+Dear Cardholder, Purchase at SERENTY INN HOMAGAMA LK for LKR 700.00 on 25/11/25 01:44 PM has been authorised on your debit card ending #4101.
+
+Credit for Rs. 2,000.00 to 8XXXXXXXX15 at 08:18 at DIGITAL BANKING DIVISION
