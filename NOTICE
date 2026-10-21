@@ -1,0 +1,54 @@
+Mudal — Private SMS Expense Tracker
+Copyright (C) 2026 Heshan Jayakody and the Mudal contributors.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License along
+with this program. If not, see <https://www.gnu.org/licenses/>.
+
+--------------------------------------------------------------------------------
+
+This program is a modified version of "PennyWise AI Expense Tracker"
+(https://github.com/sarim2000/pennywiseai-tracker),
+Copyright (C) Sarim Ahmed and the PennyWise AI contributors,
+licensed under the GNU Affero General Public License v3.0 (AGPL-3.0-only).
+
+Modifications made by the Mudal project are marked in each modified source file
+with a "Mudal fork:" notice and are summarised in `docs/MODIFICATIONS.md`.
+
+  Mudal — Copyright (C) 2026 Heshan Jayakody and the Mudal contributors.
+
+The Mudal source code is the complete corresponding source for the Mudal
+application as distributed. It is published at:
+
+  https://github.com/heshan-jj/mudal
+
+--------------------------------------------------------------------------------
+
+Trademarks
+
+"PennyWise", "PennyWise AI", the PennyWise logo and the PennyWise banner
+artwork are trademarks of Sarim Ahmed. They are NOT used by, and grant no
+rights to, Mudal. Mudal is an independent project and is not endorsed by,
+affiliated with, or sponsored by the PennyWise project or its author. See
+`TRADEMARKS.md` and `ATTRIBUTION.md`.
+
+--------------------------------------------------------------------------------
+
+Third-party components
+
+This program bundles third-party software under its own licence. The full list,
+with licence identifiers, is in `ATTRIBUTION.md`. The most notable additions
+relative to upstream PennyWise AI are:
+
+  - SQLCipher (net.zetetic:sqlcipher-android) — BSD-3-Clause — used to encrypt
+    the on-device database.
+
+--------------------------------------------------------------------------------

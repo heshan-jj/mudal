@@ -1,4 +1,13 @@
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 # Trademark Notice
+
+> **Mudal note.** This file is upstream PennyWise AI's trademark notice, kept
+> verbatim because it states the terms Mudal complies with. Mudal is an
+> independent project: it uses the name **Mudal** (මුදල්), its own launcher
+> icon and its own store listings. It does not use the PennyWise name, logo or
+> banner artwork anywhere in its branding, and it is not endorsed by,
+> affiliated with, or sponsored by the PennyWise project. See
+> [`ATTRIBUTION.md`](ATTRIBUTION.md) for what Mudal changed.
 
 "**PennyWise**", "**PennyWise AI**", the PennyWise logo, and the PennyWise
 banner artwork are unregistered trademarks of Sarim Ahmed
