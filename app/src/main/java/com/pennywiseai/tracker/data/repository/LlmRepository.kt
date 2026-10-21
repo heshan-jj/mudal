@@ -31,7 +31,6 @@ import javax.inject.Singleton
 class LlmRepository @Inject constructor(
     private val llmService: LlmService,
     private val chatDao: ChatDao,
-    private val modelRepository: ModelRepository,
     private val aiContextRepository: AiContextRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val categoryRepository: CategoryRepository,
@@ -109,15 +108,6 @@ class LlmRepository @Inject constructor(
             Log.d(TAG, "System prompt added to new chat")
         }
 
-        // Estimate tokens from all messages
-        val currentMessages = chatDao.getAllMessagesForContext()
-        val totalChars = currentMessages.map { it.message.length }.sum() + userMessage.length
-        val estimatedTokens = totalChars / 4
-
-        if (estimatedTokens > 1200) {
-            throw Exception("Chat memory is full. Please clear the chat to continue.")
-        }
-
         // Save user message
         val userChatMessage = ChatMessage(
             message = userMessage,
@@ -126,18 +116,12 @@ class LlmRepository @Inject constructor(
         Log.d(TAG, "Saving user message: ${userMessage.take(50)}...")
         chatDao.insertMessage(userChatMessage)
 
-        // Check if model is downloading
-        val currentModelState = modelRepository.modelState.first()
-        if (currentModelState == ModelState.DOWNLOADING) {
-            throw Exception("Model is currently downloading. Please wait for download to complete.")
-        }
-
         // Ensure engine is initialized and conversation is active
         ensureConversation()
 
+        val currentMessages = chatDao.getAllMessagesForContext()
         Log.d(TAG, "=== SENDING TO LLM ===")
         Log.d(TAG, "Total messages in context: ${currentMessages.size}")
-        Log.d(TAG, "Estimated tokens: $estimatedTokens")
 
         // Stream response — LiteRT-LM conversation manages history internally.
         // Tool calls are handed to us (never auto-run, #170): a lookup is
@@ -176,27 +160,19 @@ class LlmRepository @Inject constructor(
     }
 
     private suspend fun ensureConversation() {
-        // Initialize engine if needed
+        if (!userPreferencesRepository.isGeminiApiKeyConfigured()) {
+            throw Exception("Gemini API key is not configured. Please set your API key in Settings or Chat.")
+        }
+
+        // Initialize service if needed
         if (!llmService.isInitialized()) {
-            val modelFile = modelRepository.getModelFile()
-            if (!modelFile.exists()) {
-                throw Exception("Model not downloaded. Please download from Settings.")
-            }
-
-            // Integrity gate: never load a model whose bytes don't match the
-            // pinned hash (guards against an in-place-swapped or corrupted file).
-            if (!modelRepository.verifyModelIntegrity()) {
-                modelRepository.deleteModel()
-                throw Exception("AI model failed its integrity check and was removed. Please re-download it from Settings.")
-            }
-
-            val initResult = llmService.initialize(modelFile.absolutePath)
+            val initResult = llmService.initialize("")
             if (initResult.isFailure) {
                 throw initResult.exceptionOrNull() ?: Exception("Failed to initialize LLM")
             }
         }
 
-        // Create conversation if needed, replaying history from Room DB
+        // Create conversation if needed, replaying history from Room DB with sliding window
         if (!llmService.hasActiveConversation()) {
             val allMessages = chatDao.getAllMessagesForContext()
 
@@ -208,9 +184,10 @@ class LlmRepository @Inject constructor(
                     buildSystemPrompt(chatContext)
                 }
 
-            // Build history (excluding system prompt)
+            // Build history (excluding system prompt), taking last 20 messages for sliding window
             val history = allMessages
                 .filter { !it.isSystemPrompt }
+                .takeLast(20)
                 .map { it.message to it.isUser }
 
             val result = llmService.createConversation(systemPrompt, history, withTools = true)
