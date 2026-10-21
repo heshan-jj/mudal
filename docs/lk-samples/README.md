@@ -1,3 +1,4 @@
+<!-- Mudal fork: new file in Mudal, a fork of PennyWise AI (AGPL-3.0-only), 2026-10-21 - see NOTICE. -->
 # LK samples — real bank SMS from the owner
 
 Real (masked) transaction SMS collected from the owner's phone, used to write
@@ -35,6 +36,8 @@ than "debited", and the branch credits carry no date at all.
 ## Privacy
 
 These files contain real merchant names, locations, amounts and timestamps.
-Keep the repository private, or scrub them, before publishing. Sample messages
-must never be copied into app code, tests, or logs (repo rule 4: no PII
-anywhere).
+Personal names have been replaced with placeholders (`OWNER`, `PERSON A`,
+`PERSON B`) and account numbers are reduced to their last four digits, but the
+spending pattern is still a real one. Keep the repository private, or scrub
+further, before publishing. Sample messages must never be copied into app
+code, tests, or logs (repo rule 4: no PII anywhere).

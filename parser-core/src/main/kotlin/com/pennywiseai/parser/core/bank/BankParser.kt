@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.parser.core.bank
 
 import com.pennywiseai.parser.core.CompiledPatterns
@@ -45,7 +46,7 @@ abstract class BankParser {
      * Returns the currency used by this bank.
      * Defaults to INR for Indian banks. International banks should override this.
      */
-    open fun getCurrency(): String = "INR"
+    open fun getCurrency(): String = "LKR"
 
     /**
      * Parses an SMS message and extracts transaction information.
