@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.database
 
 import androidx.room.AutoMigration
@@ -79,7 +80,7 @@ import com.pennywiseai.tracker.data.database.entity.UnrecognizedSmsEntity
 const val SCHEMA_VERSION = 67
 
 /**
- * The PennyWise Room database.
+ * The Mudal Room database.
  * 
  * This database stores all financial transaction data locally on the device.
  * 

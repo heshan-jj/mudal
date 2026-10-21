@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.receiver
 
 import com.pennywiseai.parser.core.bank.BankParserFactory
@@ -16,10 +17,11 @@ import org.junit.Test
 class BankNotificationConfigTest {
 
     private val expectedBankByPackage = mapOf(
-        "com.avanza.ambitwizfbl" to "Faysal Bank",
-        "finansbank.enpara" to "Enpara",
-        "com.enparabank.retail" to "Enpara",
-        "com.huntington.m" to "Huntington Bank"
+        "lk.combank.flash" to "Commercial Bank",
+        "com.sampath.vishwa" to "Sampath Bank",
+        "com.fri_mi" to "Nations Trust Bank",
+        "lk.ndb.neos" to "National Development Bank",
+        "lk.nsb.pay" to "National Savings Bank"
     )
 
     @Test
@@ -41,13 +43,12 @@ class BankNotificationConfigTest {
     }
 
     @Test
-    fun `huntington notification parses like its text`() {
-        val alias = BankNotificationConfig.senderAlias("com.huntington.m")
-        val body = "Huntington Heads Up. We processed an ATM withdrawal: \$17.07 at TEST ATM. " +
-            "Acct CK1234 has a \$500.00 bal (10/01/26 7:13 AM ET)."
+    fun `commercial bank notification parses like its text`() {
+        val alias = BankNotificationConfig.senderAlias("lk.combank.flash")
+        val body = "Purchase at ARPITAN for LKR 2,500.00 with Card #4101 has been authorised."
         val parsed = BankParserFactory.getParser(alias)?.parse(body, alias, 0L)
-        assertEquals("17.07", parsed?.amount?.toPlainString())
-        assertEquals("USD", parsed?.currency)
+        assertEquals("2500.00", parsed?.amount?.toPlainString())
+        assertEquals("LKR", parsed?.currency)
     }
 
     @Test

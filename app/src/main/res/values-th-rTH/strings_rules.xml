@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ App lock ══ -->
     <string name="applock_prompt_subtitle">ตรวจสอบตัวตนเพื่อเข้าถึงข้อมูลค่าใช้จ่ายของคุณ</string>
-    <string name="applock_title">PennyWise ถูกล็อก</string>
+    <string name="applock_title">Mudal ถูกล็อก</string>
     <string name="applock_subtitle">ตรวจสอบตัวตนเพื่อเข้าถึงข้อมูลค่าใช้จ่ายของคุณ</string>
     <string name="applock_unlock">ปลดล็อก</string>
     <string name="applock_biometric_unavailable">การตรวจสอบทางชีวมิติไม่สามารถใช้งานได้</string>
@@ -11,7 +12,7 @@
     <!-- ══ SMS permission screen ══ -->
     <!-- ══ Unrecognized SMS ══ -->
     <string name="unrecognized_header_title">ข้อความธนาคารที่ไม่รู้จัก</string>
-    <string name="unrecognized_header_body">ข้อความเหล่านี้จากธนาคารที่อาจเกิดขึ้นไม่สามารถแยกวิเคราะห์โดยอัตโนมัติได้ ช่วยปรับปรุง PennyWise โดยรายงานพวกเขาเพื่อให้เราสนับสนุนธนาคารเพิ่มเติม</string>
+    <string name="unrecognized_header_body">ข้อความเหล่านี้จากธนาคารที่อาจเกิดขึ้นไม่สามารถแยกวิเคราะห์โดยอัตโนมัติได้ ช่วยปรับปรุง Mudal โดยรายงานพวกเขาเพื่อให้เราสนับสนุนธนาคารเพิ่มเติม</string>
     <string name="unrecognized_show_reported">แสดงที่รายงานแล้ว</string>
     <plurals name="unrecognized_new_count">
         <item quantity="other">%1$d ใหม่</item>
@@ -37,7 +38,7 @@
     <string name="onboarding_selected_cd">ที่เลือก</string>
     <string name="onboarding_get_started">เริ่มต้นใช้งาน</string>
     <string name="onboarding_continue">ดำเนินการต่อ</string>
-    <!-- ══ Chat (PennyWise AI) ══ -->
+    <!-- ══ Chat (Mudal) ══ -->
     <string name="chat_download">ดาวน์โหลด</string>
     <string name="chat_cancel">ยกเลิก</string>
     <string name="chat_settings">การตั้งค่า</string>

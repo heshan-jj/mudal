@@ -1,16 +1,15 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.presentation.add
 
 import java.math.BigDecimal
 
 /**
- * Best guess at the amount in text shared into the app ("Share to PennyWise"):
- * a UPI receipt, a forwarded bank SMS, or a quick note like "450 swiggy".
+ * Extracts a spending amount and optional currency from freeform text shared
+ * into the app (e.g. from a UPI receipt, a WhatsApp message, or another tracker).
  *
- * A currency-tagged figure ("₹450", "Rs. 1,200.50", "INR 99", "$12") wins and
- * also names its currency. A bare number is only trusted in a short note, and
- * only when it looks like an amount (≤ 6 digits, not glued to letters like an
- * account "XX1234"), because messages are full of dates, references and
- * account numbers. Anything unclear returns null — the user fills it in.
+ * Scans for explicit currency tags first ($120, EUR 45, LKR 500, Rs. 1500).
+ * If none match and the note is short (<= 40 chars), falls back to the first
+ * bare number on the assumption that a shared string like "450 lunch" is the amount.
  */
 object SharedTextAmount {
     data class Guess(val amount: BigDecimal, val currency: String?)
@@ -21,17 +20,14 @@ object SharedTextAmount {
     private const val SMALL_NUMBER = """(\d{1,6}(?:\.\d{1,2})?)$END"""
 
     // \b keeps "rs" from matching inside words ("users 50").
-    private val TAGGED = Regex("""([₹$€£]|\b(?:rs\.?|inr|usd|aed|sar|eur|gbp)(?![a-z]))\s*$NUMBER""", RegexOption.IGNORE_CASE)
+    private val TAGGED = Regex("""([$€]|\b(?:rs\.?|lkr|usd|eur)(?![a-z]))\s*$NUMBER""", RegexOption.IGNORE_CASE)
     private val BARE = Regex("""(?<![\w/.,-])$SMALL_NUMBER(?![/-])""")
     private const val SHORT_NOTE_CHARS = 40
 
     private fun currencyOf(tag: String): String? = when (tag.lowercase().trimEnd('.')) {
-        "₹", "rs", "inr" -> "INR"
+        "rs", "lkr" -> "LKR"
         "$", "usd" -> "USD"
         "€", "eur" -> "EUR"
-        "£", "gbp" -> "GBP"
-        "aed" -> "AED"
-        "sar" -> "SAR"
         else -> null
     }
 

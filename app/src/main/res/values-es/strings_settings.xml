@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ Settings screen ══ -->
     <!-- Shared dialog actions -->
-    <!-- PennyWise Pro -->
+    <!-- Mudal Pro -->
     <!-- Personalization -->
     <!-- Currency -->
     <!-- Budget -->

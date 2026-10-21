@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- Export transactions dialog -->
     <string name="txn_export_title_ready">Экспортировать транзакции</string>
@@ -27,7 +28,7 @@
     <string name="txn_export_action_export">Экспорт</string>
     <string name="txn_export_action_export_first">Экспорт первого %1$d</string>
     <string name="txn_export_action_done">Готово</string>
-    <string name="txn_export_share_subject">Экспорт транзакций PennyWise</string>
+    <string name="txn_export_share_subject">Экспорт транзакций Mudal</string>
     <string name="txn_export_share_chooser_title">Поделиться CSV</string>
     <string name="txn_export_action_share">Поделиться</string>
     <string name="txn_export_action_close">Закрыть</string>
@@ -397,14 +398,14 @@
     <string name="share_sheet_show">Показать</string>
     <string name="share_sheet_transactions">Хронология</string>
     <string name="share_sheet_subscriptions">Подписки</string>
-    <string name="share_sheet_no_subscriptions">Подписки пока не обнаружены — PennyWise находит их из повторяющихся платежей в вашем SMS.</string>
+    <string name="share_sheet_no_subscriptions">Подписки пока не обнаружены — Mudal находит их из повторяющихся платежей в вашем SMS.</string>
     <string name="share_sheet_period">Период</string>
     <string name="share_sheet_this_month">Этот месяц</string>
     <string name="share_sheet_last_month">Прошлый месяц</string>
     <string name="share_sheet_all_time">За все время</string>
     <!-- %1$s = month name -->
     <string name="share_banner_title">%1$s, подытожил</string>
-    <string name="share_banner_subtitle">Посмотрите, что отслеживает PennyWise</string>
+    <string name="share_banner_subtitle">Посмотрите, что отслеживает Mudal</string>
     <string name="share_banner_dismiss">Закрыть</string>
     <!-- Shared transaction components -->
     <string name="quick_category_title">Изменить категорию</string>

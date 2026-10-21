@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.ui.theme
 
 import androidx.compose.material3.Typography
@@ -8,6 +9,16 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.pennywiseai.tracker.R
+
+val GoogleSansFontFamily = FontFamily(
+    Font(R.font.google_sans_regular, FontWeight.Normal),
+    Font(R.font.google_sans_italic, FontWeight.Normal, FontStyle.Italic),
+    Font(R.font.google_sans_medium, FontWeight.Medium),
+    Font(R.font.google_sans_medium_italic, FontWeight.Medium, FontStyle.Italic),
+    Font(R.font.google_sans_bold, FontWeight.SemiBold),
+    Font(R.font.google_sans_bold, FontWeight.Bold),
+    Font(R.font.google_sans_bold_italic, FontWeight.Bold, FontStyle.Italic),
+)
 
 val SNProFontFamily = FontFamily(
     Font(R.font.sn_pro_regular, FontWeight.Normal),
@@ -59,7 +70,7 @@ val SNProFontFamily = FontFamily(
  * | `labelLarge` | Buttons, prominent inline actions |
  * | `labelMedium`/`Small` | Chips, badges, axis ticks, overlines |
  */
-fun getTypography(fontFamily: FontFamily = FontFamily.Default): Typography = Typography(
+fun getTypography(fontFamily: FontFamily = GoogleSansFontFamily): Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.SemiBold,

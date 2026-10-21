@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.core
 
 
@@ -113,6 +114,6 @@ object Constants {
      * External Links
      */
     object Links {
-        const val GITHUB_URL = "https://github.com/heshan-jj/pennywiseai-tracker"
+        const val GITHUB_URL = "https://github.com/heshan-jj/mudal"
     }
 }

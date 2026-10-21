@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.ui.screens.settings
 
 import android.os.Build
@@ -150,6 +151,7 @@ import com.pennywiseai.tracker.ui.theme.RosePine_Surface_tertiary
 import com.pennywiseai.tracker.ui.theme.RosePine_Text
 import com.pennywiseai.tracker.ui.theme.RosePine_Text_secondary
 import com.pennywiseai.tracker.ui.theme.RosePine_Text_tertiary
+import com.pennywiseai.tracker.ui.theme.GoogleSansFontFamily
 import com.pennywiseai.tracker.ui.theme.SNProFontFamily
 import com.pennywiseai.tracker.ui.theme.Spacing
 import com.pennywiseai.tracker.ui.viewmodel.ThemeViewModel
@@ -793,7 +795,7 @@ private fun FontSelector(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
         ) {
-            // System Default Option
+            // Google Sans Option
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -805,28 +807,28 @@ private fun FontSelector(
                         )
                     )
                     .background(
-                        color = if (currentFont == AppFont.SYSTEM)
+                        color = if (currentFont == AppFont.GOOGLE_SANS)
                             MaterialTheme.colorScheme.primaryContainer
                         else MaterialTheme.colorScheme.surfaceContainerLow
                     )
-                    .clickable { onFontSelected(AppFont.SYSTEM) },
+                    .clickable { onFontSelected(AppFont.GOOGLE_SANS) },
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = stringResource(R.string.appearance_font_default),
+                        text = stringResource(R.string.appearance_font_google_sans),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Default,
-                        color = if (currentFont == AppFont.SYSTEM)
+                        fontFamily = GoogleSansFontFamily,
+                        color = if (currentFont == AppFont.GOOGLE_SANS)
                             MaterialTheme.colorScheme.onPrimaryContainer
                         else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = stringResource(R.string.appearance_font_default_subtitle),
+                        text = stringResource(R.string.appearance_font_google_sans_subtitle),
                         style = MaterialTheme.typography.labelSmall,
-                        fontFamily = FontFamily.Default,
-                        color = if (currentFont == AppFont.SYSTEM)
+                        fontFamily = GoogleSansFontFamily,
+                        color = if (currentFont == AppFont.GOOGLE_SANS)
                             MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         else MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -840,8 +842,8 @@ private fun FontSelector(
                     .height(80.dp)
                     .clip(
                         RoundedCornerShape(
-                            topStart = 4.dp, topEnd = 16.dp,
-                            bottomStart = 4.dp, bottomEnd = 16.dp
+                            topStart = 4.dp, topEnd = 4.dp,
+                            bottomStart = 4.dp, bottomEnd = 4.dp
                         )
                     )
                     .background(
@@ -868,6 +870,46 @@ private fun FontSelector(
                         fontFamily = SNProFontFamily,
                         color = if (currentFont == AppFont.SN_PRO)
                             MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f)
+                        else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            // System Default Option
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(80.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 4.dp, topEnd = 16.dp,
+                            bottomStart = 4.dp, bottomEnd = 16.dp
+                        )
+                    )
+                    .background(
+                        color = if (currentFont == AppFont.SYSTEM)
+                            MaterialTheme.colorScheme.secondaryContainer
+                        else MaterialTheme.colorScheme.surfaceContainerLow
+                    )
+                    .clickable { onFontSelected(AppFont.SYSTEM) },
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(R.string.appearance_font_default),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Default,
+                        color = if (currentFont == AppFont.SYSTEM)
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                        else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = stringResource(R.string.appearance_font_default_subtitle),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontFamily = FontFamily.Default,
+                        color = if (currentFont == AppFont.SYSTEM)
+                            MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
                         else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

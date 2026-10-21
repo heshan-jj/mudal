@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.worker
 
 import androidx.room.withTransaction
@@ -16,7 +17,7 @@ import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import com.pennywiseai.parser.core.ParsedTransaction
-import com.pennywiseai.parser.core.bank.*
+import com.pennywiseai.parser.core.bank.BankParser
 import com.pennywiseai.tracker.data.database.entity.AccountBalanceEntity
 import com.pennywiseai.tracker.data.database.entity.ProfileEntity
 import com.pennywiseai.tracker.data.database.entity.CardType
@@ -132,7 +133,7 @@ class OptimizedSmsReaderWorker @AssistedInject constructor(
         private val ISO_CURRENCY_CODES: Set<String> by lazy {
             Currency.getAvailableCurrencies().mapTo(HashSet()) { it.currencyCode }
         }
-        private val AMOUNT_NEAR_SYMBOL = Regex("""[€$£₹]\s?\.?\d|\d[\d.,]*\s?[€$£₹]""")
+        private val AMOUNT_NEAR_SYMBOL = Regex("""(?:[€$£₹]|Rs\.?)\s?\.?\d|\d[\d.,]*\s?(?:[€$£₹]|Rs\.?)""", RegexOption.IGNORE_CASE)
         private val AMOUNT_NEAR_CODE = Regex("""\b([A-Z]{3})\s?\.?\d|\d[\d.,]*\s?([A-Z]{3})\b""")
 
         /**
@@ -644,117 +645,7 @@ class OptimizedSmsReaderWorker @AssistedInject constructor(
         parser: BankParser,
         sms: SmsMessage,
         isRecent: Boolean
-    ): ParseResult? = when (parser) {
-
-        is SBIBankParser -> {
-            if (!parser.isUPIMandateNotification(sms.body) || !isRecent) null
-            else parser.parseUPIMandateSubscription(sms.body)?.let { info ->
-                ParseResult.SpecialNotification(sms) {
-                    subscriptionRepository.createOrUpdateFromSBIMandate(info, parser.getBankName(), sms.body)
-                }
-            }
-        }
-
-        is PNBBankParser -> {
-            if (!parser.isUPIMandateNotification(sms.body) || !isRecent) null
-            else parser.parseUPIMandateSubscription(sms.body)?.let { info ->
-                ParseResult.SpecialNotification(sms) {
-                    subscriptionRepository.createOrUpdateFromMandate(info, parser.getBankName(), sms.body)
-                }
-            }
-        }
-
-        is FederalBankParser -> when {
-            parser.isMandateCreationNotification(sms.body) ->
-                parser.parseEMandateSubscription(sms.body)?.let { info ->
-                    ParseResult.SpecialNotification(sms) {
-                        subscriptionRepository.createOrUpdateFromFederalBankMandate(info, parser.getBankName(), sms.body)
-                    }
-                }
-            else ->
-                parser.parseFutureDebit(sms.body)?.let { info ->
-                    // Process if the SMS is recent, OR if the payment date is still in the future
-                    // (a mandate from 45 days ago with next-debit next week must still create the subscription).
-                    val paymentStillUpcoming = info.nextDeductionDate?.let { dateStr ->
-                        try {
-                            java.time.LocalDate.parse(
-                                dateStr,
-                                java.time.format.DateTimeFormatter.ofPattern(info.dateFormat)
-                            ).isAfter(java.time.LocalDate.now())
-                        } catch (_: Exception) { false }
-                    } ?: false
-
-                    if (isRecent || paymentStillUpcoming) {
-                        ParseResult.SpecialNotification(sms) {
-                            subscriptionRepository.createOrUpdateFromFederalBankMandate(info, parser.getBankName(), sms.body)
-                        }
-                    } else null
-                }
-        }
-
-        is HDFCBankParser -> {
-            val actions = mutableListOf<suspend () -> Unit>()
-            if (parser.isBalanceUpdateNotification(sms.body)) {
-                parser.parseBalanceUpdate(sms.body)?.let { info ->
-                    actions += { saveBalanceNotification(info, parser.getCurrency(), sms) }
-                }
-                // If unparseable as balance update, fall through to check eMandate/futureDebit below
-            }
-            if (parser.isEMandateNotification(sms.body) && isRecent)
-                parser.parseEMandateSubscription(sms.body)?.let { info ->
-                    actions += { subscriptionRepository.createOrUpdateFromEMandate(info, parser.getBankName(), sms.body) }
-                }
-            if (parser.isFutureDebitNotification(sms.body) && isRecent)
-                parser.parseFutureDebit(sms.body)?.let { info ->
-                    actions += { subscriptionRepository.createOrUpdateFromEMandate(info, parser.getBankName(), sms.body) }
-                }
-            if (actions.isNotEmpty()) ParseResult.SpecialNotification(sms) {
-                actions.forEach { action ->
-                    try { action() } catch (e: Exception) {
-                        Log.e(TAG, "HDFC action failed: ${e.message}", e)
-                    }
-                }
-            } else null
-        }
-
-        is IndianBankParser -> {
-            if (!parser.isMandateNotification(sms.body) || !isRecent) null
-            else parser.parseMandateSubscription(sms.body)?.let { info ->
-                ParseResult.SpecialNotification(sms) {
-                    subscriptionRepository.createOrUpdateFromIndianBankMandate(info, parser.getBankName(), sms.body)
-                }
-            }
-        }
-
-        is IndusIndBankParser -> {
-            if (!parser.isBalanceUpdateNotification(sms.body)) null
-            else parser.parseBalanceUpdate(sms.body)?.let { info ->
-                ParseResult.SpecialNotification(sms) {
-                    saveBalanceNotification(info, parser.getCurrency(), sms)
-                }
-            }
-        }
-
-        else -> null
-    }
-
-    private suspend fun saveBalanceNotification(
-        info: BaseIndianBankParser.BaseBalanceUpdateInfo,
-        currency: String,
-        sms: SmsMessage
-    ) = BankAccountMergeStore.mutationMutex.withLock {
-        val suffix = info.accountLast4?.let { bankAccountMerges.resolveSuffix(info.bankName, currency, it) }
-        // Balance-only notifications bypass saveTransaction, so apply the same account gates here.
-        if (!ignoredAccountsStore.isIgnored(info.bankName, suffix)) {
-            accountBalanceRepository.insertBalanceUpdate(
-                bankName = info.bankName,
-                accountLast4 = suffix ?: "XXXX",
-                balance = info.balance,
-                timestamp = info.asOfDate?.toJavaLocalDateTime() ?: sms.timestamp.toLocalDateTime(),
-                currency = currency
-            )
-        }
-    }
+    ): ParseResult? = null
 
     // ─── Stage 3b: Regular transactions ──────────────────────────────────────
 

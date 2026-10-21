@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ Home screen ══ -->
     <string name="home_transaction_deleted">Transaction deleted</string>
     <string name="home_undo">Undo</string>
-    <string name="home_upgrade_pro">Upgrade to PennyWise Pro</string>
+    <string name="home_upgrade_pro">Upgrade to Mudal Pro</string>
     <string name="home_profile_filter">Profile filter</string>
     <string name="home_more_options">More options</string>
     <string name="home_view_all">View All</string>
@@ -307,7 +308,7 @@
     <string name="balance_chart_label">Balance Trend</string>
 
     <!-- One-time Home card for engaged free users (#945). No price, link or website. -->
-    <string name="pro_home_card_title">Enjoying PennyWise?</string>
+    <string name="pro_home_card_title">Enjoying Mudal?</string>
     <string name="pro_home_card_body">Pro adds unlimited rules, goals, exports and statement imports.</string>
     <string name="pro_home_card_action">See Pro</string>
     <string name="pro_home_card_dismiss">Dismiss</string>

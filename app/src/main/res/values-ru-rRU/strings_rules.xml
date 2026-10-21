@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ App lock ══ -->
-    <string name="applock_prompt_title">Разблокировать PennyWise</string>
+    <string name="applock_prompt_title">Разблокировать Mudal</string>
     <string name="applock_prompt_subtitle">Аутентифицируйтесь, чтобы получить доступ к данным о расходах</string>
     <string name="applock_prompt_description">Используйте ваши биометрические данные или PIN-код устройства</string>
     <string name="applock_icon_cd">Приложение заблокировано</string>
-    <string name="applock_title">PennyWise заблокирован</string>
+    <string name="applock_title">Mudal заблокирован</string>
     <string name="applock_subtitle">Аутентифицируйтесь, чтобы получить доступ к данным о расходах</string>
     <string name="applock_unlock">Разблокировать</string>
     <string name="applock_biometric_unavailable">Биометрическая аутентификация недоступна</string>
@@ -27,11 +28,11 @@
     <string name="biometric_error_unknown">Неизвестный биометрический статус</string>
     <!-- ══ SMS permission screen ══ -->
     <string name="permission_title">Включить автоматическое обнаружение транзакций</string>
-    <string name="permission_description">PennyWise может автоматически определять и классифицировать Ваши банковские операции из SMS сообщений, что экономит Ваше время и усилия.</string>
+    <string name="permission_description">Mudal может автоматически определять и классифицировать Ваши банковские операции из SMS сообщений, что экономит Ваше время и усилия.</string>
     <string name="permission_privacy_title">Ваши личные вопросы</string>
     <string name="permission_privacy_points">• Только транзакции обрабатываются\n• Все данные остаются на вашем устройстве\n• Личные сообщения не читаются\n• Вы можете отменить доступ в любое время в настройках</string>
     <string name="permission_notification_title">Разрешить доступ к банковским уведомлениям</string>
-    <string name="permission_notification_description">Разрешить PennyWise читать уведомления о транзакциях из поддерживаемых банковских приложений. Это помогает захватывать покупки, когда SMS отложен или недоступен.</string>
+    <string name="permission_notification_description">Разрешить Mudal читать уведомления о транзакциях из поддерживаемых банковских приложений. Это помогает захватывать покупки, когда SMS отложен или недоступен.</string>
     <string name="permission_notification_enabled">Доступ к уведомлениям включен</string>
     <string name="permission_notification_open_settings">Открыть настройки доступа к уведомлениям</string>
     <string name="permission_rationale">Без SMS-доступа вам нужно вручную добавить все ваши транзакции. Мы только читаем сообщения о банковских транзакциях, а не личные разговоры.</string>
@@ -40,7 +41,7 @@
     <string name="unrecognized_title">Нераспознанные СМС</string>
     <string name="unrecognized_back">Назад</string>
     <string name="unrecognized_header_title">Неопознанные банковские сообщения</string>
-    <string name="unrecognized_header_body">Эти сообщения от потенциальных банков не удалось автоматически распознать. Помогите улучшить PennyWise, сообщая о них, чтобы мы могли добавить поддержку большего числа банков.</string>
+    <string name="unrecognized_header_body">Эти сообщения от потенциальных банков не удалось автоматически распознать. Помогите улучшить Mudal, сообщая о них, чтобы мы могли добавить поддержку большего числа банков.</string>
     <string name="unrecognized_show_reported">Показать отправленные отчеты</string>
     <plurals name="unrecognized_new_count">
         <item quantity="one">%1$d новых</item>
@@ -81,12 +82,12 @@
     <string name="import_statement_failed">Не удалось импортировать</string>
     <string name="import_statement_try_again">Попробовать ещё раз</string>
     <!-- ══ Upgrade sheet (Pro) — wording is Play-policy reviewed (#802); keep as-is ══ -->
-    <string name="upgrade_title">PennyWise Pro</string>
+    <string name="upgrade_title">Mudal Pro</string>
     <string name="upgrade_subtitle_member">Все возможности Pro активны</string>
     <string name="upgrade_subtitle_upgrade">Всё разблокировано с лицензионным ключом</string>
     <string name="upgrade_enter_license_key">Введите лицензионный ключ</string>
     <string name="upgrade_support_note">Сделано сольным девом — Pro funds что дальше. Спасибо.</string>
-    <string name="upgrade_available_at">PennyWise Pro доступен на %1$s</string>
+    <string name="upgrade_available_at">Mudal Pro доступен на %1$s</string>
     <string name="upgrade_copied">Скопировано</string>
     <string name="upgrade_copy_address">Копировать адрес</string>
     <string name="upgrade_includes">Включает</string>
@@ -99,7 +100,7 @@
     <string name="upgrade_get_help">Получить помощь</string>
     <string name="upgrade_welcome_eyebrow">ДОБРО ПОЖАЛОСЬ</string>
     <string name="upgrade_celebration_title">Вы являетесь участником Pro</string>
-    <string name="upgrade_celebration_body">Спасибо за поддержку PennyWise — все функции в списке теперь ваш.</string>
+    <string name="upgrade_celebration_body">Спасибо за поддержку Mudal — все функции в списке теперь ваш.</string>
     <string name="upgrade_continue">Продолжить</string>
     <string name="upgrade_active_eyebrow">АКТИВНЫЙ</string>
     <string name="upgrade_active_title">Все функции Pro разблокированы</string>
@@ -119,8 +120,8 @@
     <string name="upgrade_license_error_active_elsewhere">Этот ключ уже активен на другом устройстве.</string>
     <string name="upgrade_license_error_offline">Не удалось подключиться к серверу лицензии. Проверьте подключение и повторите попытку.</string>
     <!-- ══ Onboarding ══ -->
-    <string name="onboarding_logo_cd">PennyWise</string>
-    <string name="onboarding_welcome_title">Добро пожаловать в PennyWise</string>
+    <string name="onboarding_logo_cd">Mudal</string>
+    <string name="onboarding_welcome_title">Добро пожаловать в Mudal</string>
     <string name="onboarding_welcome_body">Ваш AI-мощный трекер расходов, который автоматически определяет транзакции из SMS-сообщений.</string>
     <string name="onboarding_setup_heading">Что вы настраиваете:</string>
     <string name="onboarding_setup_steps">1. Ваш профиль\n2. разрешения SMS для автоопределения\n3. Начальные транзакции сканируют\n4. Ваш основной банковский счет</string>
@@ -131,7 +132,7 @@
     <string name="onboarding_background_color_title">Выбрать цвет фона</string>
     <string name="onboarding_selected_cd">Выбрано</string>
     <string name="onboarding_permission_title">Включить автоматическое обнаружение</string>
-    <string name="onboarding_permission_body">PennyWise может автоматически определять и классифицировать Ваши банковские операции из SMS-сообщений.</string>
+    <string name="onboarding_permission_body">Mudal может автоматически определять и классифицировать Ваши банковские операции из SMS-сообщений.</string>
     <string name="onboarding_permission_granted">Разрешения предоставлены! Нажмите Продолжить, чтобы продолжить.</string>
     <string name="onboarding_enable_permissions">Включить разрешения</string>
     <string name="onboarding_scan_in_progress">Сканирование сообщений...</string>
@@ -164,8 +165,8 @@
     <string name="onboarding_continue">Продолжить</string>
     <string name="onboarding_start_scanning">Начать сканирование</string>
     <string name="onboarding_finish">Закончить</string>
-    <!-- ══ Chat (PennyWise AI) ══ -->
-    <string name="chat_title">PennyWise AI</string>
+    <!-- ══ Chat (Mudal) ══ -->
+    <string name="chat_title">Mudal</string>
     <string name="chat_downloading_model">Загрузка модели...</string>
     <string name="chat_model_required_title">Требуется модель ИИ</string>
     <string name="chat_model_required_body">Загрузите ИИ модель, чтобы начать чат</string>
@@ -234,7 +235,7 @@
     <string name="chat_error_integrity_failed">Загруженная модель не смогла проверить целостность и была удалена. Пожалуйста, попробуйте загрузить еще раз.</string>
     <string name="chat_error_download_failed">Не удалось загрузить. Попробуйте еще раз.</string>
     <string name="chat_download_notification_title">Модель чата ИИ</string>
-    <string name="chat_download_notification_description">Загрузка помощника AI для PennyWise</string>
+    <string name="chat_download_notification_description">Загрузка помощника AI для Mudal</string>
     <!-- ══ Smart Rules list ══ -->
     <string name="rules_title">Умные правила</string>
     <string name="rules_navigate_back">Назад</string>

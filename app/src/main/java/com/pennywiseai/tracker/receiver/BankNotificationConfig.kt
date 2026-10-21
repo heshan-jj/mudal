@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.receiver
 
 import android.app.Notification
@@ -12,19 +13,17 @@ import com.pennywiseai.parser.core.bank.BankParserFactory
 object BankNotificationConfig {
 
     internal val allowedPackages: Map<String, String> = mapOf(
-        // Faysal Bank (Pakistan) – alias must match FaysalBankParser.canHandle()
-        "com.avanza.ambitwizfbl" to "FaysalBank",
-        // Enpara (Turkey) – alias must match EnparaBankParser.canHandle()
-        "finansbank.enpara" to "Enpara",      // Enpara.com Cep Şubesi (personal, older brand)
-        "com.enparabank.retail" to "Enpara",  // Enpara Bank Cep Şube (personal, post-rebrand)
-        // slice (India) – alias must match SliceParser.canHandle()
-        "indwin.c3.shareapp" to "slice",
-        // Notification-only providers (UK) – aliases must match their parsers
-        "com.chase.intl" to "ChaseUK",        // Chase UK — distinct from the US Chase parser
-        "com.avuscapital.trading212" to "Trading212",
-        // Huntington (USA) – app notifications use the same wording as its texts;
-        // alias must match HuntingtonBankParser.canHandle()
-        "com.huntington.m" to "Huntington"    // Huntington Mobile Banking
+        // Commercial Bank of Ceylon
+        "lk.combank.flash" to "COMBANK",
+        "com.combank.qplus" to "COMBANK",
+        // Sampath Bank
+        "com.sampath.vishwa" to "SAMPATHTXN",
+        // Nations Trust Bank
+        "com.fri_mi" to "NationsSMS",
+        // NDB Bank
+        "lk.ndb.neos" to "NDBALERT",
+        // National Savings Bank
+        "lk.nsb.pay" to "NSB"
     )
 
     /** Sender aliases notification-booked transactions are saved under. */

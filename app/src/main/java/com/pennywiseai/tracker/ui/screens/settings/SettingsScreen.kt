@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.ui.screens.settings
 
 import android.content.ActivityNotFoundException
@@ -803,7 +804,7 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_report_issue_title),
                     subtitle = stringResource(R.string.settings_report_issue_subtitle),
                     onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/heshan-jj/pennywiseai-tracker/issues/new"))
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/heshan-jj/mudal/issues/new"))
                         context.startActivity(intent)
                     },
                     position = ListItemPosition.Middle,
@@ -814,9 +815,9 @@ fun SettingsScreen(
                     iconBgColor = teal_light,
                     iconTint = teal_dark,
                     title = "Source code & licenses",
-                    subtitle = "AGPL-3.0 · heshan-jj/pennywiseai-tracker",
+                    subtitle = "AGPL-3.0 · heshan-jj/mudal",
                     onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/heshan-jj/pennywiseai-tracker"))
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/heshan-jj/mudal"))
                         context.startActivity(intent)
                     },
                     position = ListItemPosition.Bottom,
@@ -1259,7 +1260,7 @@ fun SettingsScreen(
         val timestamp = java.time.LocalDateTime.now().format(
             java.time.format.DateTimeFormatter.ofPattern("yyyy_MM_dd_HHmmss")
         )
-        val fileName = "PennyWise_Backup_$timestamp.pennywisebackup"
+        val fileName = "Mudal_Backup_$timestamp.pennywisebackup"
 
         AlertDialog(
             onDismissRequest = {

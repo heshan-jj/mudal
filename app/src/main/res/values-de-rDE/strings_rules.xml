@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ App lock ══ -->
-    <string name="applock_prompt_title">PennyWise freischalten</string>
+    <string name="applock_prompt_title">Mudal freischalten</string>
     <string name="applock_prompt_subtitle">Authentifizieren, um auf Ihre Ausgabendaten zuzugreifen</string>
     <string name="applock_prompt_description">Nutze deine biometrische Zugangsdaten oder Geräte-PIN</string>
     <string name="applock_icon_cd">App gesperrt</string>
-    <string name="applock_title">PennyWise ist gesperrt</string>
+    <string name="applock_title">Mudal ist gesperrt</string>
     <string name="applock_subtitle">Authentifizieren, um auf Ihre Ausgabendaten zuzugreifen</string>
     <string name="applock_unlock">Entsperren</string>
     <string name="applock_biometric_unavailable">Biometrische Authentifizierung nicht verfügbar</string>
@@ -25,11 +26,11 @@
     <string name="biometric_error_unknown">Unbekannter biometrischer Status</string>
     <!-- ══ SMS permission screen ══ -->
     <string name="permission_title">Automatische Transaktionserkennung aktivieren</string>
-    <string name="permission_description">PennyWise erkennt und kategorisiert Ihre Banktransaktionen automatisch aus SMS und spart Ihnen Zeit und Aufwand.</string>
+    <string name="permission_description">Mudal erkennt und kategorisiert Ihre Banktransaktionen automatisch aus SMS und spart Ihnen Zeit und Aufwand.</string>
     <string name="permission_privacy_title">Ihre Privatsphäre ist wichtig</string>
     <string name="permission_privacy_points">• Nur Transaktionsnachrichten werden verarbeitet\n• Alle Daten bleiben auf Ihrem Gerät\n• Keine persönlichen Nachrichten werden\ngelesen • Sie können den Zugriff jederzeit in den Einstellungen widerrufen</string>
     <string name="permission_notification_title">Zugriff auf Bankbenachrichtigung aktivieren</string>
-    <string name="permission_notification_description">Erlaube PennyWise Transaktionsbenachrichtigungen von unterstützten Banking-Apps zu lesen. Dies hilft, Einkäufe zu erfassen, wenn SMS verzögert oder nicht verfügbar ist.</string>
+    <string name="permission_notification_description">Erlaube Mudal Transaktionsbenachrichtigungen von unterstützten Banking-Apps zu lesen. Dies hilft, Einkäufe zu erfassen, wenn SMS verzögert oder nicht verfügbar ist.</string>
     <string name="permission_notification_enabled">Benachrichtigungszugriff aktiviert</string>
     <string name="permission_notification_open_settings">Benachrichtigungszugriffseinstellungen öffnen</string>
     <string name="permission_rationale">Ohne SMS-Zugriff müssen Sie alle Ihre Transaktionen manuell hinzufügen. Wir lesen nur Banktransaktionsnachrichten, nicht persönliche Gespräche.</string>
@@ -38,7 +39,7 @@
     <string name="unrecognized_title">Unbekannte SMS</string>
     <string name="unrecognized_back">Zurück</string>
     <string name="unrecognized_header_title">Unbekannte Banknachrichten</string>
-    <string name="unrecognized_header_body">Diese Nachrichten von potenziellen Banken konnten nicht automatisch geparst werden. Hilf dabei, PennyWise zu verbessern, indem du sie meldest, damit wir Unterstützung für mehr Banken hinzufügen können.</string>
+    <string name="unrecognized_header_body">Diese Nachrichten von potenziellen Banken konnten nicht automatisch geparst werden. Hilf dabei, Mudal zu verbessern, indem du sie meldest, damit wir Unterstützung für mehr Banken hinzufügen können.</string>
     <string name="unrecognized_show_reported">Gemeldete anzeigen</string>
     <plurals name="unrecognized_new_count">
         <item quantity="one">%1$d neu</item>
@@ -75,12 +76,12 @@
     <string name="import_statement_failed">Import fehlgeschlagen</string>
     <string name="import_statement_try_again">Erneut versuchen</string>
     <!-- ══ Upgrade sheet (Pro) — wording is Play-policy reviewed (#802); keep as-is ══ -->
-    <string name="upgrade_title">PennyWise Pro</string>
+    <string name="upgrade_title">Mudal Pro</string>
     <string name="upgrade_subtitle_member">Alle Pro-Fähigkeiten aktiv</string>
     <string name="upgrade_subtitle_upgrade">Alles entsperrt mit einem Lizenzschlüssel</string>
     <string name="upgrade_enter_license_key">Lizenzschlüssel eingeben</string>
     <string name="upgrade_support_note">Erstellt von einem Solo-Entwickler — Pro finanziert was als nächstes geschieht. Vielen Dank.</string>
-    <string name="upgrade_available_at">PennyWise Pro ist verfügbar unter %1$s</string>
+    <string name="upgrade_available_at">Mudal Pro ist verfügbar unter %1$s</string>
     <string name="upgrade_copied">Kopiert</string>
     <string name="upgrade_copy_address">Adresse kopieren</string>
     <string name="upgrade_includes">Beinhaltet</string>
@@ -93,7 +94,7 @@
     <string name="upgrade_get_help">Hilfe erhalten</string>
     <string name="upgrade_welcome_eyebrow">WILLKOMMEN</string>
     <string name="upgrade_celebration_title">Du bist ein Pro-Mitglied</string>
-    <string name="upgrade_celebration_body">Vielen Dank für die Unterstützung von PennyWise – alle Funktionen auf der Liste gehören jetzt Ihnen.</string>
+    <string name="upgrade_celebration_body">Vielen Dank für die Unterstützung von Mudal – alle Funktionen auf der Liste gehören jetzt Ihnen.</string>
     <string name="upgrade_continue">Weiter</string>
     <string name="upgrade_active_eyebrow">AKTIV</string>
     <string name="upgrade_active_title">Alle Pro-Funktionen freigeschaltet</string>
@@ -114,7 +115,7 @@
     <string name="upgrade_license_error_offline">Konnte den Lizenzserver nicht erreichen. Überprüfe deine Verbindung und versuche es erneut.</string>
     <!-- ══ Onboarding ══ -->
     <string name="onboarding_logo_cd">Barrio</string>
-    <string name="onboarding_welcome_title">Willkommen bei PennyWise</string>
+    <string name="onboarding_welcome_title">Willkommen bei Mudal</string>
     <string name="onboarding_welcome_body">Ihr KI-basierter Ausgaben-Tracker, der automatisch Transaktionen aus SMS-Nachrichten erkennt.</string>
     <string name="onboarding_setup_heading">Was Sie einrichten:</string>
     <string name="onboarding_setup_steps">1. Ihr Profil\n2. SMS-Berechtigungen für die Auto-Erkennung\n3. Anfangsbuchung\n4. Ihr Hauptkonto</string>
@@ -126,7 +127,7 @@
     <string name="onboarding_background_color_title">Wählen Sie eine Hintergrundfarbe</string>
     <string name="onboarding_selected_cd">Ausgewählt</string>
     <string name="onboarding_permission_title">Automatische Erkennung aktivieren</string>
-    <string name="onboarding_permission_body">PennyWise erkennt und kategorisiert Ihre Banktransaktionen automatisch aus SMS-Nachrichten.</string>
+    <string name="onboarding_permission_body">Mudal erkennt und kategorisiert Ihre Banktransaktionen automatisch aus SMS-Nachrichten.</string>
     <string name="onboarding_permission_granted">Berechtigungen gewährt! Tippen Sie auf Weiter, um fortzufahren.</string>
     <string name="onboarding_enable_permissions">Berechtigungen aktivieren</string>
     <string name="onboarding_scan_in_progress">Scanne deine Nachrichten...</string>
@@ -159,8 +160,8 @@
     <string name="onboarding_continue">Weiter</string>
     <string name="onboarding_start_scanning">Scan starten</string>
     <string name="onboarding_finish">Beenden</string>
-    <!-- ══ Chat (PennyWise AI) ══ -->
-    <string name="chat_title">PennyWise AI</string>
+    <!-- ══ Chat (Mudal) ══ -->
+    <string name="chat_title">Mudal</string>
     <string name="chat_downloading_model">Modell wird heruntergeladen...</string>
     <string name="chat_model_required_title">KI-Modell erforderlich</string>
     <string name="chat_model_required_body">Laden Sie das KI-Modell herunter, um zu chatten</string>
@@ -227,7 +228,7 @@
     <string name="chat_error_integrity_failed">Heruntergeladenes Modell ist bei der Integritätsprüfung fehlgeschlagen und wurde entfernt. Bitte versuchen Sie es erneut.</string>
     <string name="chat_error_download_failed">Download fehlgeschlagen. Bitte erneut versuchen.</string>
     <string name="chat_download_notification_title">KI-Chat-Modell</string>
-    <string name="chat_download_notification_description">KI-Chat-Assistent für PennyWise herunterladen</string>
+    <string name="chat_download_notification_description">KI-Chat-Assistent für Mudal herunterladen</string>
     <!-- ══ Smart Rules list ══ -->
     <string name="rules_title">Intelligente Regeln</string>
     <string name="rules_navigate_back">Zurück navigieren</string>

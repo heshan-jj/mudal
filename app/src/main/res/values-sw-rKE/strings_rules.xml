@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ App lock ══ -->
     <!-- Biometric capability errors (also shown in Settings) -->
@@ -8,7 +9,7 @@
     <!-- ══ Upgrade sheet (Pro) — wording is Play-policy reviewed (#802); keep as-is ══ -->
     <!-- License key dialog -->
     <!-- ══ Onboarding ══ -->
-    <!-- ══ Chat (PennyWise AI) ══ -->
+    <!-- ══ Chat (Mudal) ══ -->
     <!-- Example prompts: tapping one sends it to the on-device model as the user's message. -->
     <!-- Chat confirm card for an AI-proposed action -->
     <!-- Chat errors -->

@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker
 
 import android.content.Intent
@@ -67,7 +68,7 @@ class MainActivity : FragmentActivity() {
     var widgetDestination by mutableStateOf<Any?>(null)
         private set
 
-    // Text shared to PennyWise from another app; opens Add Transaction pre-filled.
+    // Text shared to Mudal from another app; opens Add Transaction pre-filled.
     var sharedText by mutableStateOf<String?>(null)
         private set
 

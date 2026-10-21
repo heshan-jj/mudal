@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.utils
 
 import java.math.BigDecimal
@@ -6,55 +7,59 @@ import java.util.Currency
 import java.util.Locale
 
 /**
- * Utility functions for currency formatting
+ * Utility functions for currency formatting.
+ * Supported currencies are restricted to LKR (Sri Lankan Rupee), USD (US Dollar), and EUR (Euro).
  */
 object CurrencyUtils {
-    
-    private val indianLocale = Locale.Builder().setLanguage("en").setRegion("IN").build()
-    private val indianCurrencyFormat = NumberFormat.getCurrencyInstance(indianLocale).apply {
-        currency = Currency.getInstance("INR")
-        maximumFractionDigits = 0 // No decimal places for whole amounts
+
+    private val lkLocale = Locale.Builder().setLanguage("en").setRegion("LK").build()
+    private val lkCurrencyFormat = NumberFormat.getCurrencyInstance(lkLocale).apply {
+        try {
+            currency = Currency.getInstance("LKR")
+        } catch (_: Exception) {}
+        maximumFractionDigits = 0
     }
-    
+
     /**
-     * Formats a BigDecimal amount as Indian Rupees
-     * @param amount The amount to format
-     * @return Formatted string like "₹1,234" or "₹1,23,456"
+     * Formats a BigDecimal amount as Sri Lankan Rupees
      */
     fun formatCurrency(amount: BigDecimal): String {
-        // For amounts with decimals, show them
         return if (amount.stripTrailingZeros().scale() > 0) {
-            val formatter = NumberFormat.getCurrencyInstance(indianLocale).apply {
-                currency = Currency.getInstance("INR")
+            val formatter = NumberFormat.getCurrencyInstance(lkLocale).apply {
+                try {
+                    currency = Currency.getInstance("LKR")
+                } catch (_: Exception) {}
                 maximumFractionDigits = 2
                 minimumFractionDigits = 1
             }
             formatter.format(amount)
         } else {
-            indianCurrencyFormat.format(amount)
+            lkCurrencyFormat.format(amount)
         }
     }
-    
+
     /**
-     * Formats a Double amount as Indian Rupees
+     * Formats a Double amount as Sri Lankan Rupees
      */
     fun formatCurrency(amount: Double): String {
         return formatCurrency(BigDecimal.valueOf(amount))
     }
-    
+
     /**
-     * Formats an Int amount as Indian Rupees
+     * Formats an Int amount as Sri Lankan Rupees
      */
     fun formatCurrency(amount: Int): String {
         return formatCurrency(BigDecimal(amount))
     }
-    
+
     /**
      * Formats an amount with a custom number of decimal places
      */
     fun formatCurrency(amount: BigDecimal, decimalPlaces: Int): String {
-        val formatter = NumberFormat.getCurrencyInstance(indianLocale).apply {
-            currency = Currency.getInstance("INR")
+        val formatter = NumberFormat.getCurrencyInstance(lkLocale).apply {
+            try {
+                currency = Currency.getInstance("LKR")
+            } catch (_: Exception) {}
             maximumFractionDigits = decimalPlaces
             minimumFractionDigits = decimalPlaces
         }
@@ -62,54 +67,27 @@ object CurrencyUtils {
     }
 
     /**
-     * Sorts a list of currency codes with INR prioritized first, then alphabetically.
-     * This is the standard sorting for currency lists throughout the app.
-     *
-     * @param currencies List of currency codes to sort
-     * @return Sorted list with INR first (if present), then alphabetically
-     *
-     * Example:
-     * ```
-     * sortCurrencies(listOf("USD", "EUR", "INR", "GBP"))
-     * // Returns: ["INR", "EUR", "GBP", "USD"]
-     * ```
+     * Sorts a list of currency codes with LKR prioritized first, followed by USD, EUR, then others.
      */
     fun sortCurrencies(currencies: List<String>): List<String> {
+        val priority = listOf("LKR", "USD", "EUR")
         return currencies.sortedWith { a, b ->
+            val idxA = priority.indexOf(a.uppercase())
+            val idxB = priority.indexOf(b.uppercase())
             when {
-                a == "INR" -> -1 // INR first
-                b == "INR" -> 1
-                else -> a.compareTo(b) // Alphabetical for others
+                idxA != -1 && idxB != -1 -> idxA.compareTo(idxB)
+                idxA != -1 -> -1
+                idxB != -1 -> 1
+                else -> a.compareTo(b)
             }
         }
     }
 
     /**
-     * Returns a comprehensive list of all supported currencies.
-     * Includes currencies from supported banks and common international currencies.
-     *
-     * @return List of currency codes sorted with INR first, then alphabetically
+     * Returns the list of all supported currencies in Mudal.
+     * Restricted to LKR, USD, and EUR.
      */
     fun getAllSupportedCurrencies(): List<String> {
-        // Keep this in sync with the currencies our bank parsers emit
-        // (BankParser.getCurrency()) so anything the app can auto-import is also
-        // manually selectable. Every code here must be a valid ISO 4217 code.
-        val currencies = listOf(
-            // Major currencies
-            "INR", "USD", "EUR", "GBP", "JPY", "CNY",
-            // Middle East
-            "AED", "SAR", "KWD", "OMR", "IRR", "JOD", "BHD",
-            // South Asia
-            "NPR", "LKR", "BDT", "PKR",
-            // Asia Pacific
-            "SGD", "AUD", "THB", "MYR", "KRW",
-            // Americas
-            "CAD", "MXN", "COP", "BRL", "ARS", "CLP", "UYU",
-            // Africa
-            "ETB", "KES", "NGN", "TZS", "MZN", "EGP",
-            // Europe
-            "BYN", "CZK", "RUB", "TRY"
-        )
-        return sortCurrencies(currencies)
+        return listOf("LKR", "USD", "EUR")
     }
 }

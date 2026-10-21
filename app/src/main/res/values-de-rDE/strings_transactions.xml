@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- Export transactions dialog -->
     <string name="txn_export_title_ready">Transaktionen exportieren</string>
@@ -23,7 +24,7 @@
     <string name="txn_export_action_export">Exportieren</string>
     <string name="txn_export_action_export_first">Erste %1$d exportieren</string>
     <string name="txn_export_action_done">Fertig</string>
-    <string name="txn_export_share_subject">PennyWise Transaktionen Export</string>
+    <string name="txn_export_share_subject">Mudal Transaktionen Export</string>
     <string name="txn_export_share_chooser_title">CSV teilen</string>
     <string name="txn_export_action_share">Teilen</string>
     <string name="txn_export_action_close">Schließen</string>
@@ -375,14 +376,14 @@
     <string name="share_sheet_show">Zeigen</string>
     <string name="share_sheet_transactions">Zeitleiste</string>
     <string name="share_sheet_subscriptions">Abonnements</string>
-    <string name="share_sheet_no_subscriptions">Noch keine Abonnements gefunden – PennyWise findet diese bei wiederkehrenden Zahlungen in Ihren SMS.</string>
+    <string name="share_sheet_no_subscriptions">Noch keine Abonnements gefunden – Mudal findet diese bei wiederkehrenden Zahlungen in Ihren SMS.</string>
     <string name="share_sheet_period">Zeitraum</string>
     <string name="share_sheet_this_month">Diesen Monat</string>
     <string name="share_sheet_last_month">Letzten Monat</string>
     <string name="share_sheet_all_time">Gesamt</string>
     <!-- %1$s = month name -->
     <string name="share_banner_title">%1$s, zusammengefasst</string>
-    <string name="share_banner_subtitle">Sieh was PennyWise für dich verfolgt hat</string>
+    <string name="share_banner_subtitle">Sieh was Mudal für dich verfolgt hat</string>
     <string name="share_banner_dismiss">Verwerfen</string>
     <!-- Shared transaction components -->
     <string name="quick_category_title">Kategorie ändern</string>

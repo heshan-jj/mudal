@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.presentation.accounts
 
 import com.pennywiseai.tracker.R
@@ -263,7 +264,7 @@ class AccountDetailViewModel @Inject constructor(
     private fun primaryCurrencyForAccount(latestBalance: AccountBalanceEntity?): String {
         return CurrencyFormatter.resolveAccountCurrency(
             sourceType = latestBalance?.sourceType,
-            storedCurrency = latestBalance?.currency ?: "INR",
+            storedCurrency = latestBalance?.currency ?: "LKR",
             bankName = bankName
         )
     }

@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.backup.folder
 
 import android.content.Context
@@ -45,6 +46,9 @@ class FolderBackupWriter @Inject constructor(
         // Temp now holds a complete backup. Remove the old file, then rename temp -> final.
         // If interrupted between the two, the fresh data still exists under the temp name.
         folder.findFile(ScheduledFolderBackupConstants.BACKUP_FILE_NAME)?.delete()
+        // One-time cleanup: a pre-rebrand build wrote the backup under the old
+        // file name. Delete it so the folder holds exactly one copy.
+        folder.findFile(ScheduledFolderBackupConstants.LEGACY_BACKUP_FILE_NAME)?.delete()
         if (tempFile.renameTo(ScheduledFolderBackupConstants.BACKUP_FILE_NAME)) {
             return Result.Success
         }

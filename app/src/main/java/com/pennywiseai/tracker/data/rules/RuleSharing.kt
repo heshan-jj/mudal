@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.rules
 
 import com.pennywiseai.tracker.domain.model.rule.RuleAction
@@ -146,10 +147,10 @@ object RuleSharingCodec {
         val parsed = try {
             json.decodeFromString<SharedRuleSet>(text)
         } catch (e: Exception) {
-            throw IllegalArgumentException("This doesn't look like a PennyWise rules file.", e)
+            throw IllegalArgumentException("This doesn't look like a Mudal rules file.", e)
         }
         require(parsed.version <= SharedRuleSet.CURRENT_VERSION) {
-            "This rules file was made by a newer version of PennyWise."
+            "This rules file was made by a newer version of Mudal."
         }
 
         val mapped = parsed.rules.map { shared ->

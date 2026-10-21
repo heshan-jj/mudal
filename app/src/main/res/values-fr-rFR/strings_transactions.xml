@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- Export transactions dialog -->
     <string name="txn_export_title_ready">Exporter les transactions</string>
@@ -369,14 +370,14 @@
     <string name="share_sheet_show">Afficher</string>
     <string name="share_sheet_transactions">Chronologie</string>
     <string name="share_sheet_subscriptions">Abonnements</string>
-    <string name="share_sheet_no_subscriptions">Aucun abonnement détecté pour le moment — PennyWise les trouve à partir de paiements récurrents dans votre SMS.</string>
+    <string name="share_sheet_no_subscriptions">Aucun abonnement détecté pour le moment — Mudal les trouve à partir de paiements récurrents dans votre SMS.</string>
     <string name="share_sheet_period">Période</string>
     <string name="share_sheet_this_month">Ce mois-ci</string>
     <string name="share_sheet_last_month">Le mois dernier</string>
     <string name="share_sheet_all_time">Tous les temps</string>
     <!-- %1$s = month name -->
     <string name="share_banner_title">%1$s, résumé</string>
-    <string name="share_banner_subtitle">Voir ce que PennyWise a suivi pour vous</string>
+    <string name="share_banner_subtitle">Voir ce que Mudal a suivi pour vous</string>
     <string name="share_banner_dismiss">Refuser</string>
     <!-- Shared transaction components -->
     <string name="quick_category_title">Changer de catégorie</string>

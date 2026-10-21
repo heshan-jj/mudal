@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- Export transactions dialog -->
     <string name="txn_export_title_ready">Exportar transações</string>
@@ -23,7 +24,7 @@
     <string name="txn_export_action_export">Exportação</string>
     <string name="txn_export_action_export_first">Exportar primeiro %1$d</string>
     <string name="txn_export_action_done">Concluído</string>
-    <string name="txn_export_share_subject">Exportação de Transações PennyWise</string>
+    <string name="txn_export_share_subject">Exportação de Transações Mudal</string>
     <string name="txn_export_share_chooser_title">Compartilhar CSV</string>
     <string name="txn_export_action_share">Compartilhar</string>
     <string name="txn_export_action_close">FECHAR</string>
@@ -373,14 +374,14 @@
     <string name="share_sheet_show">Apresentar</string>
     <string name="share_sheet_transactions">Linha do Tempo</string>
     <string name="share_sheet_subscriptions">Inscrições</string>
-    <string name="share_sheet_no_subscriptions">Nenhuma assinatura detectada ainda — A PennyWise encontra em seus pagamentos recorrentes em seu SMS.</string>
+    <string name="share_sheet_no_subscriptions">Nenhuma assinatura detectada ainda — A Mudal encontra em seus pagamentos recorrentes em seu SMS.</string>
     <string name="share_sheet_period">Menstruação</string>
     <string name="share_sheet_this_month">Este Mês</string>
     <string name="share_sheet_last_month">Mês anterior</string>
     <string name="share_sheet_all_time">Desde o início</string>
     <!-- %1$s = month name -->
     <string name="share_banner_title">%1$s, resumido</string>
-    <string name="share_banner_subtitle">Veja o que o PennyWise monitorou para você</string>
+    <string name="share_banner_subtitle">Veja o que o Mudal monitorou para você</string>
     <string name="share_banner_dismiss">Descartar</string>
     <!-- Shared transaction components -->
     <string name="quick_category_title">Alterar categoria</string>

@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.worker
 
 import com.pennywiseai.tracker.worker.OptimizedSmsReaderWorker.Companion.isUnrecognizedCandidate
@@ -29,5 +30,12 @@ class UnrecognizedCandidateTest {
         assertFalse(isUnrecognizedCandidate("TestBanka", "OTP 123456 for login"))
         assertFalse(isUnrecognizedCandidate("TestShop", "Big sale this weekend, visit us"))
         assertFalse(isUnrecognizedCandidate("+38200000000", "I paid 12,50 EUR for lunch"))
+    }
+    @Test
+    fun `sri lankan bank sender with Rs or LKR amount is kept`() {
+        assertTrue(isUnrecognizedCandidate("HNB", "Paid Rs. 2,500.00 at Keells Super on 21/10/2026"))
+        assertTrue(isUnrecognizedCandidate("BOC", "Debited Rs 10,000.00 from A/C 123456"))
+        assertTrue(isUnrecognizedCandidate("SEYLAN", "LKR 1,500.00 debited from card ending 4321"))
+        assertTrue(isUnrecognizedCandidate("BOC", "Credit for Rs. 50,000.00 to A/C 987654"))
     }
 }

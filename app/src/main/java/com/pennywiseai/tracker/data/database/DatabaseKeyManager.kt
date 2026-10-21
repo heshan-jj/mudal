@@ -1,3 +1,4 @@
+// Mudal fork: new file in Mudal, a fork of PennyWise AI (AGPL-3.0-only), 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.database
 
 import android.content.Context

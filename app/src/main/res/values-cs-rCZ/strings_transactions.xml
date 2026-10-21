@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- Export transactions dialog -->
     <string name="txn_export_title_ready">Exportovat transakce</string>
@@ -27,7 +28,7 @@
     <string name="txn_export_action_export">Exportovat</string>
     <string name="txn_export_action_export_first">Exportovat první %1$d</string>
     <string name="txn_export_action_done">Hotovo</string>
-    <string name="txn_export_share_subject">Export transakcí do PennyWise</string>
+    <string name="txn_export_share_subject">Export transakcí do Mudal</string>
     <string name="txn_export_share_chooser_title">Sdílet CSV</string>
     <string name="txn_export_action_share">Sdílet</string>
     <string name="txn_export_action_close">Zavřít</string>
@@ -395,14 +396,14 @@
     <string name="share_sheet_show">Zobrazit</string>
     <string name="share_sheet_transactions">Časová osa</string>
     <string name="share_sheet_subscriptions">Předplatné</string>
-    <string name="share_sheet_no_subscriptions">Zatím nebyly nalezeny žádné předplatné - PennyWise je našel z opakujících se plateb ve vašem SMS.</string>
+    <string name="share_sheet_no_subscriptions">Zatím nebyly nalezeny žádné předplatné - Mudal je našel z opakujících se plateb ve vašem SMS.</string>
     <string name="share_sheet_period">Období</string>
     <string name="share_sheet_this_month">Tento měsíc</string>
     <string name="share_sheet_last_month">Minulý měsíc</string>
     <string name="share_sheet_all_time">Celý čas</string>
     <!-- %1$s = month name -->
     <string name="share_banner_title">%1$ssečteno</string>
-    <string name="share_banner_subtitle">Podívejte se, co pro vás PennyWise zaznamenal</string>
+    <string name="share_banner_subtitle">Podívejte se, co pro vás Mudal zaznamenal</string>
     <string name="share_banner_dismiss">Odmítnout</string>
     <!-- Shared transaction components -->
     <string name="quick_category_title">Změnit kategorii</string>

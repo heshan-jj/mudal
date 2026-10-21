@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.backup
 
 import com.pennywiseai.tracker.data.database.entity.*
@@ -51,7 +52,14 @@ data class PennyWiseBackup(
     val receipts: List<BackupReceipt> = emptyList()
 ) {
     companion object {
-        /** Current format string written by this app version. */
+        /**
+         * Current format string written by this app version.
+         *
+         * Mudal keeps the upstream "PennyWise Backup v1.x" marker on purpose: it is
+         * an on-disk format identifier, not branding. Renaming it would make every
+         * backup written by an earlier build (or by upstream PennyWise) fail to
+         * import. The app's own name never appears in the payload.
+         */
         const val CURRENT_FORMAT = "PennyWise Backup v1.3"
 
         /** Prefix accepted on import — any `v1.x` backup is compatible. */

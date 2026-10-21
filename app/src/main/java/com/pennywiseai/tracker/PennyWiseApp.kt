@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker
 
 import android.Manifest
@@ -113,7 +114,7 @@ fun PennyWiseApp(
     }
     
     // Every outside entry point — notification and Recent-widget transaction taps,
-    // the Add widget/shortcut, "Share to PennyWise" and goal widget taps (#914) —
+    // the Add widget/shortcut, "Share to Mudal" and goal widget taps (#914) —
     // opens a screen with private data, so they all wait for onboarding and an
     // unlocked app (see NavigateWhenUnlocked).
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route

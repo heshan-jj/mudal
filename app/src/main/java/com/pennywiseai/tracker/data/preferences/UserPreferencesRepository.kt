@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.preferences
 
 import android.content.Context
@@ -208,8 +209,8 @@ open class UserPreferencesRepository @Inject constructor(
                 } ?: AccentColor.SURFACE,
                 isAmoledMode = preferences[PreferencesKeys.IS_AMOLED_MODE] ?: false,
                 appFont = preferences[PreferencesKeys.APP_FONT]?.let {
-                    try { AppFont.valueOf(it) } catch (_: Exception) { AppFont.SYSTEM }
-                } ?: AppFont.SYSTEM,
+                    try { AppFont.valueOf(it) } catch (_: Exception) { AppFont.GOOGLE_SANS }
+                } ?: AppFont.GOOGLE_SANS,
                 hasSkippedSmsPermission = preferences[PreferencesKeys.HAS_SKIPPED_SMS_PERMISSION] ?: false,
                 isDeveloperModeEnabled = preferences[PreferencesKeys.DEVELOPER_MODE_ENABLED] ?: false,
                 hasShownScanTutorial = preferences[PreferencesKeys.HAS_SHOWN_SCAN_TUTORIAL] ?: false,
@@ -1094,7 +1095,7 @@ data class UserPreferences(
     val themeStyle: ThemeStyle = ThemeStyle.DYNAMIC,
     val accentColor: AccentColor = AccentColor.SURFACE,
     val isAmoledMode: Boolean = false,
-    val appFont: AppFont = AppFont.SYSTEM,
+    val appFont: AppFont = AppFont.GOOGLE_SANS,
     val hasSkippedSmsPermission: Boolean = false,
     val isDeveloperModeEnabled: Boolean = false,
     val hasShownScanTutorial: Boolean = false,

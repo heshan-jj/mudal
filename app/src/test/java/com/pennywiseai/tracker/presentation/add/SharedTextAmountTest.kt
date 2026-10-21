@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.presentation.add
 
 import org.junit.Assert.assertEquals
@@ -12,17 +13,18 @@ class SharedTextAmountTest {
 
     @Test
     fun `currency-tagged amount wins over other numbers`() {
-        assertEquals(BigDecimal("1200.50"), amount("Paid Rs. 1,200.50 to Cafe on 03-10-26. UPI Ref 412345678901"))
-        assertEquals(BigDecimal("450"), amount("You paid ₹450 to Swiggy"))
-        assertEquals(BigDecimal("99"), amount("INR 99 debited from A/c XX1234"))
+        assertEquals(BigDecimal("1200.50"), amount("Paid Rs. 1,200.50 to Cafe on 03-10-26. Ref 412345678901"))
+        assertEquals(BigDecimal("450"), amount("You paid €450 for booking"))
+        assertEquals(BigDecimal("99"), amount("LKR 99 debited from A/c XX1234"))
         assertEquals(BigDecimal("125000"), amount("Salary of Rs 1,25,000 credited"))
     }
 
     @Test
     fun `tag names the currency`() {
         assertEquals("USD", currency("Paid $12 to the app store"))
-        assertEquals("INR", currency("You paid ₹450 to Swiggy"))
-        assertEquals("AED", currency("AED 75 at the mall"))
+        assertEquals("EUR", currency("You paid €45 to the cafe"))
+        assertEquals("LKR", currency("LKR 450 at Arpico"))
+        assertEquals("LKR", currency("Paid Rs. 1500 for groceries"))
         assertNull(currency("450 swiggy"))
     }
 

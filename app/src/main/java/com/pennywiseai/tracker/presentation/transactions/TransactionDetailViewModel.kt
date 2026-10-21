@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.presentation.transactions
 
 import com.pennywiseai.tracker.data.mapper.withTransferAccount
@@ -74,7 +75,7 @@ class TransactionDetailViewModel @Inject constructor(
     private val _transaction = MutableStateFlow<TransactionEntity?>(null)
     val transaction: StateFlow<TransactionEntity?> = _transaction.asStateFlow()
 
-    private val _primaryCurrency = MutableStateFlow("INR")
+    private val _primaryCurrency = MutableStateFlow("LKR")
     val primaryCurrency: StateFlow<String> = _primaryCurrency.asStateFlow()
 
     private val _convertedAmount = MutableStateFlow<BigDecimal?>(null)
@@ -414,7 +415,7 @@ class TransactionDetailViewModel @Inject constructor(
             if (!bankName.isNullOrEmpty()) {
                 com.pennywiseai.tracker.utils.CurrencyFormatter.getBankBaseCurrency(bankName)
             } else {
-                transaction.currency.takeIf { it.isNotEmpty() } ?: "INR"
+                transaction.currency.takeIf { it.isNotEmpty() } ?: "LKR"
             }
         }
         _primaryCurrency.value = primaryCurrency

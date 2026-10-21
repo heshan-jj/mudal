@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.backup
 
 import com.pennywiseai.tracker.data.preferences.BankAccountMergeStore
@@ -312,7 +313,7 @@ class BackupExporter @Inject constructor(
         val timestamp = LocalDateTime.now().format(
             DateTimeFormatter.ofPattern("yyyy_MM_dd_HHmmss")
         )
-        val fileName = "PennyWise_Backup_$timestamp.pennywisebackup"
+        val fileName = "Mudal_Backup_$timestamp.pennywisebackup"
         
         return File(exportDir, fileName)
     }

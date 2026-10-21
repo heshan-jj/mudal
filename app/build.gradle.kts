@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 import java.util.Properties
 import org.gradle.api.tasks.PathSensitivity
 
@@ -79,7 +80,7 @@ android {
         }
     }
     // Lists every values-<lang>/ folder as a supported locale, so Android 13+
-    // shows PennyWise under System settings → App languages.
+    // shows Mudal under System settings → App languages.
     androidResources {
         generateLocaleConfig = true
     }

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ Settings screen ══ -->
     <string name="settings_title">Nastavení</string>
@@ -7,10 +8,10 @@
     <string name="settings_action_cancel">Zrušit</string>
     <string name="settings_action_ok">OK</string>
     <string name="settings_action_done">Hotovo</string>
-    <!-- PennyWise Pro -->
-    <string name="settings_pro_section">PennyWise Pro</string>
-    <string name="settings_pro_title_active">PennyWise Pro</string>
-    <string name="settings_pro_title_upgrade">Upgradovat na PennyWise Pro</string>
+    <!-- Mudal Pro -->
+    <string name="settings_pro_section">Mudal Pro</string>
+    <string name="settings_pro_title_active">Mudal Pro</string>
+    <string name="settings_pro_title_upgrade">Upgradovat na Mudal Pro</string>
     <string name="settings_pro_subtitle_active">Aktivní · odemknuté funkce</string>
     <string name="settings_pro_subtitle_upgrade">Neomezená pravidla, prohlášení, vývoz a další</string>
     <!-- Personalization -->
@@ -103,7 +104,7 @@
     <string name="settings_import_data_title">Importovat data</string>
     <string name="settings_import_data_subtitle">Obnovit data ze zálohy</string>
     <string name="settings_import_csv_title">Importovat transakce (CSV)</string>
-    <string name="settings_import_csv_subtitle">Import z PennyWise CSV exportu</string>
+    <string name="settings_import_csv_subtitle">Import z Mudal CSV exportu</string>
     <string name="settings_import_statement_title">Prohlášení o importu</string>
     <string name="settings_import_statement_subtitle">Importovat z GPay, PhonePe, Paytm</string>
     <string name="settings_unrecognized_sms_title">Nerozpoznané SMS</string>
@@ -202,7 +203,7 @@
     <string name="settings_save_backup_choose">Vyberte si, jak ho chcete uložit:</string>
     <string name="settings_save_backup_to_files">Uložit do souborů</string>
     <string name="settings_save_backup_share">Sdílet</string>
-    <string name="settings_share_backup_subject">PennyWise zálohování</string>
+    <string name="settings_share_backup_subject">Mudal zálohování</string>
     <string name="settings_share_backup_chooser">Sdílet zálohu</string>
     <!-- Notifications -->
     <string name="settings_notifications_section">Oznámení</string>
@@ -231,7 +232,7 @@
     <string name="settings_ai_cancel_download">Zrušit stahování</string>
     <string name="settings_ai_info">Chatujte s AI o vašich výdajích a získejte finanční přehledy. Všechny konverzace zůstávají na vašem zařízení soukromé.</string>
     <string name="settings_ai_download_notification_title">Model AI chatu</string>
-    <string name="settings_ai_download_notification_description">Stahování AI chatovacího asistenta PennyWise</string>
+    <string name="settings_ai_download_notification_description">Stahování AI chatovacího asistenta Mudal</string>
     <!-- Developer -->
     <string name="settings_developer_section">Vývojář</string>
     <string name="settings_developer_mode_title">Vývojářský režim</string>
@@ -243,7 +244,7 @@
     <string name="settings_report_issue_title">Nahlásit problém</string>
     <string name="settings_report_issue_subtitle">Odeslat hlášení o chybách na GitHub</string>
     <!-- %1$s = app version, e.g. 2.18.0 -->
-    <string name="settings_app_version">PennyWise v%1$s</string>
+    <string name="settings_app_version">Mudal v%1$s</string>
     <!-- ══ Appearance screen ══ -->
     <string name="appearance_title">Vzhled</string>
     <string name="appearance_back">Zpět</string>

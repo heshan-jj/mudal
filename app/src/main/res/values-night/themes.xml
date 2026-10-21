@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- Base dark theme -->
     <style name="Theme.Pennywisecompose" parent="android:Theme.Material.NoActionBar" />
     
     <!-- Splash Screen theme for dark mode -->
-    <style name="Theme.PennyWise.SplashScreen" parent="Theme.SplashScreen">
+    <style name="Theme.Mudal.SplashScreen" parent="Theme.SplashScreen">
         <!-- Dark background color matching Material Design 3 dark theme -->
         <item name="windowSplashScreenBackground">#000000</item>
         

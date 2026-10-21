@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -122,7 +123,7 @@ data class ThemeUiState(
     val themeStyle: ThemeStyle = ThemeStyle.DYNAMIC,
     val accentColor: AccentColor = AccentColor.SURFACE,
     val isAmoledMode: Boolean = false,
-    val appFont: AppFont = AppFont.SYSTEM,
+    val appFont: AppFont = AppFont.GOOGLE_SANS,
     val hasSkippedSmsPermission: Boolean = false,
     val blurEffectsEnabled: Boolean = true,
     val navBarStyle: NavBarStyle = NavBarStyle.NORMAL,

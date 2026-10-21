@@ -1,6 +1,7 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.preferences
 
-import com.pennywiseai.parser.core.bank.PNBBankParser
+import com.pennywiseai.parser.core.bank.SampathBankParser
 import com.pennywiseai.parser.core.TransactionType
 import com.pennywiseai.tracker.data.backup.AppPreferences
 import com.pennywiseai.tracker.data.database.entity.AccountBalanceEntity
@@ -12,7 +13,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class BankAccountMergeStoreTest {
-    private fun account(bank: String, suffix: String, currency: String = "INR", card: Boolean = false) =
+    private fun account(bank: String, suffix: String, currency: String = "LKR", card: Boolean = false) =
         AccountBalanceEntity(bankName = bank, accountLast4 = suffix, currency = currency,
             isCreditCard = card, balance = BigDecimal.ZERO, timestamp = LocalDateTime.of(2026, 1, 1, 0, 0))
 
@@ -38,7 +39,7 @@ class BankAccountMergeStoreTest {
     }
 
     @Test fun `invalid mapping and card identifiers remain unchanged`() {
-        val parsed = PNBBankParser().parse("A/c X000 debited INR 125.00 to Example Shop thru UPI:000000000001-PNB", "PNB", 0)!!
+        val parsed = SampathBankParser().parse("LKR 125.00 debited from AC **000 for Example Shop", "SAMPATHTXN", 0)!!
         val key = BankAccountMergeStore.mappingKey(parsed.bankName, parsed.currency, "000")
         assertEquals("1000", BankAccountMergeStore.resolve(parsed, mapOf(key to "1000")).accountLast4)
         assertEquals("000", BankAccountMergeStore.resolve(parsed.copy(isFromCard = true), mapOf(key to "1000")).accountLast4)
@@ -48,19 +49,19 @@ class BankAccountMergeStoreTest {
 
     @Test fun `later merges retarget compatible aliases and invalidate incompatible targets`() {
         val source = account("Example Bank", "1000")
-        val key = BankAccountMergeStore.mappingKey("Example Bank", "INR", "000")
-        val otherKey = BankAccountMergeStore.mappingKey("Another Bank", "INR", "000")
+        val key = BankAccountMergeStore.mappingKey("Example Bank", "LKR", "000")
+        val otherKey = BankAccountMergeStore.mappingKey("Another Bank", "LKR", "000")
         val mappings = mapOf(key to "1000", otherKey to "1000")
         val compatible = BankAccountMergeStore.mappingsAfterMerge(mappings, source, account("Example Bank", "2000"))
         assertEquals("2000", compatible[key])
-        assertEquals("2000", BankAccountMergeStore.resolveSuffix("Example Bank", "INR", "000", compatible))
+        assertEquals("2000", BankAccountMergeStore.resolveSuffix("Example Bank", "LKR", "000", compatible))
         assertEquals("1000", compatible[otherKey])
         for (target in listOf(account("Example Bank", "1999"), account("Another Bank", "2000"),
             account("Example Bank", "2000", currency = "USD"), account("Example Bank", "2000", card = true))) {
             val invalidated = BankAccountMergeStore.mappingsAfterMerge(mappings, source, target)
             assertFalse(invalidated.containsKey(key))
             assertEquals("1000", invalidated[otherKey])
-            assertEquals("000", BankAccountMergeStore.resolveSuffix("Example Bank", "INR", "000", invalidated))
+            assertEquals("000", BankAccountMergeStore.resolveSuffix("Example Bank", "LKR", "000", invalidated))
         }
     }
 

@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.csv
 
 import com.opencsv.CSVReader
@@ -14,7 +15,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Parses PennyWise's own CSV export format (the 12 columns [CsvExporter] writes)
+ * Parses Mudal's own CSV export format (the 12 columns [CsvExporter] writes)
  * back into [TransactionEntity] rows, so historical data can be re-imported and
  * an export can round-trip.
  *
@@ -97,7 +98,7 @@ class CsvTransactionImporter @Inject constructor() {
                     transactions = emptyList(),
                     failedCount = 0,
                     failureReasons = listOf(
-                        "This doesn't look like a PennyWise CSV export — missing column(s): $missing"
+                        "This doesn't look like a Mudal CSV export — missing column(s): $missing"
                     )
                 )
             }

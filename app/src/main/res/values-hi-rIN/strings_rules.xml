@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ App lock ══ -->
     <string name="applock_prompt_subtitle">अपने खर्च डेटा तक पहुँचने के लिए प्रमाणीकरण करें</string>
@@ -11,7 +12,7 @@
     <!-- ══ SMS permission screen ══ -->
     <!-- ══ Unrecognized SMS ══ -->
     <string name="unrecognized_header_title">अमान्यता प्राप्त बैंक संदेश</string>
-    <string name="unrecognized_header_body">संभावित बैंकों से ये संदेश स्वचालित रूप से पार्स नहीं किए जा सके। उन्हें रिपोर्ट करके PennyWise को सुधारने में मदद करें ताकि हम अधिक बैंकों के लिए समर्थन जोड़ सकें।</string>
+    <string name="unrecognized_header_body">संभावित बैंकों से ये संदेश स्वचालित रूप से पार्स नहीं किए जा सके। उन्हें रिपोर्ट करके Mudal को सुधारने में मदद करें ताकि हम अधिक बैंकों के लिए समर्थन जोड़ सकें।</string>
     <string name="unrecognized_show_reported">रिपोर्ट दिखाएँ</string>
     <plurals name="unrecognized_new_count">
         <item quantity="one">%1$d नया</item>
@@ -39,7 +40,7 @@
     <string name="onboarding_selected_cd">चयनित</string>
     <string name="onboarding_get_started">शुरू करें</string>
     <string name="onboarding_continue">जारी रखें</string>
-    <!-- ══ Chat (PennyWise AI) ══ -->
+    <!-- ══ Chat (Mudal) ══ -->
     <string name="chat_title">कैशिरो एआई</string>
     <string name="chat_download">डाउनलोड</string>
     <string name="chat_cancel">रद्द करें</string>

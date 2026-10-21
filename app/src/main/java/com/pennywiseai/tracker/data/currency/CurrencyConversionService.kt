@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.currency
 
 import com.pennywiseai.tracker.data.database.dao.ExchangeRateDao
@@ -297,7 +298,7 @@ class CurrencyConversionService @Inject constructor(
      * Get the base currency for the app
      */
     private suspend fun getBaseCurrency(): String {
-        return userPreferencesRepository.baseCurrency.first() ?: "INR"
+        return userPreferencesRepository.baseCurrency.first() ?: "LKR"
     }
 
     /**

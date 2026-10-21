@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.utils
 
 import com.pennywiseai.parser.core.bank.BankParserFactory
@@ -63,47 +64,9 @@ object CurrencyFormatter {
      * Currency symbol mapping for display
      */
     private val CURRENCY_SYMBOLS = mapOf(
-        "INR" to "₹",
-        "PKR" to "Rs",
-        "USD" to "$",
-        "EUR" to "€",
-        "GBP" to "£",
-        "AED" to "AED",
-        "SGD" to "S$",
-        "CAD" to "C$",
-        "MXN" to "MX$",
-        "AUD" to "A$",
-        "JPY" to "¥",
-        "CNY" to "¥",
-        "IRR" to "﷼",
-        "NPR" to "₨",
-        "ETB" to "ብር",
-        "THB" to "฿",
-        "MYR" to "RM",
-        "KWD" to "KD",
-        "KRW" to "₩",
-        "NGN" to "₦",
-        "TZS" to "TSh",
-        "BRL" to "R$",
-        "EGP" to "E£",
-        "JOD" to "JD",
-        "BHD" to "BD",
-        "OMR" to "RO",
         "LKR" to "Rs.",
-        "BDT" to "৳",
-        "CZK" to "Kč",
-        "RUB" to "₽",
-        "TRY" to "₺",
-        "MZN" to "MT",
-        "KES" to "KSh",
-        "SAR" to "SR",
-        "BYN" to "Br",
-        "COP" to "COL$",
-        // South American pesos (#654) — prefixed like MX$/COL$ so a peso figure
-        // can never be misread as USD in a mixed-currency list.
-        "ARS" to "AR$",
-        "CLP" to "CL$",
-        "UYU" to "\$U"
+        "USD" to "$",
+        "EUR" to "€"
     )
 
     /**
@@ -111,36 +74,8 @@ object CurrencyFormatter {
      */
     private val CURRENCY_LOCALES = mapOf(
         "LKR" to SRI_LANKAN_LOCALE,
-        "INR" to INDIAN_LOCALE,
         "USD" to Locale.US,
-        "EUR" to Locale.GERMANY,
-        "GBP" to Locale.UK,
-        "AED" to Locale.Builder().setLanguage("en").setRegion("AE").build(),
-        "SGD" to Locale.Builder().setLanguage("en").setRegion("SG").build(),
-        "CAD" to Locale.CANADA,
-        "MXN" to Locale.Builder().setLanguage("es").setRegion("MX").build(),
-        "AUD" to Locale.Builder().setLanguage("en").setRegion("AU").build(),
-        "JPY" to Locale.JAPAN,
-        "CNY" to Locale.CHINA,
-        "PKR" to Locale.Builder().setLanguage("en").setRegion("PK").build(),
-        "IRR" to Locale.Builder().setLanguage("fa").setRegion("IR").build(),
-        "NPR" to Locale.Builder().setLanguage("ne").setRegion("NP").build(),
-        "ETB" to Locale.Builder().setLanguage("am").setRegion("ET").build(),
-        "THB" to Locale.Builder().setLanguage("th").setRegion("TH").build(),
-        "MYR" to Locale.Builder().setLanguage("ms").setRegion("MY").build(),
-        "KWD" to Locale.Builder().setLanguage("en").setRegion("KW").build(),
-        "KRW" to Locale.KOREA,
-        "NGN" to Locale.Builder().setLanguage("en").setRegion("NG").build(),
-        "TZS" to Locale.Builder().setLanguage("en").setRegion("TZ").build(),
-        "BRL" to Locale.Builder().setLanguage("pt").setRegion("BR").build(),
-        "EGP" to Locale.Builder().setLanguage("en").setRegion("EG").build(),
-        "JOD" to Locale.Builder().setLanguage("en").setRegion("JO").build(),
-        "BHD" to Locale.Builder().setLanguage("en").setRegion("BH").build(),
-        "OMR" to Locale.Builder().setLanguage("en").setRegion("OM").build(),
-        "LKR" to Locale.Builder().setLanguage("en").setRegion("LK").build(),
-        "ARS" to Locale.Builder().setLanguage("es").setRegion("AR").build(),
-        "CLP" to Locale.Builder().setLanguage("es").setRegion("CL").build(),
-        "UYU" to Locale.Builder().setLanguage("es").setRegion("UY").build()
+        "EUR" to Locale.GERMANY
     )
 
     /**
@@ -152,7 +87,7 @@ object CurrencyFormatter {
      * currency-instance symbol entirely and always render the explicit
      * [CURRENCY_SYMBOLS] value instead.
      */
-    private val EXPLICIT_SYMBOL_CURRENCIES = setOf("PKR", "LKR")
+    private val EXPLICIT_SYMBOL_CURRENCIES = setOf("LKR")
 
     /**
      * Formats a BigDecimal amount as currency with the specified currency code

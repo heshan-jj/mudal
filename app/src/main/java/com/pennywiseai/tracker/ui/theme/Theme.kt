@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.ui.theme
 
 import android.app.Activity
@@ -124,7 +125,7 @@ fun PennyWiseTheme(
     themeStyle: ThemeStyle = ThemeStyle.DYNAMIC,
     accentColor: AccentColor = AccentColor.SURFACE,
     isAmoledMode: Boolean = false,
-    appFont: AppFont = AppFont.SYSTEM,
+    appFont: AppFont = AppFont.GOOGLE_SANS,
     blurEffects: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -177,7 +178,8 @@ fun PennyWiseTheme(
     }
 
     val fontFamily = when (appFont) {
-        AppFont.SYSTEM -> FontFamily.Default
+        AppFont.GOOGLE_SANS -> GoogleSansFontFamily
+        AppFont.SYSTEM -> GoogleSansFontFamily
         AppFont.SN_PRO -> SNProFontFamily
     }
 

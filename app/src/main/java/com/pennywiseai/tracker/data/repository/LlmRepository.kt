@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.repository
 
 import android.util.Log
@@ -389,7 +390,7 @@ class LlmRepository @Inject constructor(
     }
 
     companion object {
-        private const val PROMPT_MARKER = "[PennyWise tools v6]"
+        private const val PROMPT_MARKER = "[Mudal tools v6]"
         private val CLAIMS_A_CHANGE = Regex("\\b(I(?:'ve| have)?|has been|have been|is now|was) (added|updated|changed|deleted|removed|recorded)\\b", RegexOption.IGNORE_CASE)
         private const val TAG = "LlmRepository"
     }

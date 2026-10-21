@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.csv
 
 import android.content.Context
@@ -14,7 +15,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Imports historical transactions from a CSV in PennyWise's own export format
+ * Imports historical transactions from a CSV in Mudal's own export format
  * (see [CsvTransactionImporter]). Opens the picked [Uri] via the ContentResolver,
  * parses it, dedups the parsed rows against what's already in the DB (by the
  * deterministic import hash) and inserts the rest.

@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.utils
 
 import com.pennywiseai.tracker.data.preferences.NumberFormatStyle
@@ -35,18 +36,15 @@ class CurrencyFormatterTest {
     }
 
     @Test
-    fun `sms-tracked non-INR account ignores stored INR default and uses parser currency`() {
-        // The core regression: an SMS-tracked UAE account stores the INR default but must
-        // display its parser currency (AED). Both the null and "TRANSACTION" source types
-        // (what SMS rows carry) must resolve to the parser value.
+    fun `sms-tracked account uses parser currency`() {
         listOf(null, "TRANSACTION", "SMS_BALANCE", "CARD_LINK").forEach { sourceType ->
             assertEquals(
                 "source_type=$sourceType should fall back to the bank parser currency",
-                "AED",
+                "LKR",
                 CurrencyFormatter.resolveAccountCurrency(
                     sourceType = sourceType,
-                    storedCurrency = "INR",
-                    bankName = "Liv Bank"
+                    storedCurrency = "USD",
+                    bankName = "Commercial Bank of Ceylon"
                 )
             )
         }
@@ -138,20 +136,17 @@ class CurrencyFormatterTest {
     // for both so they never collide regardless of runtime ICU data.
 
     @Test
-    fun `formatCurrency renders PKR and LKR with distinct explicit symbols`() {
-        val pkr = CurrencyFormatter.formatCurrency(BigDecimal(500), "PKR")
+    fun `formatCurrency renders LKR with explicit symbol`() {
         val lkr = CurrencyFormatter.formatCurrency(BigDecimal(500), "LKR")
-        assertTrue("PKR should use its explicit symbol, got: $pkr", pkr.startsWith("Rs"))
         assertTrue("LKR should use its explicit symbol, got: $lkr", lkr.startsWith("Rs."))
-        assertFalse("PKR and LKR must not render identically", pkr == lkr)
     }
 
     @Test
-    fun `formatByCurrency keeps PKR and LKR distinguishable in a mixed total`() {
+    fun `formatByCurrency keeps USD and LKR distinguishable in a mixed total`() {
         val out = CurrencyFormatter.formatByCurrency(
-            mapOf("PKR" to Money(BigDecimal(500), "PKR"), "LKR" to Money(BigDecimal(500), "LKR"))
+            mapOf("USD" to Money(BigDecimal(500), "USD"), "LKR" to Money(BigDecimal(500), "LKR"))
         )
-        assertTrue("expected the PKR symbol, got: $out", out.contains("Rs"))
+        assertTrue("expected the USD symbol, got: $out", out.contains("$"))
         assertTrue("expected the LKR symbol, got: $out", out.contains("Rs."))
     }
 
@@ -224,36 +219,24 @@ class CurrencyFormatterTest {
         )
     }
 
-    // ── South American pesos (#654) ──
-
     @Test
-    fun `ARS CLP UYU are selectable and carry non-USD symbols`() {
-        // Every peso must be in the pickers' source list…
-        listOf("ARS", "CLP", "UYU").forEach { code ->
-            assertTrue(
-                "$code missing from CurrencyFormatter.getSupportedCurrencies()",
-                code in CurrencyFormatter.getSupportedCurrencies()
-            )
-            assertTrue(
-                "$code missing from CurrencyUtils.getAllSupportedCurrencies()",
-                code in CurrencyUtils.getAllSupportedCurrencies()
-            )
-        }
-        // …and no peso may render as a bare "$" — that reads as USD in a
-        // mixed-currency list (the reporter's exact workaround-pain in #654).
-        assertEquals("AR$", CurrencyFormatter.getCurrencySymbol("ARS"))
-        assertEquals("CL$", CurrencyFormatter.getCurrencySymbol("CLP"))
-        assertEquals("\$U", CurrencyFormatter.getCurrencySymbol("UYU"))
+    fun `only LKR USD and EUR are supported`() {
+        val supported = CurrencyUtils.getAllSupportedCurrencies()
+        assertEquals(listOf("LKR", "USD", "EUR"), supported)
+        assertEquals(listOf("LKR", "USD", "EUR"), CurrencyFormatter.getSupportedCurrencies())
+        assertEquals("Rs.", CurrencyFormatter.getCurrencySymbol("LKR"))
+        assertEquals("$", CurrencyFormatter.getCurrencySymbol("USD"))
+        assertEquals("€", CurrencyFormatter.getCurrencySymbol("EUR"))
     }
 
     @Test
-    fun `formatted peso amounts carry their distinguishing symbol`() {
+    fun `formatted amounts carry their distinguishing symbol`() {
         CurrencyFormatter.numberFormatStyle = NumberFormatStyle.AUTO
-        val ars = CurrencyFormatter.formatCurrency(BigDecimal("1234.56"), "ARS")
-        assertTrue("expected AR$ in: $ars", ars.contains("AR$"))
-        val clp = CurrencyFormatter.formatCurrency(BigDecimal("1234"), "CLP")
-        assertTrue("expected CL$ in: $clp", clp.contains("CL$"))
-        val uyu = CurrencyFormatter.formatCurrency(BigDecimal("1234.56"), "UYU")
-        assertTrue("expected \$U in: $uyu", uyu.contains("\$U"))
+        val lkr = CurrencyFormatter.formatCurrency(BigDecimal("1234.56"), "LKR")
+        assertTrue("expected Rs. in: $lkr", lkr.contains("Rs."))
+        val usd = CurrencyFormatter.formatCurrency(BigDecimal("1234"), "USD")
+        assertTrue("expected $ in: $usd", usd.contains("$"))
+        val eur = CurrencyFormatter.formatCurrency(BigDecimal("1234.56"), "EUR")
+        assertTrue("expected € in: $eur", eur.contains("€"))
     }
 }

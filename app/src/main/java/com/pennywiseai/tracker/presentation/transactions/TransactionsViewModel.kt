@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.presentation.transactions
 
 import com.pennywiseai.tracker.ui.UiText
@@ -144,7 +145,7 @@ class TransactionsViewModel @Inject constructor(
     private val _sortOption = MutableStateFlow(SortOption.DATE_NEWEST)
     val sortOption: StateFlow<SortOption> = _sortOption.asStateFlow()
 
-    private val _selectedCurrency = MutableStateFlow("INR") // Will be initialized from preferences
+    private val _selectedCurrency = MutableStateFlow("LKR") // Will be initialized from preferences
     val selectedCurrency: StateFlow<String> = _selectedCurrency.asStateFlow()
 
     private val _isUnifiedMode = MutableStateFlow(false)

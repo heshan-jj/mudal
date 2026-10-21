@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- Base theme -->
     <style name="Theme.Pennywisecompose" parent="android:Theme.Material.Light.NoActionBar" />
@@ -6,7 +7,7 @@
     <!-- Transparent host theme for QuickCategoryPickerActivity: a Compose
          bottom-sheet floats over whatever's behind it, no window decor,
          no background dim (the ModalBottomSheet draws its own scrim). -->
-    <style name="Theme.PennyWise.Transparent" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.Mudal.Transparent" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -16,7 +17,7 @@
 
 
     <!-- Splash Screen theme for light mode -->
-    <style name="Theme.PennyWise.SplashScreen" parent="Theme.SplashScreen">
+    <style name="Theme.Mudal.SplashScreen" parent="Theme.SplashScreen">
         <!-- Set the background color -->
         <item name="windowSplashScreenBackground">#FFFFFF</item>
         

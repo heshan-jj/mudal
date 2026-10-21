@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.currency
 
 import io.ktor.client.*
@@ -79,7 +80,7 @@ class FreeExchangeRateProvider @Inject constructor() : ExchangeRateProvider {
         return try {
             withContext(Dispatchers.IO) {
                 val response = client.get("https://open.er-api.com/v6/latest/${baseCurrency.uppercase()}") {
-                    header("User-Agent", "PennyWise/1.0")
+                    header("User-Agent", "Mudal/1.0")
                 }
 
                 val exchangeRateResponse: ExchangeRateApiResponse = response.body()

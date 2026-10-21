@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ Home screen ══ -->
     <string name="home_transaction_deleted">Transaktion gelöscht</string>
     <string name="home_undo">Rückgängig</string>
-    <string name="home_upgrade_pro">Upgrade auf PennyWise Pro</string>
+    <string name="home_upgrade_pro">Upgrade auf Mudal Pro</string>
     <string name="home_profile_filter">Profilfilter</string>
     <string name="home_more_options">Weitere Optionen</string>
     <string name="home_view_all">Alle anzeigen</string>

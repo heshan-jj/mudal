@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ App lock ══ -->
     <string name="applock_prompt_title">Unlock Mudal</string>
@@ -39,7 +40,7 @@
     <string name="unrecognized_title">Unrecognized SMS</string>
     <string name="unrecognized_back">Back</string>
     <string name="unrecognized_header_title">Unrecognized Bank Messages</string>
-    <string name="unrecognized_header_body">These messages from potential banks couldn\'t be automatically parsed. Help improve PennyWise by reporting them so we can add support for more banks.</string>
+    <string name="unrecognized_header_body">These messages from potential banks couldn\'t be automatically parsed. Help improve Mudal by reporting them so we can add support for more banks.</string>
     <string name="unrecognized_show_reported">Show Reported</string>
     <plurals name="unrecognized_new_count">
         <item quantity="one">%1$d new</item>
@@ -83,12 +84,12 @@
     <string name="import_statement_password_open">Open</string>
     <string name="import_statement_password_cancel">Cancel</string>
     <!-- ══ Upgrade sheet (Pro) — wording is Play-policy reviewed (#802); keep as-is ══ -->
-    <string name="upgrade_title">PennyWise Pro</string>
+    <string name="upgrade_title">Mudal Pro</string>
     <string name="upgrade_subtitle_member">All Pro capabilities active</string>
     <string name="upgrade_subtitle_upgrade">Everything unlocked with a license key</string>
     <string name="upgrade_enter_license_key">Enter license key</string>
     <string name="upgrade_support_note">Built by a solo dev — Pro funds what\'s next. Thank you.</string>
-    <string name="upgrade_available_at">PennyWise Pro is available at %1$s</string>
+    <string name="upgrade_available_at">Mudal Pro is available at %1$s</string>
     <string name="upgrade_copied">Copied</string>
     <string name="upgrade_copy_address">Copy address</string>
     <string name="upgrade_includes">Includes</string>
@@ -101,7 +102,7 @@
     <string name="upgrade_get_help">Get help</string>
     <string name="upgrade_welcome_eyebrow">WELCOME</string>
     <string name="upgrade_celebration_title">You\'re a Pro member</string>
-    <string name="upgrade_celebration_body">Thank you for backing PennyWise — every feature on the list is now yours.</string>
+    <string name="upgrade_celebration_body">Thank you for backing Mudal — every feature on the list is now yours.</string>
     <string name="upgrade_continue">Continue</string>
     <string name="upgrade_active_eyebrow">ACTIVE</string>
     <string name="upgrade_active_title">All Pro features unlocked</string>
@@ -122,8 +123,8 @@
     <string name="upgrade_license_error_active_elsewhere">This key is already active on another device.</string>
     <string name="upgrade_license_error_offline">Couldn\'t reach the license server. Check your connection and try again.</string>
     <!-- ══ Onboarding ══ -->
-    <string name="onboarding_logo_cd">PennyWise</string>
-    <string name="onboarding_welcome_title">Welcome to PennyWise</string>
+    <string name="onboarding_logo_cd">Mudal</string>
+    <string name="onboarding_welcome_title">Welcome to Mudal</string>
     <string name="onboarding_welcome_body">Your AI-powered expense tracker that automatically detects transactions from SMS messages.</string>
     <string name="onboarding_setup_heading">What you\'ll set up:</string>
     <string name="onboarding_setup_steps">1. Your profile\n2. SMS permissions for auto-detection\n3. Initial transaction scan\n4. Your main bank account</string>
@@ -135,7 +136,7 @@
     <string name="onboarding_background_color_title">Pick a background color</string>
     <string name="onboarding_selected_cd">Selected</string>
     <string name="onboarding_permission_title">Enable Automatic Detection</string>
-    <string name="onboarding_permission_body">PennyWise can automatically detect and categorize your bank transactions from SMS messages.</string>
+    <string name="onboarding_permission_body">Mudal can automatically detect and categorize your bank transactions from SMS messages.</string>
     <string name="onboarding_permission_granted">Permissions granted! Tap Continue to proceed.</string>
     <string name="onboarding_enable_permissions">Enable Permissions</string>
     <string name="onboarding_scan_in_progress">Scanning your messages...</string>
@@ -168,8 +169,8 @@
     <string name="onboarding_continue">Continue</string>
     <string name="onboarding_start_scanning">Start Scanning</string>
     <string name="onboarding_finish">Finish</string>
-    <!-- ══ Chat (PennyWise AI) ══ -->
-    <string name="chat_title">PennyWise AI</string>
+    <!-- ══ Chat (Mudal) ══ -->
+    <string name="chat_title">Mudal AI</string>
     <string name="chat_downloading_model">Downloading Model...</string>
     <string name="chat_model_required_title">AI Model Required</string>
     <string name="chat_model_required_body">Download the AI model to start chatting</string>
@@ -240,7 +241,7 @@
     <string name="chat_error_download_failed">Download failed. Please try again.</string>
     <string name="chat_error_download_roaming">Not downloading while roaming. Connect to Wi-Fi or turn off roaming, then try again.</string>
     <string name="chat_download_notification_title">AI Chat Model</string>
-    <string name="chat_download_notification_description">Downloading AI chat assistant for PennyWise</string>
+    <string name="chat_download_notification_description">Downloading AI chat assistant for Mudal</string>
     <!-- ══ Smart Rules list ══ -->
     <string name="rules_title">Smart Rules</string>
     <string name="rules_navigate_back">Navigate back</string>

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- Export transactions dialog -->
     <string name="txn_export_title_ready">تصدير العمليات</string>
@@ -419,14 +420,14 @@
     <string name="share_sheet_show">عرض</string>
     <string name="share_sheet_transactions">الخط الزمني</string>
     <string name="share_sheet_subscriptions">الاشتراكات</string>
-    <string name="share_sheet_no_subscriptions">لم يتم الكشف عن اشتراكات حتى الآن — PennyWise تجد هذه اشتراكات من مدفوعات متكررة في الرسائل القصيرة الخاصة بك.</string>
+    <string name="share_sheet_no_subscriptions">لم يتم الكشف عن اشتراكات حتى الآن — Mudal تجد هذه اشتراكات من مدفوعات متكررة في الرسائل القصيرة الخاصة بك.</string>
     <string name="share_sheet_period">الفترة</string>
     <string name="share_sheet_this_month">هذا الشهر</string>
     <string name="share_sheet_last_month">الشهر الماضي</string>
     <string name="share_sheet_all_time">كل الوقت</string>
     <!-- %1$s = month name -->
     <string name="share_banner_title">%1$s، ملخص</string>
-    <string name="share_banner_subtitle">شاهد ما تعقبه PennyWise لك</string>
+    <string name="share_banner_subtitle">شاهد ما تعقبه Mudal لك</string>
     <string name="share_banner_dismiss">تجاهل</string>
     <!-- Shared transaction components -->
     <string name="quick_category_title">تغيير الفئة</string>

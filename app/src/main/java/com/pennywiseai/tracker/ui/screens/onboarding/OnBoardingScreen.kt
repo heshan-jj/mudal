@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.ui.screens.onboarding
 
 import android.Manifest
@@ -37,6 +38,7 @@ import com.pennywiseai.tracker.ui.effects.overScrollVertical
 import com.pennywiseai.tracker.data.database.entity.AccountBalanceEntity
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.AccountBalance
@@ -288,8 +290,8 @@ private fun ProfileStep(
                         .size(OPTION_TILE_SIZE)
                         .clip(CircleShape)
                         .background(
-                            if (isSelected) MaterialTheme.colorScheme.primaryContainer
-                            else MaterialTheme.colorScheme.surfaceVariant
+                            if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                            else MaterialTheme.colorScheme.surfaceContainerHigh
                         )
                         .then(
                             if (isSelected) Modifier.border(
@@ -304,11 +306,10 @@ private fun ProfileStep(
                     Image(
                         painter = painterResource(id = drawableRes),
                         contentDescription = stringResource(R.string.onboarding_avatar_cd, index + 1),
-                        modifier = Modifier.size(Dimensions.Icon.avatar),
-                        colorFilter = ColorFilter.tint(
-                            if (isSelected) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        modifier = Modifier
+                            .size(54.dp)
+                            .padding(2.dp),
+                        contentScale = ContentScale.Fit
                     )
                 }
             }
@@ -320,8 +321,8 @@ private fun ProfileStep(
                         .size(OPTION_TILE_SIZE)
                         .clip(CircleShape)
                         .background(
-                            if (uiState.profileImageUri != null) MaterialTheme.colorScheme.primaryContainer
-                            else MaterialTheme.colorScheme.surfaceVariant
+                            if (uiState.profileImageUri != null) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                            else MaterialTheme.colorScheme.surfaceContainerHigh
                         )
                         .then(
                             if (uiState.profileImageUri != null) Modifier.border(
@@ -341,10 +342,11 @@ private fun ProfileStep(
                             modifier = Modifier.size(Dimensions.Icon.large)
                         )
                     } else {
-                        Text(
-                            text = "+",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.onboarding_photo_selected_cd),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }

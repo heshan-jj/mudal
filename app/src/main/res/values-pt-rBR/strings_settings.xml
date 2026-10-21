@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ Settings screen ══ -->
     <string name="settings_title">Confirgurações</string>
@@ -7,10 +8,10 @@
     <string name="settings_action_cancel">cancelar</string>
     <string name="settings_action_ok">Certo</string>
     <string name="settings_action_done">Concluído</string>
-    <!-- PennyWise Pro -->
-    <string name="settings_pro_section">PennyWise Pro</string>
-    <string name="settings_pro_title_active">PennyWise Pro</string>
-    <string name="settings_pro_title_upgrade">Atualizar para PennyWise Pro</string>
+    <!-- Mudal Pro -->
+    <string name="settings_pro_section">Mudal Pro</string>
+    <string name="settings_pro_title_active">Mudal Pro</string>
+    <string name="settings_pro_title_upgrade">Atualizar para Mudal Pro</string>
     <string name="settings_pro_subtitle_active">Ativo · todos os recursos de energia desbloqueados</string>
     <string name="settings_pro_subtitle_upgrade">Regras ilimitadas, declarações, exportações e muito mais</string>
     <!-- Personalization -->
@@ -95,7 +96,7 @@
     <string name="settings_import_data_title">Importar dados</string>
     <string name="settings_import_data_subtitle">Restaurar dados do backup</string>
     <string name="settings_import_csv_title">Importar transações (CSV)</string>
-    <string name="settings_import_csv_subtitle">Importar de uma exportação CSV PennyWise</string>
+    <string name="settings_import_csv_subtitle">Importar de uma exportação CSV Mudal</string>
     <string name="settings_import_statement_title">Importar Declaração</string>
     <string name="settings_import_statement_subtitle">Importar do GPay, PhonePe, Paytm</string>
     <string name="settings_unrecognized_sms_title">SMS não reconhecido</string>
@@ -171,7 +172,7 @@
     <string name="settings_save_backup_choose">Escolha como você deseja salvá-lo:</string>
     <string name="settings_save_backup_to_files">Salvar em Arquivos</string>
     <string name="settings_save_backup_share">Compartilhar</string>
-    <string name="settings_share_backup_subject">Backup PennyWise</string>
+    <string name="settings_share_backup_subject">Backup Mudal</string>
     <string name="settings_share_backup_chooser">Compartilhar backup</string>
     <!-- Notifications -->
     <string name="settings_notifications_section">notificações</string>
@@ -200,7 +201,7 @@
     <string name="settings_ai_cancel_download">Cancelar download</string>
     <string name="settings_ai_info">Converse com AI sobre suas despesas e receba informações financeiras. Todas as conversas permanecem privadas no seu dispositivo.</string>
     <string name="settings_ai_download_notification_title">Modelo de chat IA</string>
-    <string name="settings_ai_download_notification_description">Baixando o Assistente de chat IA para PennyWise</string>
+    <string name="settings_ai_download_notification_description">Baixando o Assistente de chat IA para Mudal</string>
     <!-- Developer -->
     <string name="settings_developer_section">Desenvolvedores</string>
     <string name="settings_developer_mode_title">Modo de desenvolvedor</string>
@@ -212,7 +213,7 @@
     <string name="settings_report_issue_title">Relatar um problema</string>
     <string name="settings_report_issue_subtitle">Enviar relatórios de erros no GitHub</string>
     <!-- %1$s = app version, e.g. 2.18.0 -->
-    <string name="settings_app_version">PennyWise v%1$s</string>
+    <string name="settings_app_version">Mudal v%1$s</string>
     <!-- ══ Appearance screen ══ -->
     <string name="appearance_title">Aparência</string>
     <string name="appearance_back">Anterior</string>

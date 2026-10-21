@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <resources>
     <!-- ══ App lock ══ -->
-    <string name="applock_prompt_title">Débloquer PennyWise</string>
+    <string name="applock_prompt_title">Débloquer Mudal</string>
     <string name="applock_prompt_subtitle">Authentifiez-vous pour accéder à vos données de dépenses</string>
     <string name="applock_prompt_description">Utilisez votre code PIN biométrique ou votre code PIN de l\'appareil</string>
     <string name="applock_icon_cd">Application verrouillée</string>
-    <string name="applock_title">PennyWise est verrouillé</string>
+    <string name="applock_title">Mudal est verrouillé</string>
     <string name="applock_subtitle">Authentifiez-vous pour accéder à vos données de dépenses</string>
     <string name="applock_unlock">Déverrouiller</string>
     <string name="applock_biometric_unavailable">Authentification biométrique non disponible</string>
@@ -21,11 +22,11 @@
     <string name="biometric_error_unknown">Etat biométrique inconnu</string>
     <!-- ══ SMS permission screen ══ -->
     <string name="permission_title">Activer la détection automatique des transactions</string>
-    <string name="permission_description">PennyWise peut automatiquement détecter et catégoriser vos transactions bancaires à partir de SMS et vous faire gagner du temps et de l\'effort.</string>
+    <string name="permission_description">Mudal peut automatiquement détecter et catégoriser vos transactions bancaires à partir de SMS et vous faire gagner du temps et de l\'effort.</string>
     <string name="permission_privacy_title">Votre vie privée est importante</string>
     <string name="permission_privacy_points">• Seuls les messages de transaction sont traités\n• Toutes les données restent sur votre appareil\n• Aucun message personnel n\'est lu\n• Vous pouvez révoquer l\'accès à tout moment dans les paramètres</string>
     <string name="permission_notification_title">Activer l\'accès aux notifications bancaires</string>
-    <string name="permission_notification_description">Permettre à PennyWise de lire les notifications de transactions des applications bancaires prises en charge. Cela permet de capturer les achats lorsque les SMS sont retardés ou indisponibles.</string>
+    <string name="permission_notification_description">Permettre à Mudal de lire les notifications de transactions des applications bancaires prises en charge. Cela permet de capturer les achats lorsque les SMS sont retardés ou indisponibles.</string>
     <string name="permission_notification_enabled">Accès aux notifications activé</string>
     <string name="permission_notification_open_settings">Ouvrir les paramètres d\'accès aux notifications</string>
     <string name="permission_rationale">Sans accès aux SMS, vous devrez ajouter manuellement toutes vos transactions. Nous ne lisons que les messages de transaction bancaire, pas les conversations personnelles.</string>
@@ -34,7 +35,7 @@
     <string name="unrecognized_title">SMS non reconnu</string>
     <string name="unrecognized_back">Précédent</string>
     <string name="unrecognized_header_title">Messages bancaires non reconnus</string>
-    <string name="unrecognized_header_body">Ces messages provenant de banques potentielles n\'ont pas pu être analysés automatiquement. Aidez à améliorer PennyWise en les signalant afin que nous puissions ajouter le support pour plus de banques.</string>
+    <string name="unrecognized_header_body">Ces messages provenant de banques potentielles n\'ont pas pu être analysés automatiquement. Aidez à améliorer Mudal en les signalant afin que nous puissions ajouter le support pour plus de banques.</string>
     <string name="unrecognized_show_reported">Afficher les signalés</string>
     <plurals name="unrecognized_new_count">
         <item quantity="one">%1$d nouveau</item>
@@ -71,12 +72,12 @@
     <string name="import_statement_failed">Importation échouée</string>
     <string name="import_statement_try_again">Réessayez</string>
     <!-- ══ Upgrade sheet (Pro) — wording is Play-policy reviewed (#802); keep as-is ══ -->
-    <string name="upgrade_title">PennyWise Pro</string>
+    <string name="upgrade_title">Mudal Pro</string>
     <string name="upgrade_subtitle_member">Toutes les fonctionnalités Pro sont activées</string>
     <string name="upgrade_subtitle_upgrade">Tout déverrouillé avec une clé de licence</string>
     <string name="upgrade_enter_license_key">Entrez la clé de licence</string>
     <string name="upgrade_support_note">Construit par un développeur solo — Pro finance ce qui se passe. Merci.</string>
-    <string name="upgrade_available_at">PennyWise Pro est disponible sur %1$s</string>
+    <string name="upgrade_available_at">Mudal Pro est disponible sur %1$s</string>
     <string name="upgrade_copied">Copié</string>
     <string name="upgrade_copy_address">Copier l\'adresse</string>
     <string name="upgrade_includes">Inclus</string>
@@ -89,7 +90,7 @@
     <string name="upgrade_get_help">Obtenir de l\'aide</string>
     <string name="upgrade_welcome_eyebrow">BIENVENUE</string>
     <string name="upgrade_celebration_title">Vous êtes un membre Pro</string>
-    <string name="upgrade_celebration_body">Merci de votre soutien à PennyWise — toutes les fonctionnalités de la liste sont maintenant à vous.</string>
+    <string name="upgrade_celebration_body">Merci de votre soutien à Mudal — toutes les fonctionnalités de la liste sont maintenant à vous.</string>
     <string name="upgrade_continue">Continuer</string>
     <string name="upgrade_active_eyebrow">ACTIF</string>
     <string name="upgrade_active_title">Toutes les fonctionnalités Pro sont déverrouillées</string>
@@ -109,8 +110,8 @@
     <string name="upgrade_license_error_active_elsewhere">Cette clé est déjà active sur un autre appareil.</string>
     <string name="upgrade_license_error_offline">Impossible d\'accéder au serveur de licences. Vérifiez votre connexion et réessayez.</string>
     <!-- ══ Onboarding ══ -->
-    <string name="onboarding_logo_cd">PennyWise</string>
-    <string name="onboarding_welcome_title">Bienvenue sur PennyWise</string>
+    <string name="onboarding_logo_cd">Mudal</string>
+    <string name="onboarding_welcome_title">Bienvenue sur Mudal</string>
     <string name="onboarding_welcome_body">Votre outil de suivi des dépenses alimenté par votre IA, qui détecte automatiquement les transactions à partir de messages SMS.</string>
     <string name="onboarding_setup_heading">Ce que vous allez configurer:</string>
     <string name="onboarding_setup_steps">1. Votre profil\n2. Autorisations SMS pour l\'auto-détection\n3. Analyse initiale des transactions\n4. Votre compte bancaire principal</string>
@@ -122,7 +123,7 @@
     <string name="onboarding_background_color_title">Choisir une couleur de fond</string>
     <string name="onboarding_selected_cd">Sélectionné</string>
     <string name="onboarding_permission_title">Activer la détection automatique</string>
-    <string name="onboarding_permission_body">PennyWise peut automatiquement détecter et catégoriser vos transactions bancaires à partir de messages SMS.</string>
+    <string name="onboarding_permission_body">Mudal peut automatiquement détecter et catégoriser vos transactions bancaires à partir de messages SMS.</string>
     <string name="onboarding_permission_granted">Autorisations accordées ! Appuyez sur Continuer pour continuer.</string>
     <string name="onboarding_enable_permissions">Activer les autorisations</string>
     <string name="onboarding_scan_in_progress">Analyse de vos messages...</string>
@@ -155,8 +156,8 @@
     <string name="onboarding_continue">Continuer</string>
     <string name="onboarding_start_scanning">Commencer à scanner</string>
     <string name="onboarding_finish">Terminer</string>
-    <!-- ══ Chat (PennyWise AI) ══ -->
-    <string name="chat_title">PennyWise AI</string>
+    <!-- ══ Chat (Mudal) ══ -->
+    <string name="chat_title">Mudal</string>
     <string name="chat_downloading_model">Téléchargement du modèle...</string>
     <string name="chat_model_required_title">Modèle IA requis</string>
     <string name="chat_model_required_body">Télécharger le modèle IA pour commencer à discuter</string>
@@ -221,7 +222,7 @@
     <string name="chat_error_integrity_failed">Le modèle téléchargé a échoué à sa vérification d\'intégrité et a été supprimé. Veuillez essayer de télécharger à nouveau.</string>
     <string name="chat_error_download_failed">Échec du téléchargement. Veuillez réessayer.</string>
     <string name="chat_download_notification_title">Modèle de chat AI</string>
-    <string name="chat_download_notification_description">Téléchargement de l\'assistant de chat AI pour PennyWise</string>
+    <string name="chat_download_notification_description">Téléchargement de l\'assistant de chat AI pour Mudal</string>
     <!-- ══ Smart Rules list ══ -->
     <string name="rules_title">Règles intelligentes</string>
     <string name="rules_navigate_back">Revenir en arrière</string>

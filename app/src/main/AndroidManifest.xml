@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -44,7 +45,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.PennyWise.SplashScreen"
+            android:theme="@style/Theme.Mudal.SplashScreen"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,7 +53,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- "Share to PennyWise": text shared from any app (a UPI receipt, a
+            <!-- "Share to Mudal": text shared from any app (a UPI receipt, a
                  forwarded bank message, a quick note) opens Add Transaction
                  pre-filled. Nothing is saved until the user taps Save. -->
             <intent-filter>
@@ -81,7 +82,7 @@
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:noHistory="true"
-            android:theme="@style/Theme.PennyWise.Transparent" />
+            android:theme="@style/Theme.Mudal.Transparent" />
 
         <!-- Quick Settings tile: swipe down -> tap -> Add Transaction -->
         <service
