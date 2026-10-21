@@ -250,19 +250,25 @@ class SupportedBanksDocTest {
         )
         assertEquals(
             claim,
-            listingFile.takeIf { it.exists() }?.readText()?.let { listingClaim.find(it)?.value },
+            listingFile.takeIf { it.exists() }?.readText()
+                ?.replace("\r\n", "\n")
+                ?.let { listingClaim.find(it)?.value },
             "The Play listing coverage claim (fastlane/.../full_description.txt) is stale — " +
                 "run scripts/update-supported-banks.sh"
         )
         val readme = readmeFile.readText()
+        // Compare with line endings normalised: the repository stores LF, but a
+        // Windows checkout (core.autocrlf=true) puts CRLF in the working tree,
+        // and the block below is built with \n. Without this the staleness
+        // check fails on Windows even when the content is identical.
         assertEquals(
             block,
-            extractBlock(readme),
+            extractBlock(readme).replace("\r\n", "\n"),
             "README supported-banks block is stale — run scripts/update-supported-banks.sh"
         )
         assertEquals(
             summary,
-            currentSummary(readme),
+            currentSummary(readme)?.replace("\r\n", "\n"),
             "README banks-summary bullet is stale — run scripts/update-supported-banks.sh"
         )
     }
