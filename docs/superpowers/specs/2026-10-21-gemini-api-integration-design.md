@@ -1,8 +1,8 @@
-# Design Document: Google Gemini 3.1 Flash-Lite Integration
+# Design Document: Google Gemini 3.5 Flash-Lite Integration
 
 **Date**: 2026-10-21  
 **Status**: Draft  
-**Target Model**: `gemini-3.1-flash-lite`
+**Target Model**: `gemini-3.5-flash-lite`
 
 ---
 
@@ -12,14 +12,14 @@
 Mudal (formerly PennyWise AI) previously included an on-device Large Language Model subsystem powered by Google's LiteRT-LM runtime. This required users to download an ~1.6 GB `.litertlm` model file to device storage, consumed significant RAM/CPU on mobile devices, and introduced complex download state tracking, file integrity verification, and runtime crashes.
 
 ### Purpose
-Replace the local on-device LLM with the Google Gemini Cloud API using the **`gemini-3.1-flash-lite`** model. Users provide their own personal API key (free tier from Google AI Studio). This provides instant onboarding (no multi-gigabyte downloads), near-instant inference, advanced reasoning, and full function calling support while dramatically shrinking the app package and memory footprint.
+Replace the local on-device LLM with the Google Gemini Cloud API using the **`gemini-3.5-flash-lite`** model. Users provide their own personal API key (free tier from Google AI Studio). This provides instant onboarding (no multi-gigabyte downloads), near-instant inference, advanced reasoning, and full function calling support while dramatically shrinking the app package and memory footprint.
 
 ---
 
 ## 2. Goals, Non-Goals, and Anti-Goals
 
 ### Goals
-1. **Gemini 3.1 Flash-Lite as Core Engine**: Use `gemini-3.1-flash-lite` via the Gemini REST API for chat generation and streaming responses.
+1. **Gemini 3.5 Flash-Lite as Core Engine**: Use `gemini-3.5-flash-lite` via the Gemini REST API for chat generation and streaming responses.
 2. **BYOK (Bring Your Own Key)**: Allow users to enter and store their Gemini API key securely in the app via Datastore / Keystore.
 3. **Chat Setup Flow**: In `ChatScreen`, if no key is set, present an onboarding/setup card with an input field and a one-tap link to generate a free key at [Google AI Studio](https://aistudio.google.com/app/apikey).
 4. **Settings Management**: In `SettingsScreen`, replace the 1.6 GB model download section with a Gemini API configuration section (view status, edit key, test connection, clear key).
@@ -55,7 +55,7 @@ flowchart TD
     ChatVM --> LlmRepo["LlmRepository"]
     LlmRepo --> AiContext["AiContextRepository (Financial Summary Context)"]
     LlmRepo --> GeminiService["GeminiLlmServiceImpl (implements LlmService)"]
-    GeminiService -->|HTTPS SSE / JSON| GeminiAPI["Google Gemini API (gemini-3.1-flash-lite)"]
+    GeminiService -->|HTTPS SSE / JSON| GeminiAPI["Google Gemini API (gemini-3.5-flash-lite)"]
     GeminiAPI -->|Tool Call| GeminiService
     GeminiService -->|LlmEvent.ToolCall| LlmRepo
     LlmRepo -->|PendingChatAction| ChatVM
@@ -70,7 +70,7 @@ flowchart TD
     ChatVM --> LlmRepo["LlmRepository"]
     LlmRepo --> AiContext["AiContextRepository (Financial Summary Context)"]
     LlmRepo --> GeminiService["GeminiLlmServiceImpl (implements LlmService)"]
-    GeminiService -->|HTTPS SSE / JSON| GeminiAPI["Google Gemini API (gemini-3.1-flash-lite)"]
+    GeminiService -->|HTTPS SSE / JSON| GeminiAPI["Google Gemini API (gemini-3.5-flash-lite)"]
     GeminiAPI -->|Tool Call| GeminiService
     GeminiService -->|LlmEvent.ToolCall| LlmRepo
     LlmRepo -->|PendingChatAction| ChatVM
