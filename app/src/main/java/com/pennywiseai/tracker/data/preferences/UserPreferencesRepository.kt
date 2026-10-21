@@ -54,10 +54,18 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
 )
 
 @Singleton
-open class UserPreferencesRepository @Inject constructor(
-    @ApplicationContext private val context: Context
+open class UserPreferencesRepository(
+    @ApplicationContext private val context: Context,
+    customDataStore: DataStore<Preferences>? = null
 ) {
+    @Inject
+    constructor(@ApplicationContext context: Context) : this(context, null)
+
+    private val activeDataStore: DataStore<Preferences> = customDataStore ?: context.run { dataStore }
+    private val Context.dataStore: DataStore<Preferences> get() = activeDataStore
+
     private object PreferencesKeys {
+        val GEMINI_API_KEY = stringPreferencesKey("gemini_api_key")
         val DARK_THEME_ENABLED = booleanPreferencesKey("dark_theme_enabled")
         val DYNAMIC_COLOR_ENABLED = booleanPreferencesKey("dynamic_color_enabled")
         val THEME_STYLE = stringPreferencesKey("theme_style")
@@ -349,6 +357,24 @@ open class UserPreferencesRepository @Inject constructor(
         .map { preferences ->
             preferences[PreferencesKeys.SYSTEM_PROMPT]
         }
+
+    val geminiApiKey: Flow<String?> = context.dataStore.data
+        .map { preferences -> preferences[PreferencesKeys.GEMINI_API_KEY] }
+
+    suspend fun updateGeminiApiKey(key: String?) {
+        context.dataStore.edit { preferences ->
+            val trimmed = key?.trim()
+            if (trimmed.isNullOrEmpty()) {
+                preferences.remove(PreferencesKeys.GEMINI_API_KEY)
+            } else {
+                preferences[PreferencesKeys.GEMINI_API_KEY] = trimmed
+            }
+        }
+    }
+
+    suspend fun isGeminiApiKeyConfigured(): Boolean {
+        return !geminiApiKey.first().isNullOrBlank()
+    }
     
     suspend fun markScanTutorialShown() {
         context.dataStore.edit { preferences ->
