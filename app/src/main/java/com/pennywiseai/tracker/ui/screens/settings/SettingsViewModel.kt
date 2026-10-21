@@ -21,8 +21,6 @@ import com.pennywiseai.tracker.R
 import com.pennywiseai.tracker.billing.EntitlementGate
 import com.pennywiseai.tracker.ui.UiText
 import com.pennywiseai.tracker.core.Constants.Links
-import com.pennywiseai.tracker.data.repository.ModelRepository
-import com.pennywiseai.tracker.data.repository.ModelState
 import com.pennywiseai.tracker.data.repository.UnrecognizedSmsRepository
 import com.pennywiseai.tracker.data.preferences.NumberFormatStyle
 import com.pennywiseai.tracker.data.preferences.UserPreferencesRepository
@@ -58,7 +56,6 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val modelRepository: ModelRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val unrecognizedSmsRepository: UnrecognizedSmsRepository,
     private val transactionRepository: TransactionRepository,
@@ -70,7 +67,6 @@ class SettingsViewModel @Inject constructor(
     private val folderBackupWriter: FolderBackupWriter,
     private val scheduledFolderBackupScheduler: ScheduledFolderBackupScheduler,
     private val contactsResolver: com.pennywiseai.tracker.data.contacts.ContactsResolver,
-    private val modelDownloader: com.pennywiseai.tracker.data.manager.ModelDownloader,
     entitlementGate: EntitlementGate,
 ) : ViewModel() {
 
@@ -78,18 +74,18 @@ class SettingsViewModel @Inject constructor(
     val isProEntitled: StateFlow<Boolean> = entitlementGate.isProEntitled
     
     
-    // Download state
-    private val _downloadState = MutableStateFlow(DownloadState.NOT_DOWNLOADED)
-    val downloadState: StateFlow<DownloadState> = _downloadState.asStateFlow()
-    
-    private val _downloadProgress = MutableStateFlow(0)
-    val downloadProgress: StateFlow<Int> = _downloadProgress.asStateFlow()
-    
-    private val _downloadedMB = MutableStateFlow(0L)
-    val downloadedMB: StateFlow<Long> = _downloadedMB.asStateFlow()
-    
-    private val _totalMB = MutableStateFlow(0L)
-    val totalMB: StateFlow<Long> = _totalMB.asStateFlow()
+    val geminiApiKey: StateFlow<String?> = userPreferencesRepository.geminiApiKey
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    fun updateGeminiApiKey(key: String?) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateGeminiApiKey(key)
+        }
+    }
     
     // Import/Export state
     private val _importExportMessage = MutableStateFlow<UiText?>(null)
@@ -223,106 +219,7 @@ class SettingsViewModel @Inject constructor(
             initialValue = 0
         )
     
-    init {
-        // Resolves the shared ModelState (verifying a present file when needed) across
-        // every branch below, so it replaces the old size-only checkModelState().
-        checkDownloadStatus()
-    }
-    
-    private fun checkDownloadStatus() {
-        viewModelScope.launch {
-            if (!modelDownloader.isRunning &&
-                !modelDownloader.adoptLegacyDownload() &&
-                !modelDownloader.resumeIfInterrupted()
-            ) checkModelFile()
-        }
-        // Mirror the shared downloader (it may have been started from Chat).
-        viewModelScope.launch {
-            combine(modelDownloader.progress, modelRepository.modelState) { p, m -> p to m }.collect { (p, m) ->
-                if (m == ModelState.DOWNLOADING) {
-                    _downloadState.value = DownloadState.DOWNLOADING
-                    _downloadedMB.value = p.downloadedBytes / BYTES_PER_MB
-                    _totalMB.value = p.totalBytes / BYTES_PER_MB
-                    _downloadProgress.value = (p.downloadedBytes * 100 / p.totalBytes.coerceAtLeast(1)).toInt()
-                }
-                when {
-                    p.failure == com.pennywiseai.tracker.data.manager.ModelDownloader.Failure.NO_SPACE ->
-                        _downloadState.value = DownloadState.ERROR_INSUFFICIENT_SPACE
-                    p.failure != null -> _downloadState.value = DownloadState.FAILED
-                    m == ModelState.READY && _downloadState.value == DownloadState.DOWNLOADING -> {
-                        _downloadState.value = DownloadState.COMPLETED
-                        _downloadProgress.value = 100
-                        _downloadedMB.value = _totalMB.value
-                    }
-                    // Cancelled elsewhere (e.g. from Chat) while this screen was alive.
-                    m == ModelState.NOT_DOWNLOADED && _downloadState.value == DownloadState.DOWNLOADING -> {
-                        _downloadState.value = DownloadState.NOT_DOWNLOADED
-                        _downloadProgress.value = 0
-                        _downloadedMB.value = 0
-                        _totalMB.value = 0
-                    }
-                }
-            }
-        }
-    }
 
-    private suspend fun checkModelFile() {
-        val modelFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), Constants.ModelDownload.MODEL_FILE_NAME)
-        Log.d("SettingsViewModel", "Checking model file at: ${modelFile.absolutePath}")
-        Log.d("SettingsViewModel", "Model file exists: ${modelFile.exists()}, size: ${modelFile.length()}, expected: ${Constants.ModelDownload.MODEL_SIZE_BYTES}")
-
-        // Drop an obviously-incomplete partial file before verifying.
-        // Allow 5% variance in file size as download sizes can vary slightly.
-        val minSize = (Constants.ModelDownload.MODEL_SIZE_BYTES * 0.95).toLong()
-        if (modelFile.exists() && modelFile.length() < minSize) {
-            Log.d("SettingsViewModel", "Partial model file found (${modelFile.length()} bytes), deleting")
-            modelFile.delete()
-        }
-
-        // Re-verify a present full-size file; a hash mismatch deletes it here. This MUST
-        // run before we set DownloadState so a rejected model is never reported COMPLETED.
-        modelRepository.refreshModelState()
-
-        // Mirror the real post-verification outcome into the Settings download state, so
-        // a deleted (hash-invalid) model shows NOT_DOWNLOADED rather than a stale COMPLETED.
-        if (modelRepository.isModelDownloaded()) {
-            _downloadState.value = DownloadState.COMPLETED
-            _totalMB.value = modelFile.length() / (1024 * 1024)
-            _downloadedMB.value = _totalMB.value
-            _downloadProgress.value = 100
-        } else {
-            _downloadState.value = DownloadState.NOT_DOWNLOADED
-            _downloadProgress.value = 0
-        }
-    }
-    
-    fun startModelDownload() = modelDownloader.start()
-
-    fun cancelDownload() {
-        modelDownloader.cancel()
-        _downloadState.value = DownloadState.NOT_DOWNLOADED
-        _downloadProgress.value = 0
-        _downloadedMB.value = 0
-        _totalMB.value = 0
-    }
-
-    fun deleteModel() {
-        viewModelScope.launch {
-            val modelFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), Constants.ModelDownload.MODEL_FILE_NAME)
-            if (modelFile.exists()) {
-                modelFile.delete()
-                _downloadState.value = DownloadState.NOT_DOWNLOADED
-                _downloadProgress.value = 0
-                _downloadedMB.value = 0
-                _totalMB.value = 0
-                // Clear any saved download ID
-                userPreferencesRepository.clearActiveDownloadId()
-                // Update model repository state
-                modelRepository.updateModelState(ModelState.NOT_DOWNLOADED)
-                Log.d("SettingsViewModel", "Model deleted")
-            }
-        }
-    }
     
     fun setUnifiedCurrencyMode(enabled: Boolean) {
         viewModelScope.launch {
@@ -790,16 +687,7 @@ class SettingsViewModel @Inject constructor(
     }
 }
 
-private const val BYTES_PER_MB = 1024L * 1024L
 
-enum class DownloadState {
-    NOT_DOWNLOADED,
-    DOWNLOADING,
-    PAUSED,
-    COMPLETED,
-    FAILED,
-    ERROR_INSUFFICIENT_SPACE
-}
 
 private enum class FolderPickerAction {
     ENABLE,

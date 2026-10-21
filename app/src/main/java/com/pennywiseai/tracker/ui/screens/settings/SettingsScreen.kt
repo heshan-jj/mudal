@@ -117,10 +117,7 @@ fun SettingsScreen(
 ) {
     val themeUiState by themeViewModel.themeUiState.collectAsStateWithLifecycle()
     val appLockUiState by appLockViewModel.uiState.collectAsStateWithLifecycle()
-    val downloadState by settingsViewModel.downloadState.collectAsStateWithLifecycle()
-    val downloadProgress by settingsViewModel.downloadProgress.collectAsStateWithLifecycle()
-    val downloadedMB by settingsViewModel.downloadedMB.collectAsStateWithLifecycle()
-    val totalMB by settingsViewModel.totalMB.collectAsStateWithLifecycle()
+    val geminiApiKey by settingsViewModel.geminiApiKey.collectAsStateWithLifecycle()
     val isDeveloperModeEnabled by settingsViewModel.isDeveloperModeEnabled.collectAsStateWithLifecycle(initialValue = false)
     val smsScanMonths by settingsViewModel.smsScanMonths.collectAsStateWithLifecycle(initialValue = 3)
     val smsScanAllTime by settingsViewModel.smsScanAllTime.collectAsStateWithLifecycle(initialValue = false)
@@ -750,14 +747,9 @@ fun SettingsScreen(
             // ── AI Features ──
             SectionHeaderV2(title = stringResource(R.string.settings_ai_section))
             SettingsGroup {
-                AiChatSettingsItem(
-                    downloadState = downloadState,
-                    downloadProgress = downloadProgress,
-                    downloadedMB = downloadedMB,
-                    totalMB = totalMB,
-                    onDownload = { settingsViewModel.startModelDownload() },
-                    onCancel = { settingsViewModel.cancelDownload() },
-                    onDelete = { settingsViewModel.deleteModel() }
+                GeminiAiSettingsItem(
+                    apiKey = geminiApiKey,
+                    onSaveApiKey = { settingsViewModel.updateGeminiApiKey(it) }
                 )
             }
 
@@ -1512,147 +1504,128 @@ private fun SettingsDropdownItem(
 }
 
 @Composable
-private fun AiChatSettingsItem(
-    downloadState: DownloadState,
-    downloadProgress: Int,
-    downloadedMB: Long,
-    totalMB: Long,
-    onDownload: () -> Unit,
-    onCancel: () -> Unit,
-    onDelete: () -> Unit
+private fun GeminiAiSettingsItem(
+    apiKey: String?,
+    onSaveApiKey: (String?) -> Unit
 ) {
-    GroupedColumn(
-        position = ListItemPosition.Single,
-        verticalArrangement = Arrangement.spacedBy(Spacing.md)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Spacing.md),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconTile(
-                icon = Icons.Default.AutoAwesome,
-                containerColor = yellow_light,
-                contentColor = yellow_dark
-            )
-            RowLabels(
-                title = stringResource(R.string.settings_ai_chat_title),
-                subtitle = when (downloadState) {
-                    DownloadState.NOT_DOWNLOADED -> stringResource(R.string.settings_ai_status_not_downloaded, Constants.ModelDownload.MODEL_SIZE_MB)
-                    DownloadState.DOWNLOADING -> stringResource(R.string.settings_ai_status_downloading)
-                    DownloadState.PAUSED -> stringResource(R.string.settings_ai_status_paused)
-                    DownloadState.COMPLETED -> stringResource(R.string.settings_ai_status_completed)
-                    DownloadState.FAILED -> stringResource(R.string.settings_ai_status_failed)
-                    DownloadState.ERROR_INSUFFICIENT_SPACE -> stringResource(R.string.settings_ai_status_insufficient_space)
-                }
-            )
+    var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val isConfigured = !apiKey.isNullOrBlank()
 
-            when (downloadState) {
-                DownloadState.NOT_DOWNLOADED -> {
-                    Button(onClick = onDownload) {
-                        Icon(Icons.Default.Download, contentDescription = null)
-                        Spacer(modifier = Modifier.width(Spacing.xs))
-                        Text(stringResource(R.string.settings_ai_download))
-                    }
-                }
-                DownloadState.DOWNLOADING -> {
+    SettingsNavItem(
+        icon = Icons.Default.AutoAwesome,
+        iconBgColor = yellow_light,
+        iconTint = yellow_dark,
+        title = stringResource(R.string.settings_ai_chat_title),
+        subtitle = if (isConfigured) {
+            val masked = if (apiKey.length > 10) "${apiKey.take(6)}...${apiKey.takeLast(4)}" else "••••••••"
+            "Configured ($masked) • gemini-3.5-flash-lite"
+        } else {
+            "Not configured (tap to set API key)"
+        },
+        position = ListItemPosition.Single,
+        trailingText = if (isConfigured) "Configured" else "Setup",
+        onClick = { showDialog = true }
+    )
+
+    if (showDialog) {
+        var inputKey by remember { mutableStateOf(apiKey ?: "") }
+        var showPassword by remember { mutableStateOf(false) }
+
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.AutoAwesome,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = {
+                Text(
+                    text = "Google Gemini API Key",
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.md)
+                ) {
                     Text(
-                        text = "$downloadProgress%",
+                        text = "Mudal uses Google Gemini (gemini-3.5-flash-lite) to analyze your finances and parse transactions. Your key is stored securely on device.",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
-                DownloadState.PAUSED -> {
-                    Button(onClick = onDownload) {
-                        Icon(Icons.Default.Download, contentDescription = null)
-                        Spacer(modifier = Modifier.width(Spacing.xs))
-                        Text(stringResource(R.string.settings_ai_retry))
-                    }
-                }
-                DownloadState.COMPLETED -> {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-                        verticalAlignment = Alignment.CenterVertically
+                    OutlinedTextField(
+                        value = inputKey,
+                        onValueChange = { inputKey = it },
+                        label = { Text("Gemini API Key") },
+                        placeholder = { Text("AIzaSy...") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = if (showPassword) androidx.compose.ui.text.input.VisualTransformation.None else androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { showPassword = !showPassword }) {
+                                Icon(
+                                    imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                    contentDescription = if (showPassword) "Hide API Key" else "Show API Key"
+                                )
+                            }
+                        }
+                    )
+                    OutlinedButton(
+                        onClick = {
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://aistudio.google.com/app/apikey")
+                            )
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(
-                            Icons.Default.CheckCircle,
-                            contentDescription = stringResource(R.string.settings_ai_downloaded),
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(Dimensions.Icon.medium)
+                            imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                            contentDescription = null,
+                            modifier = Modifier.size(Dimensions.Icon.inline)
                         )
-                        TextButton(onClick = onDelete) {
-                            Text(stringResource(R.string.settings_ai_delete))
+                        Spacer(modifier = Modifier.width(Spacing.xs))
+                        Text("Get Free Key at Google AI Studio")
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val trimmed = inputKey.trim()
+                        onSaveApiKey(if (trimmed.isNotBlank()) trimmed else null)
+                        showDialog = false
+                    }
+                ) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                    if (isConfigured) {
+                        TextButton(
+                            onClick = {
+                                onSaveApiKey(null)
+                                showDialog = false
+                            },
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text("Clear")
                         }
                     }
-                }
-                DownloadState.FAILED -> {
-                    Button(
-                        onClick = onDownload,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error
-                        )
-                    ) {
-                        Icon(Icons.Default.Refresh, contentDescription = null)
-                        Spacer(modifier = Modifier.width(Spacing.xs))
-                        Text(stringResource(R.string.settings_ai_retry))
+                    TextButton(onClick = { showDialog = false }) {
+                        Text("Cancel")
                     }
                 }
-                DownloadState.ERROR_INSUFFICIENT_SPACE -> {
-                    Icon(
-                        Icons.Default.Error,
-                        contentDescription = stringResource(R.string.settings_ai_error),
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(Dimensions.Icon.medium)
-                    )
-                }
             }
-        }
-
-        // Progress details during download
-        AnimatedVisibility(
-            visible = downloadState == DownloadState.DOWNLOADING,
-            enter = expandVertically() + fadeIn(),
-            exit = shrinkVertically() + fadeOut()
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(Spacing.sm)
-            ) {
-                LinearProgressIndicator(
-                    progress = { downloadProgress / 100f },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = stringResource(R.string.settings_ai_download_progress, downloadedMB, totalMB),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Button(
-                    onClick = onCancel,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    )
-                ) {
-                    Icon(Icons.Default.Cancel, contentDescription = null)
-                    Spacer(modifier = Modifier.width(Spacing.xs))
-                    Text(stringResource(R.string.settings_ai_cancel_download))
-                }
-            }
-        }
-
-        // Info about AI features
-        if (downloadState == DownloadState.NOT_DOWNLOADED ||
-            downloadState == DownloadState.ERROR_INSUFFICIENT_SPACE
-        ) {
-            HorizontalDivider()
-            Text(
-                text = stringResource(R.string.settings_ai_info),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        )
     }
 }
 
