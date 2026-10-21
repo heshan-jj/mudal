@@ -347,6 +347,14 @@ echo -e "${GREEN}✅ APKs built${NC}"
 # 7. Rename APKs (matching GitHub Actions)
 STANDARD_PATH="app/build/outputs/apk/release"
 
+# Rename the release APK(s). This project builds a single universal APK (no
+# ABI splits), so that is the primary case; the per-ABI outputs are handled
+# too in case splits are ever enabled.
+if [ -f "$STANDARD_PATH/app-release.apk" ]; then
+    mv "$STANDARD_PATH/app-release.apk" \
+       "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-universal.apk"
+fi
+
 # Rename universal APK
 if [ -f "$STANDARD_PATH/app-universal-release.apk" ]; then
     mv "$STANDARD_PATH/app-universal-release.apk" \
@@ -419,15 +427,23 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     # Create GitHub release with gh CLI
     if command -v gh &> /dev/null; then
         echo "Creating GitHub release..."
+        # Publish whatever APKs this build actually produced (universal and/or
+        # per-ABI), each with its .sha256.
+        RELEASE_FILES=""
+        for f in "$STANDARD_PATH"/Mudal-v${NEXT_VERSION}*.apk \
+                 "$STANDARD_PATH"/Mudal-v${NEXT_VERSION}*.apk.sha256; do
+            if [ -f "$f" ]; then
+                RELEASE_FILES="$RELEASE_FILES $f"
+            fi
+        done
+        if [ -z "$RELEASE_FILES" ]; then
+            echo -e "${RED}No release APKs found in $STANDARD_PATH - aborting the release.${NC}"
+            exit 1
+        fi
         gh release create "v$NEXT_VERSION" \
             --title "Release v$NEXT_VERSION" \
             --notes-file RELEASE_NOTES.md \
-            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-universal.apk" \
-            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-universal.apk.sha256" \
-            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-arm64-v8a.apk" \
-            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-arm64-v8a.apk.sha256" \
-            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-armeabi-v7a.apk" \
-            "$STANDARD_PATH/Mudal-v${NEXT_VERSION}-armeabi-v7a.apk.sha256"
+            $RELEASE_FILES
         echo -e "${GREEN}✅ GitHub release created${NC}"
     else
         echo -e "${YELLOW}gh CLI not found. Create release manually at:${NC}"

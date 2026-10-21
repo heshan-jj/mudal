@@ -234,6 +234,12 @@ jobs:
           VERSION="${{ steps.next_version.outputs.version }}"
           STANDARD_PATH="app/build/outputs/apk/release"
           
+          # This project builds a single universal APK (no ABI splits).
+          if [ -f "$STANDARD_PATH/app-release.apk" ]; then
+            mv "$STANDARD_PATH/app-release.apk" \
+               "$STANDARD_PATH/Mudal-v${VERSION}-universal.apk"
+          fi
+
           # Rename universal APK (contains all architectures)
           if [ -f "$STANDARD_PATH/app-universal-release.apk" ]; then
             mv "$STANDARD_PATH/app-universal-release.apk" \
@@ -305,10 +311,6 @@ jobs:
           files: |
             app/build/outputs/apk/release/Mudal-v${{ steps.next_version.outputs.version }}-universal.apk
             app/build/outputs/apk/release/Mudal-v${{ steps.next_version.outputs.version }}-universal.apk.sha256
-            app/build/outputs/apk/release/Mudal-v${{ steps.next_version.outputs.version }}-arm64-v8a.apk
-            app/build/outputs/apk/release/Mudal-v${{ steps.next_version.outputs.version }}-arm64-v8a.apk.sha256
-            app/build/outputs/apk/release/Mudal-v${{ steps.next_version.outputs.version }}-armeabi-v7a.apk
-            app/build/outputs/apk/release/Mudal-v${{ steps.next_version.outputs.version }}-armeabi-v7a.apk.sha256
           draft: false
           prerelease: false
       
