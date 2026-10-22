@@ -470,3 +470,37 @@ tree byte-identical to the repository.
   and show the old branding. They need replacing with Mudal's own.
 - No Play Store submission: the plan does not target the Play SMS-permission
   policy yet, and the store build is only produced with `--play`.
+
+---
+
+## 13. v2.24.1 — blocked SMS permission explained (2026-10-22)
+
+**Release:** https://github.com/heshan-jj/mudal/releases/tag/v2.24.1
+(`Mudal-v2.24.1-universal.apk`, 25.4 MB, signed with the same key as v2.24.0,
+so it installs over it and keeps the data).
+
+### The problem
+On Android 14+ the SMS permission is *restricted* for an app installed from
+outside the Play Store. The runtime request comes back denied with no dialog
+and no way to ask again. The onboarding step responded by showing "Enable
+Permissions" over and over, so a sideloaded install looked like a broken app
+with no way forward.
+
+### The fix
+- `SmsPermissionHelper` (new) classifies the permission: granted, requestable,
+  or **blocked** (denied and the system will not ask again).
+- The onboarding step shows a card explaining what happened and offers a
+  button that opens Mudal's own **App info** settings page — the only place
+  where "Allow restricted settings" lives. The numbered steps are below the
+  button so the call to action is above the fold.
+- The permission is re-checked on resume, so returning from settings moves the
+  step on by itself.
+
+Verified on an API 37 emulator: denying twice shows the card, and the button
+opens the App info screen for Mudal.
+
+### The release tooling worked this time
+`scripts/release.sh` renamed the single universal APK, published it with its
+SHA256, tagged and pushed without intervention — the fix from §11 does its
+job. Only `gh release create` failed, on a transient network drop
+(`wsarecv: connection forcibly closed`); the release was created by hand.
