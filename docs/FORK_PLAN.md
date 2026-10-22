@@ -30,10 +30,16 @@ for none.
 | 5 | Sinhala localisation | optional, post-v1.0 |
 | 6 | Budget rollover + alerts | optional, post-v1.0 |
 | 7 | Offline build variant | optional, post-v1.0 |
-| 8 | Release (F-Droid + GitHub Releases) | **v2.24.0 published** — https://github.com/heshan-jj/mudal/releases/tag/v2.24.0 |
+| 8 | Release (F-Droid + GitHub Releases) | **v2.24.1 published** — https://github.com/heshan-jj/mudal/releases/tag/v2.24.1 |
+| 9 | Remove the UPI / contacts feature | **planned** — see [`REMOVE_UPI_PLAN.md`](REMOVE_UPI_PLAN.md) |
 
-**Next phase: finish Phase 2.** Outstanding items are listed in the Phase 2
-section — they are the known blockers, not a wish list.
+**Next phase: Phase 9 — remove the UPI / contacts feature.** The plan, the
+inventory and the verification gates are in
+[`docs/REMOVE_UPI_PLAN.md`](REMOVE_UPI_PLAN.md). It is small, self-contained and
+unblocks the next release: the app should not be asking for `READ_CONTACTS`.
+
+Phase 2 is still open (the outstanding items are listed in its section), but
+none of them block a release.
 
 ---
 
