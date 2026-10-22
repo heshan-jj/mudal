@@ -1,4 +1,5 @@
 <!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
+# Mudal (මුදල්) — Private SMS Expense Tracker
 
 ![Mudal — private SMS expense tracker for Sri Lanka](branding/feature-graphics/feature-brand-green.png)
 

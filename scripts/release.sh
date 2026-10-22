@@ -275,8 +275,9 @@ if [ "$USE_CLAUDE" = false ]; then
         echo "Version $NEXT_VERSION" > "$CHANGELOG_FILE"
         echo "" >> "$CHANGELOG_FILE"
         # Get features
-        FEATURES=$(git log $LAST_TAG..HEAD --pretty=format:"%s" | grep "^feat" 2>/dev/null | sed 's/^feat[:(].*[):] */• /' | head -5)
-        FIXES=$(git log $LAST_TAG..HEAD --pretty=format:"%s" | grep "^fix" 2>/dev/null | sed 's/^fix[:(].*[):] */• /' | head -5)
+        # Scoped (feat(scope):) and unscoped (feat:) conventional commits
+        FEATURES=$(git log $LAST_TAG..HEAD --pretty=format:"%s" | grep "^feat" 2>/dev/null | sed -E 's/^feat(\([^)]+\))?: */• /' | head -5)
+        FIXES=$(git log $LAST_TAG..HEAD --pretty=format:"%s" | grep "^fix" 2>/dev/null | sed -E 's/^fix(\([^)]+\))?: */• /' | head -5)
 
         if [ -n "$FEATURES" ]; then
             echo "New Features:" >> "$CHANGELOG_FILE"
