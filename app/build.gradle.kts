@@ -22,8 +22,8 @@ android {
         applicationId = "com.mudal.tracker"
         minSdk = 26
         targetSdk = 36
-        versionCode = 108
-        versionName = "2.24.0"
+        versionCode = 109
+        versionName = "2.24.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         

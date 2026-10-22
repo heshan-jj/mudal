@@ -1,9 +1,4 @@
-Version 2.24.0
+Version 2.24.1
 
-New Features:
-• remove LiteRT-LM, update AI branding to Mudal AI
-• replace model download with Gemini API key configuration
-• add Gemini API key setup card to ChatScreen and drop download UI
-• update LlmRepository with 20-message sliding window and Gemini key check
-• implement GeminiLlmServiceImpl for gemini-3.5-flash-lite
-
+Bug Fixes:
+• explain a blocked SMS permission instead of asking again
