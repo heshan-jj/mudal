@@ -93,6 +93,7 @@ class RecentTransactionsWidget : GlanceAppWidget() {
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
+                .cornerRadius(24.dp)
                 .background(GlanceTheme.colors.widgetBackground)
                 .clickable(actionStartActivity<MainActivity>()),
             verticalAlignment = Alignment.Top,

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-22 - see NOTICE. -->
+<resources>
+    <!-- Widget Preview Colors (Dark / Glassmorphism) -->
+    <color name="widget_preview_bg">#FF1A1C1E</color>
+    <color name="widget_preview_border">#2EFFFFFF</color>
+    <color name="widget_preview_divider">#20FFFFFF</color>
+    <color name="widget_preview_track">#FF2D3135</color>
+    <color name="widget_preview_accent">#A8C7FA</color>
+    <color name="widget_preview_income">#4CAF50</color>
+    <color name="widget_preview_expense">#F28B82</color>
+</resources>

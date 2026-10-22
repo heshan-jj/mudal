@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:theme="@android:style/Theme.DeviceDefault.DayNight"
-    android:background="?android:attr/colorBackground">
+    android:background="@drawable/widget_preview_card_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,9 +23,9 @@
             android:textColor="?android:attr/textColorPrimary" />
 
         <ImageView
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:padding="8dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="6dp"
             android:src="@drawable/ic_widget_add"
             android:tint="?android:attr/textColorPrimary" />
     </LinearLayout>
@@ -34,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="₹12,450"
+        android:text="Rs. 12,450"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="?android:attr/textColorPrimary" />
@@ -67,7 +67,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Zomato"
+                    android:text="Uber Eats"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:textColor="?android:attr/textColorPrimary" />
@@ -75,7 +75,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Food • Sep 12"
+                    android:text="Food • Today"
                     android:textSize="12sp"
                     android:textColor="?android:attr/textColorSecondary" />
             </LinearLayout>
@@ -83,17 +83,17 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="-₹850"
+                android:text="-Rs. 850"
                 android:textSize="13sp"
                 android:textStyle="bold"
-                android:textColor="#D32F2F" />
+                android:textColor="@color/widget_preview_expense" />
         </LinearLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="10dp"
-            android:background="#E0E0E0" />
+            android:background="@color/widget_preview_divider" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -117,7 +117,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Income • Sep 05"
+                    android:text="Income • Yesterday"
                     android:textSize="12sp"
                     android:textColor="?android:attr/textColorSecondary" />
             </LinearLayout>
@@ -125,10 +125,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+₹85,000"
+                android:text="+Rs. 85,000"
                 android:textSize="13sp"
                 android:textStyle="bold"
-                android:textColor="#2E7D32" />
+                android:textColor="@color/widget_preview_income" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

@@ -3,30 +3,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
+    android:background="@drawable/widget_preview_card_bg"
     android:orientation="vertical"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="12dp"
-    android:theme="@style/Theme.Pennywisecompose">
+    android:padding="16dp"
+    android:theme="@android:style/Theme.DeviceDefault.DayNight">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/goals_section_title"
         android:textColor="?android:attr/textColorPrimary"
+        android:textStyle="bold"
         android:textSize="14sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:indeterminate="false"
             android:max="100"
             android:progress="60"
@@ -45,7 +45,8 @@
                 android:maxLines="1"
                 android:text="@string/widget_goal_preview_name"
                 android:textColor="?android:attr/textColorPrimary"
-                android:textSize="14sp" />
+                android:textStyle="bold"
+                android:textSize="13sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -61,21 +62,21 @@
             android:layout_height="wrap_content"
             android:text="@string/widget_goal_preview_percent"
             android:textColor="?android:attr/textColorPrimary"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:indeterminate="false"
             android:max="100"
             android:progress="25"
@@ -94,7 +95,8 @@
                 android:maxLines="1"
                 android:text="@string/widget_goal_preview_name_2"
                 android:textColor="?android:attr/textColorPrimary"
-                android:textSize="14sp" />
+                android:textStyle="bold"
+                android:textSize="13sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -110,7 +112,7 @@
             android:layout_height="wrap_content"
             android:text="@string/widget_goal_preview_percent_2"
             android:textColor="?android:attr/textColorPrimary"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

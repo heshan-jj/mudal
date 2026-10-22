@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
 import androidx.datastore.preferences.core.Preferences
@@ -200,6 +201,7 @@ class GoalWidget : GlanceAppWidget() {
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
+                .cornerRadius(24.dp)
                 .background(GlanceTheme.colors.widgetBackground)
                 .padding(Spacing.smd)
                 .clickable(tap),
@@ -266,6 +268,7 @@ class GoalsListWidget : GlanceAppWidget() {
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
+                .cornerRadius(24.dp)
                 .background(GlanceTheme.colors.widgetBackground)
                 .padding(horizontal = Spacing.md, vertical = Spacing.xs)
                 .clickable(openBudgets(context)),

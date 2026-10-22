@@ -115,9 +115,9 @@
     <!-- Sample content for the widget picker previews only -->
     <string name="widget_goal_preview_name" translatable="false">Car insurance</string>
     <string name="widget_goal_preview_percent" translatable="false" formatted="false">60%</string>
-    <string name="widget_goal_preview_short" translatable="false">₹9,600 left · 5 mo</string>
-    <string name="widget_goal_preview_line" translatable="false">₹1,920/mo · 5 months left</string>
+    <string name="widget_goal_preview_short" translatable="false">Rs. 9,600 left · 5 mo</string>
+    <string name="widget_goal_preview_line" translatable="false">Rs. 1,920/mo · 5 months left</string>
     <string name="widget_goal_preview_name_2" translatable="false">Trip</string>
     <string name="widget_goal_preview_percent_2" translatable="false" formatted="false">25%</string>
-    <string name="widget_goal_preview_line_2" translatable="false">₹4,500/mo · 8 months left</string>
+    <string name="widget_goal_preview_line_2" translatable="false">Rs. 4,500/mo · 8 months left</string>
 </resources>

@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Widget picker preview for the 2x2 goal widget. Theme.Pennywisecompose has a
-     night variant, so this follows dark mode without DayNight (API 29). -->
+<!-- Widget picker preview for the 2x2 goal widget. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
+    android:background="@drawable/widget_preview_card_bg"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="12dp"
-    android:theme="@style/Theme.Pennywisecompose">
+    android:padding="16dp"
+    android:theme="@android:style/Theme.DeviceDefault.DayNight">
 
     <FrameLayout
         android:layout_width="56dp"
@@ -40,11 +39,13 @@
         android:maxLines="1"
         android:text="@string/widget_goal_preview_name"
         android:textColor="?android:attr/textColorPrimary"
+        android:textStyle="bold"
         android:textSize="14sp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
         android:maxLines="1"
         android:text="@string/widget_goal_preview_short"
         android:textColor="?android:attr/textColorSecondary"

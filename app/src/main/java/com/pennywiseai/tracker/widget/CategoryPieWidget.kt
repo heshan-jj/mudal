@@ -84,8 +84,9 @@ class CategoryPieWidget : GlanceAppWidget() {
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .padding(14.dp)
+                .cornerRadius(24.dp)
                 .background(GlanceTheme.colors.widgetBackground)
+                .padding(16.dp)
                 .clickable(actionStartActivity<MainActivity>())
         ) {
             Row(modifier = GlanceModifier.fillMaxWidth()) {

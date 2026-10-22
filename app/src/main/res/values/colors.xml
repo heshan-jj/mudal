@@ -9,4 +9,12 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="mudal_dark_background">#FF101412</color>
+    <!-- Widget Preview Colors (Light) -->
+    <color name="widget_preview_bg">#FFFDFD</color>
+    <color name="widget_preview_border">#1A000000</color>
+    <color name="widget_preview_divider">#12000000</color>
+    <color name="widget_preview_track">#E6E6E6</color>
+    <color name="widget_preview_accent">#1B6EF3</color>
+    <color name="widget_preview_income">#2E7D32</color>
+    <color name="widget_preview_expense">#D32F2F</color>
 </resources>

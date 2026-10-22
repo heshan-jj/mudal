@@ -81,8 +81,9 @@ class BudgetWidget : GlanceAppWidget() {
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .cornerRadius(24.dp)
                 .background(GlanceTheme.colors.widgetBackground)
+                .padding(16.dp)
                 .clickable(actionStartActivity<MainActivity>()),
             verticalAlignment = Alignment.CenterVertically
         ) {
