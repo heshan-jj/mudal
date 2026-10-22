@@ -64,12 +64,16 @@ Take `sarim2000/pennywiseai-tracker` (Kotlin, Jetpack Compose, Room, Hilt, KMP p
 - Pro-gated upstream: rules cap, statement imports, CSV export rows, recurring templates, goals, account merge, webhooks, some analytics groupings. The `fdroid` flavor sets `isPro = true`.
 - Network touchpoints upstream: Dodo Payments licensing, a Cloudflare Worker license URL, exchange rates (open.er-api.com), model download from upstream's own R2 bucket, "report SMS" flow that sends SMS body + sender to pennywise.zynth.dev.
 - `TRADEMARKS.md` reserves the PennyWise name, logo and banner. Forks must rebrand.
-- Cashiro is a downstream fork of PennyWise that diverged around v2.15.43 and then fell far behind (834 upstream commits since). Lesson: keep our diff small so we can keep pulling upstream.
+- Cashiro is a downstream fork of PennyWise that diverged around v2.15.43 and then fell far behind (834 upstream commits since). Lesson: keep our diff small â for **reviewability**, not for mergeability. Mudal never merges upstream (rule 2), but a small diff still means a reviewer can see what changed.
 - **Recurring transactions and subscriptions already exist** upstream (`RecurringTransactionsScreen`, `SubscriptionsScreen`) and are ungated after Phase 1. They were built for a manual-entry workflow, not an SMS-first one, and today they double-count charges and miss price changes — see Phase 4.
 
 ## Non-negotiable rules
 1. **Keep the diff small.** Add new files instead of editing existing ones where possible. Do NOT rename Kotlin packages. Change `applicationId`, app name, icons and strings only. Leave `iosApp` and KMP structure alone (just don't build iOS).
-2. **Upstream sync:** add an `upstream` remote. Keep our work on `main` via small commits. Document the sync procedure in `docs/FORK_NOTES.md` and test it once (merge or rebase upstream into a scratch branch, report conflicts). **Sync before every phase that touches the Room schema** — each migration we add makes future merges harder.
+2. **No upstream merges, ever.** Mudal is a permanent independent fork. Upstream
+   (`upstream-reference`) is **reference only**: read it, cherry-pick a single
+   commit if Mudal wants it, but never merge its branch history. `main` tracks
+   `origin/main`, and the repo config refuses any non-fast-forward merge
+   (`merge.ff = only`, `pull.ff = only`). See `docs/FORK_NOTES.md` §8. **Sync before every phase that touches the Room schema** — each migration we add makes future merges harder.
 3. **Never invent bank SMS formats.** Every parser is written from real, masked samples supplied by the owner. No samples means no parser; list the bank in `docs/lk-banks-needing-samples.md` instead.
 4. **Privacy:** no raw SMS leaves the device, ever. Never log SMS bodies. No analytics.
 5. **Licensing:** keep LICENSE (AGPL-3.0-only) and all original copyright notices. Add `NOTICE`/`ATTRIBUTION.md` crediting PennyWise (and Cashiro for any ported code). Mark our changes. Add an in-app "Source code and licenses" screen linking our repo.
@@ -295,7 +299,7 @@ listing or a privacy-focused buyer makes it worth the release-matrix cost.
 2. Signed release APK via CI secrets, GitHub Releases workflow, F-Droid metadata (unique applicationId, fastlane metadata folder, reproducibility notes). Do not target Play Store yet — its SMS-permission policy is a separate project, and F-Droid needs no store account.
 3. Docs: README with screenshots, `PRIVACY.md`, `CONTRIBUTING.md`, "How to add a Sri Lankan bank" guide with a worked example and masking instructions, issue templates ("Add or fix a bank parser" asking for masked samples).
 4. Security pass: manifest exported components, no sensitive logging (grep test), dependency audit, DB encryption verified again on the release build, backup behaviour re-checked against `PRIVACY.md`.
-5. Run the upstream sync dry run once more and record the result.
+5. Upstream sync: **not applicable** — Mudal never merges upstream (rule 2). The one dry run that was done is recorded in `docs/FORK_NOTES.md` §11.
 6. Confirm the release notes say plainly which banks are supported and which are not.
 
 Acceptance: fresh clone to running app following the README; release APK passes a manual smoke test on a real device.

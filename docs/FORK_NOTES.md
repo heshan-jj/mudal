@@ -18,7 +18,7 @@ This document records the baseline environment, build verification, audit findin
 - **Kotlin Version:** 2.3.0
 - **Git Remotes:**
   - `origin`: `https://github.com/heshan-jj/mudal.git`
-  - `upstream`: `https://github.com/sarim2000/pennywiseai-tracker.git`
+  - `upstream-reference` (read-only, never merged): `https://github.com/sarim2000/pennywiseai-tracker.git`
 
 ---
 
@@ -172,27 +172,51 @@ private val CURRENCY_PATTERN = Regex("""[₹$€£]\s?\.?\d|\d[\d.,]*\s?[₹$€
 
 ---
 
-## 8. Upstream Sync Procedure
+## 8. Upstream: reference only, never merged
 
-To synchronize changes from upstream `sarim2000/pennywiseai-tracker` without code divergence:
+**Policy (owner decision, 2026-10-22): Mudal is a permanent, independent
+fork. Upstream is never merged in.**
+
+`upstream` was renamed to **`upstream-reference`** so that no ordinary command
+can pull it by accident. It exists for one purpose only: looking at what
+Sarim's project did, and cherry-picking a single upstream commit if Mudal
+genuinely wants it.
 
 ```bash
-# 1. Fetch latest upstream changes
-git fetch upstream
+# Look at what upstream did
+git fetch upstream-reference
+git log upstream-reference/main
+git show upstream-reference/main -- path/to/file
 
-# 2. Test merge on an isolated scratch branch
-git checkout -b sync-test
-git merge upstream/main
-
-# 3. Resolve any conflicts, run tests
-./gradlew :parser-core:test
-./gradlew :app:testStandardDebugUnitTest
-
-# 4. If green, fast-forward/rebase main and delete scratch branch
-git checkout main
-git merge sync-test
-git branch -d sync-test
+# Take ONE upstream commit (never a merge, never a branch merge)
+git cherry-pick <sha>
 ```
+
+**What is forbidden:**
+- `git merge upstream-reference/main` — refused by the repo config
+  (`merge.ff = only`) and by the `pre-merge` hook in `.git/hooks/`.
+- `git pull upstream-reference main` — refused (`pull.ff = only`).
+- Merging upstream's branch history in any other form.
+
+`main` tracks **`origin/main`** (this fork). An IDE "pull" therefore pulls
+Mudal's own work, never upstream's.
+
+**Why the guards exist:** on 2026-10-22 an accidental "pull" merged 12 upstream
+commits into Mudal, dragging in ~200 files (upstream's AI-relay feature, a
+`relay/` worker, statement-import rework) and producing 11 conflicts across
+files Mudal had deliberately changed. It was reverted with `git merge --abort`;
+nothing from upstream was kept.
+
+**What this changes about the fork's premise:** "keep the diff small" is still
+good practice — but for **reviewability**, not for mergeability. Mudal is not
+going to pull upstream's changes, so there is no upstream-sync tax to budget
+for.
+
+**What does not change:** the AGPL-3.0 obligations. Mudal is a derivative work,
+so the licence, the upstream copyright, the `NOTICE`, the per-file
+`Mudal fork:` modification notices and the `docs/MODIFICATIONS.md` record all
+still apply. Not merging upstream is a development decision; it has no effect
+on the licence terms, which are about what Mudal does with the code it took.
 
 ---
 
@@ -319,8 +343,8 @@ the old slug was updated, and the AGPL-3.0 obligations were audited against
 upstream's `TRADEMARKS.md` before the first public push.
 
 ### Repository plumbing
-- `origin` remote now points at `https://github.com/heshan-jj/mudal.git`; `upstream`
-  is unchanged (`sarim2000/pennywiseai-tracker`).
+- `origin` remote now points at `https://github.com/heshan-jj/mudal.git`; the upstream remote
+  was renamed to `upstream-reference` (read-only, never merged).
 - In-app links: `Constants.Links.GITHUB_URL` and the Settings "Source code &
   licenses" / "Report an issue" entries now point at `heshan-jj/mudal`.
 - Docs: `docs/PRIVACY.md`, `docs/FORK_NOTES.md` and the issue templates point at the
@@ -563,3 +587,38 @@ the app's storage now that nothing reads it.
   which come from WorkManager and cannot be removed.
 - On the device the Settings screen has no Contacts section, and the split
   sheet's contact picker still works.
+
+---
+
+## 15. Upstream is never merged (owner decision, 2026-10-22)
+
+**Mudal is a permanent, independent fork. Upstream is never merged in, and
+Mudal is not associated with the PennyWise project.**
+
+What changed:
+
+- The `upstream` remote was renamed to **`upstream-reference`**, so no ordinary
+  command can pull it by accident.
+- The repo config refuses non-fast-forward merges (`merge.ff = only`) and
+  refuses a non-fast-forward pull (`pull.ff = only`).
+- `main` tracks `origin/main` (this fork), so an IDE "pull" pulls Mudal's work.
+- `docs/FORK_PLAN.md` rule 2 now states the policy, and `docs/FORK_NOTES.md`
+  section 8 documents how to look at upstream and cherry-pick a single commit if
+  Mudal ever wants one - never a merge.
+
+Trigger for the decision: an accidental "pull" merged 12 upstream commits into
+Mudal on 2026-10-22, pulling in upstream's AI-relay feature (a `relay/` worker
+and an `aiaccess/` module) and ~200 files, and produced 11 conflicts in files
+Mudal had deliberately changed. It was reverted with `git merge --abort`; no
+upstream code was kept.
+
+**What does not change: the licence.** Mudal is a derivative work under
+AGPL-3.0-only. Not merging upstream is a development decision; it has no
+effect on the obligations, which concern what Mudal does with the code it took:
+the `LICENSE`, the upstream copyright, `NOTICE`, `ATTRIBUTION.md`, the per-file
+`Mudal fork:` modification notices and `docs/MODIFICATIONS.md` all stay.
+Attributing the origin of the code is a legal requirement and is also what
+keeps the fork honest about what it is.
+
+**Also unchanged: the trademarks.** The PennyWise name, logo and banner stay
+with their owner and are not used anywhere in Mudal - see `TRADEMARKS.md`.

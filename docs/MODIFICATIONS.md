@@ -9,10 +9,14 @@ that Mudal modified also carries a `Mudal fork:` notice at the top of the file w
 date of modification. See [`../NOTICE`](../NOTICE) for the copyright and licence statement
 and [`../ATTRIBUTION.md`](../ATTRIBUTION.md) for the summary.
 
-Comparison base: `upstream/main` = `sarim2000/pennywiseai-tracker` @ `27e7563c`.
+Comparison base: `upstream-reference/main` = `sarim2000/pennywiseai-tracker` @ `27e7563c`.
 Generated: 2026-10-21.
 
 **Totals: 176 files modified, 24 files added, 342 files removed.**
+
+The comparison base is upstream's code, recorded because AGPL-3.0 requires the
+derivative work to state what was changed. Mudal never merges upstream
+(see `FORK_NOTES.md` section 8) - this is a record, not a sync point.
 
 ---
 
