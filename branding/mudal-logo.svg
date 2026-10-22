@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="416" viewBox="0 0 120 104" role="img" aria-label="Mudal">
+  <defs>
+    <linearGradient id="mudal-back" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="82" y2="79">
+      <stop offset="0" stop-color="#93C4B5"/>
+      <stop offset="1" stop-color="#3F8270"/>
+    </linearGradient>
+    <linearGradient id="mudal-front" gradientUnits="userSpaceOnUse" x1="48" y1="12" x2="91.2" y2="90">
+      <stop offset="0" stop-color="#4A8E7B"/>
+      <stop offset="1" stop-color="#1E5147"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#mudal-back)" d="M14 0 H68 A14 14 0 0 1 82 14 V65 A14 14 0 0 1 68 79 H14 A14 14 0 0 1 0 65 V14 A14 14 0 0 1 14 0 Z M16 72 L44 79 L8 102 Z"/>
+  <path fill="url(#mudal-front)" opacity="0.93" d="M62 12 H106 A14 14 0 0 1 120 26 V76 A14 14 0 0 1 106 90 H62 A14 14 0 0 1 48 76 V26 A14 14 0 0 1 62 12 Z M86 86 L110 80 L116 102 Z"/>
+  <g fill="none" stroke="#F4F8F5" stroke-width="5.5" stroke-linecap="round">
+    <rect x="29" y="35" width="64" height="35" rx="10"/>
+    <path d="M52 45 V60 M70 45 V60"/>
+  </g>
+</svg>

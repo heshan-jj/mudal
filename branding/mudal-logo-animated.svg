@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="416" viewBox="-8 -8 136 120" role="img" aria-label="Mudal">
+  <defs>
+    <linearGradient id="mudal-back" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="82" y2="79">
+      <stop offset="0" stop-color="#93C4B5"/>
+      <stop offset="1" stop-color="#3F8270"/>
+    </linearGradient>
+    <linearGradient id="mudal-front" gradientUnits="userSpaceOnUse" x1="48" y1="12" x2="91.2" y2="90">
+      <stop offset="0" stop-color="#4A8E7B"/>
+      <stop offset="1" stop-color="#1E5147"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .back, .front, .bar {
+      transform-box: fill-box;
+      animation-duration: 2.4s;
+      animation-iteration-count: infinite;
+      animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .back, .front { transform-origin: center; }
+    .bar { transform-origin: center bottom; }
+    .back { animation-name: back; }
+    .front { animation-name: front; }
+    .bar-1 { animation-name: bar; }
+    .bar-2 { animation-name: bar; animation-delay: 0.08s; }
+
+    @keyframes back {
+      0%, 100% { transform: none; }
+      25%, 45% { transform: translate(-3px, -3px) rotate(-4deg); }
+      70% { transform: none; }
+    }
+    @keyframes front {
+      0%, 100% { transform: none; }
+      25%, 45% { transform: translate(3px, 2px) rotate(4deg); }
+      70% { transform: none; }
+    }
+    @keyframes bar {
+      0%, 100% { transform: none; }
+      25%, 45% { transform: scaleY(0.6); }
+      70% { transform: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .back, .front, .bar { animation: none; }
+    }
+  </style>
+  <path class="back" fill="url(#mudal-back)" d="M14 0 H68 A14 14 0 0 1 82 14 V65 A14 14 0 0 1 68 79 H14 A14 14 0 0 1 0 65 V14 A14 14 0 0 1 14 0 Z M16 72 L44 79 L8 102 Z"/>
+  <path class="front" fill="url(#mudal-front)" opacity="0.93" d="M62 12 H106 A14 14 0 0 1 120 26 V76 A14 14 0 0 1 106 90 H62 A14 14 0 0 1 48 76 V26 A14 14 0 0 1 62 12 Z M86 86 L110 80 L116 102 Z"/>
+  <g fill="none" stroke="#F4F8F5" stroke-width="5.5" stroke-linecap="round">
+    <rect x="29" y="35" width="64" height="35" rx="10"/>
+    <path class="bar bar-1" d="M52 45 V60"/>
+    <path class="bar bar-2" d="M70 45 V60"/>
+  </g>
+</svg>
