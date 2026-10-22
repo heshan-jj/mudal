@@ -41,6 +41,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -50,20 +51,27 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -72,6 +80,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 // TextFieldDefaults already imported above
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pennywiseai.tracker.R
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -80,6 +90,8 @@ import com.pennywiseai.tracker.ui.theme.PennyWiseText
 import com.pennywiseai.tracker.ui.theme.Spacing
 import com.pennywiseai.tracker.ui.theme.income
 import com.pennywiseai.tracker.utils.CurrencyFormatter
+import com.pennywiseai.tracker.utils.SmsPermissionHelper
+import com.pennywiseai.tracker.utils.SmsPermissionState
 
 @Composable
 fun OnBoardingScreen(
@@ -148,7 +160,8 @@ fun OnBoardingScreen(
                 )
                 OnBoardingStep.PERMISSIONS -> PermissionsStep(
                     uiState = uiState,
-                    onPermissionResult = { viewModel.onSmsPermissionResult(it) }
+                    onPermissionResult = { viewModel.onSmsPermissionResult(it) },
+                    onPermissionBlocked = { viewModel.onSmsPermissionBlocked(it) }
                 )
                 OnBoardingStep.SMS_SCAN -> SmsScanStep(uiState = uiState)
                 OnBoardingStep.ACCOUNT_SETUP -> AccountSetupStep(
@@ -401,13 +414,52 @@ private fun ProfileStep(
 @Composable
 private fun PermissionsStep(
     uiState: OnBoardingUiState,
-    onPermissionResult: (Boolean) -> Unit
+    onPermissionResult: (Boolean) -> Unit,
+    onPermissionBlocked: (Boolean) -> Unit
 ) {
+    val context = LocalContext.current
+    // True once we have asked the system for SMS at least once. Until then a
+    // "not granted" answer means "not asked", not "blocked", and the two need
+    // different messages.
+    var hasRequested by rememberSaveable { mutableStateOf(false) }
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
+        hasRequested = true
         val readSmsGranted = permissions[Manifest.permission.READ_SMS] == true
-        onPermissionResult(readSmsGranted)
+        if (readSmsGranted) {
+            onPermissionBlocked(false)
+            onPermissionResult(true)
+        } else {
+            // The system refused without a dialog: on Android 14+ an app
+            // installed outside the Play Store is "restricted" and SMS cannot
+            // be granted until the user allows restricted settings. Say so,
+            // and point at the one screen that can fix it.
+            onPermissionBlocked(SmsPermissionHelper.state(context) == SmsPermissionState.BLOCKED)
+            onPermissionResult(false)
+        }
+    }
+
+    // The user may leave for the system settings and come back. Re-check the
+    // permission on resume so the step reflects reality instead of staying
+    // stuck on "Enable Permissions".
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, hasRequested) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME && hasRequested) {
+                val granted = SmsPermissionHelper.isGranted(context)
+                if (granted) {
+                    onPermissionBlocked(false)
+                    onPermissionResult(true)
+                } else {
+                    onPermissionBlocked(
+                        SmsPermissionHelper.state(context) == SmsPermissionState.BLOCKED
+                    )
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Column(
@@ -497,6 +549,60 @@ private fun PermissionsStep(
                 }
             }
         } else {
+            if (uiState.smsPermissionBlocked) {
+                // The permission cannot be granted from here. Say what happened
+                // and send the user to the one screen that can unblock it.
+                val errorColor = MaterialTheme.colorScheme.error
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = errorColor.copy(
+                            alpha = if (isSystemInDarkTheme()) 0.15f else 0.10f
+                        )
+                    ),
+                    shape = MaterialTheme.shapes.large,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(Spacing.md)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = null,
+                                tint = errorColor
+                            )
+                            Spacer(modifier = Modifier.width(Spacing.sm))
+                            Text(
+                                text = stringResource(R.string.onboarding_permission_blocked_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = errorColor
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(Spacing.sm))
+                        Text(
+                            text = stringResource(R.string.onboarding_permission_blocked_body),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(Spacing.md))
+                        // The call to action sits above the steps: it is the one
+                        // thing the user has to do, and it must be reachable
+                        // without scrolling.
+                        OutlinedButton(
+                            onClick = { SmsPermissionHelper.openAppSettings(context) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(stringResource(R.string.onboarding_permission_open_settings))
+                        }
+                        Spacer(modifier = Modifier.height(Spacing.md))
+                        Text(
+                            text = stringResource(R.string.onboarding_permission_blocked_steps),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(Spacing.md))
+            }
+
             Button(
                 onClick = {
                     val permissions = mutableListOf(

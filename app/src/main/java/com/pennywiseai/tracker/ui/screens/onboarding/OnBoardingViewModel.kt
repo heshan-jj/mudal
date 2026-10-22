@@ -46,6 +46,11 @@ data class OnBoardingUiState(
     val selectedBackgroundColor: Int = 0,
     val smsPermissionGranted: Boolean = false,
     val smsPermissionSkipped: Boolean = false,
+    /**
+     * The SMS permission was refused in a way the system will not repeat
+     * (permanently denied, or restricted on Android 14+ for a sideloaded app).
+     */
+    val smsPermissionBlocked: Boolean = false,
     val isScanning: Boolean = false,
     val scanTotal: Int = 0,
     val scanProcessed: Int = 0,
@@ -128,6 +133,16 @@ class OnBoardingViewModel @Inject constructor(
                 smsPermissionSkipped = !granted
             )
         }
+    }
+
+    /**
+     * The system refused the SMS permission and will not ask again — the
+     * user denied it permanently, or (Android 14+, sideloaded app) the
+     * permission is "restricted" and can only be granted from the system
+     * settings page. The step shows the way out instead of asking again.
+     */
+    fun onSmsPermissionBlocked(blocked: Boolean) {
+        _uiState.update { it.copy(smsPermissionBlocked = blocked) }
     }
 
     fun skipSmsPermission() {
