@@ -198,7 +198,7 @@ fun AppearanceScreen(
                     ),
                 verticalArrangement = Arrangement.spacedBy(Spacing.md)
             ) {
-                // Theme section: Mode + Style + Accent + AMOLED/Blur toggles
+                // Theme section: Mode + AMOLED/Blur toggles
                 Column(
                     modifier = Modifier.animateContentSize(),
                     verticalArrangement = Arrangement.spacedBy(Spacing.sm)
@@ -208,42 +208,6 @@ fun AppearanceScreen(
                         currentMode = themeUiState.isDarkTheme,
                         onModeSelected = { themeViewModel.updateDarkTheme(it) }
                     )
-
-                    // Theme Style Selector (Dynamic / Branded)
-                    ThemeStyleSelector(
-                        currentStyle = themeUiState.themeStyle,
-                        onStyleSelected = { themeViewModel.updateThemeStyle(it) }
-                    )
-
-                    // Accent Color Picker with ColorSchemeBox (only when branded)
-                    BlurredAnimatedVisibility(
-                        visible = themeUiState.themeStyle == ThemeStyle.BRANDED,
-                        enter = fadeIn() + slideInVertically { -it },
-                        exit = fadeOut() + slideOutVertically { -it },
-                        modifier = Modifier.animateContentSize().zIndex(-1f)
-                    ) {
-                        val isDark = themeUiState.isDarkTheme ?: isSystemInDarkTheme()
-
-                        LazyRow(
-                            contentPadding = PaddingValues(Spacing.md),
-                            horizontalArrangement = Arrangement.spacedBy(Spacing.md)
-                        ) {
-                            items(AccentColor.entries) { accent ->
-                                val color = getAccentColorForDisplay(accent, isDark)
-                                val secondary = getSecondaryColorForDisplay(accent, isDark)
-                                val tertiary = getTertiaryColorForDisplay(accent, isDark)
-                                val isSelected = themeUiState.accentColor == accent
-
-                                ColorSchemeBox(
-                                    accent = color,
-                                    secondary = secondary,
-                                    tertiary = tertiary,
-                                    onClick = { themeViewModel.updateAccentColor(accent) },
-                                    isSelected = isSelected
-                                )
-                            }
-                        }
-                    }
 
                     // AMOLED + Blur grouped toggles. Both rows are conditional,
                     // so positions are derived from which ones are actually

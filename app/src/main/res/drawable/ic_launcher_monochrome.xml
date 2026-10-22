@@ -1,0 +1,28 @@
+<!-- Mudal fork: new file in Mudal, a fork of PennyWise AI (AGPL-3.0-only), 2026-10-22 - see NOTICE. -->
+<!-- Single-colour mark for themed icons and notifications: only alpha is used, so the
+     bubbles are translucent and the purse is drawn solid on top. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.45"
+        android:scaleY="0.45"
+        android:translateX="27"
+        android:translateY="30.6">
+        <path
+            android:fillAlpha="0.4"
+            android:fillColor="#FFFFFF"
+            android:pathData="M14,0 H68 A14,14 0 0 1 82,14 V65 A14,14 0 0 1 68,79 H14 A14,14 0 0 1 0,65 V14 A14,14 0 0 1 14,0 Z M18,74 L8,102 L52,80 Z" />
+        <path
+            android:fillAlpha="0.4"
+            android:fillColor="#FFFFFF"
+            android:pathData="M62,12 H106 A14,14 0 0 1 120,26 V76 A14,14 0 0 1 106,90 H62 A14,14 0 0 1 48,76 V26 A14,14 0 0 1 62,12 Z M86,86 L116,102 L110,80 Z" />
+        <path
+            android:pathData="M39,35 H83 A10,10 0 0 1 93,45 V60 A10,10 0 0 1 83,70 H39 A10,10 0 0 1 29,60 V45 A10,10 0 0 1 39,35 Z M52,45 V60 M70,45 V60"
+            android:strokeColor="#FFFFFF"
+            android:strokeLineCap="round"
+            android:strokeWidth="7" />
+    </group>
+</vector>

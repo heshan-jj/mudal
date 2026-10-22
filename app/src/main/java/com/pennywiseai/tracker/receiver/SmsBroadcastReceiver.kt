@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-22 - see NOTICE.
 package com.pennywiseai.tracker.receiver
 
 import android.app.NotificationChannel
@@ -247,7 +248,7 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
 
             // Build notification with category quick actions
             val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_launcher_monochrome)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(content))
@@ -303,7 +304,7 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
                     .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                     .setPublicVersion(
                         NotificationCompat.Builder(context, CHANNEL_ID)
-                            .setSmallIcon(R.drawable.ic_launcher_foreground)
+                            .setSmallIcon(R.drawable.ic_launcher_monochrome)
                             .setContentTitle(context.getString(R.string.notif_txn_public_title, typeEmoji))
                             .setContentText(context.getString(R.string.notif_txn_public_text, bankName))
                             .setContentIntent(pendingIntent)

@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-22 - see NOTICE. -->
 <resources>
     <!-- Base dark theme -->
-    <style name="Theme.Pennywisecompose" parent="android:Theme.Material.NoActionBar" />
-    
+    <style name="Theme.Pennywisecompose" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/mudal_dark_background</item>
+    </style>
+
     <!-- Splash Screen theme for dark mode -->
     <style name="Theme.Mudal.SplashScreen" parent="Theme.SplashScreen">
-        <!-- Dark background color matching Material Design 3 dark theme -->
-        <item name="windowSplashScreenBackground">#000000</item>
-        
-        <!-- Use the app icon as splash icon -->
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
-        
+        <!-- Matches the app's dark background -->
+        <item name="windowSplashScreenBackground">@color/mudal_dark_background</item>
+
+        <!-- The website logo, animated (Android 12+; older versions show it still) -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo_animated</item>
+
         <!-- Set splash screen duration (Android 12+) -->
         <item name="windowSplashScreenAnimationDuration">1000</item>
-        
+
         <!-- Set the theme to use after splash screen -->
         <item name="postSplashScreenTheme">@style/Theme.Pennywisecompose</item>
     </style>

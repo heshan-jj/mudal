@@ -51,11 +51,11 @@ import com.pennywiseai.tracker.presentation.share.ShareCardData
  *    CurrencyFormatter.
  */
 object ShareCardColors {
-    val Ink = Color(0xFF0B0E13)
-    val Redaction = Color(0xFF1A222C)
-    val Text = Color(0xFFEAF0F6)
-    val Muted = Color(0xFF8894A4)
-    val Amber = Color(0xFFFFB74D)
+    val Ink = Color(0xFF0F1F1B)
+    val Redaction = Color(0xFF1E3A33)
+    val Text = Color(0xFFF4F8F5)
+    val Muted = Color(0xFF8FA89F)
+    val Accent = Color(0xFFB8EAD9)
 }
 
 /** 4:5 — the aspect WhatsApp and Instagram both render without cropping. */
@@ -78,7 +78,7 @@ fun ShareCard(
     }
     val caption = when (hero) {
         // "bank texts" carries the product. Without it the card says "15 — tracked" to
-        // someone who has never heard of PennyWise, and the only line explaining what was
+        // someone who has never heard of Mudal, and the only line explaining what was
         // tracked is the smallest text on the image. The zero stays: the effort that
         // wasn't spent is the surprising half, and it still reads at thumbnail size.
         ShareHero.TRANSACTIONS -> stringResource(R.string.share_card_caption_transactions)
@@ -99,23 +99,18 @@ fun ShareCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // A raster copy of the launcher icon, NOT R.mipmap.ic_launcher: that
-                // resolves to an <adaptive-icon> XML on API 26+, and painterResource only
-                // accepts VectorDrawables or rasters — it throws at composition time, which
-                // a green build will not tell you. The mark itself is the right one: on a
-                // card seen mostly by people who don't have the app, what's worth showing is
-                // exactly what they'd tap on the Play Store listing, and it matches the
-                // website header's treatment.
+                // The plain vector mark, NOT R.mipmap.ic_launcher: that resolves to an
+                // <adaptive-icon> XML on API 26+, and painterResource only accepts
+                // VectorDrawables or rasters — it throws at composition time, which a
+                // green build will not tell you.
                 Image(
-                    painter = painterResource(id = R.drawable.share_card_logo),
+                    painter = painterResource(id = R.drawable.mudal_logo),
                     contentDescription = null,
-                    modifier = Modifier
-                        .size(26.dp)
-                        .clip(RoundedCornerShape(7.dp)),
+                    modifier = Modifier.size(width = 30.dp, height = 26.dp),
                 )
                 Spacer(Modifier.width(9.dp))
                 Text(
-                    text = "PENNYWISE",
+                    text = "MUDAL",
                     style = TextStyle(
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
@@ -146,7 +141,7 @@ fun ShareCard(
                 lineHeight = 132.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = (-8).sp,
-                color = ShareCardColors.Amber,
+                color = ShareCardColors.Accent,
             ),
         )
         Spacer(Modifier.height(2.dp))

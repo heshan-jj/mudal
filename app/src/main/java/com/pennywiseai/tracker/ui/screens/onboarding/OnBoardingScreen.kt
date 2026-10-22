@@ -183,12 +183,10 @@ private fun WelcomeStep() {
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            painter = painterResource(id = R.mipmap.ic_launcher_foreground),
+            painter = painterResource(id = R.drawable.mudal_logo),
             contentDescription = stringResource(R.string.onboarding_logo_cd),
-            modifier = Modifier
-                .size(HERO_ICON_SIZE)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
+            modifier = Modifier.size(HERO_ICON_SIZE),
+            contentScale = ContentScale.Fit
         )
 
         Spacer(modifier = Modifier.height(Spacing.xl))

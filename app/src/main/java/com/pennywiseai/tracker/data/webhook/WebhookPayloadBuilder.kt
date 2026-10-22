@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-22 - see NOTICE.
 package com.pennywiseai.tracker.data.webhook
 
 import com.pennywiseai.tracker.BuildConfig
@@ -79,7 +80,7 @@ class WebhookPayloadBuilder @Inject constructor(
             WebhookBatchPayload(
                 envelope = WebhookEnvelope(
                     generatedAt = now.toString(),
-                    app = WebhookAppInfo("PennyWise", BuildConfig.VERSION_NAME),
+                    app = WebhookAppInfo("Mudal", BuildConfig.VERSION_NAME),
                     profile = WebhookProfileInfo(profile.id, profile.name),
                     request = WebhookRequestInfo(range.preset.name.lowercase(), range.start.toString(), range.end.toString(),
                         profile.currency, types.map { it.name.lowercase() }),
@@ -165,7 +166,7 @@ class WebhookPayloadBuilder @Inject constructor(
 
     private fun testPayload(profile: WebhookProfileEntity, types: Set<WebhookDataType>, now: LocalDateTime): WebhookBatchPayload {
         val envelope = WebhookEnvelope(
-            generatedAt = now.toString(), app = WebhookAppInfo("PennyWise", BuildConfig.VERSION_NAME),
+            generatedAt = now.toString(), app = WebhookAppInfo("Mudal", BuildConfig.VERSION_NAME),
             profile = WebhookProfileInfo(profile.id, profile.name),
             request = WebhookRequestInfo("test", now.minusMinutes(1).toString(), now.toString(), profile.currency,
                 types.map { it.name.lowercase() }), batch = WebhookBatchInfo(UUID.randomUUID().toString(), 1, 1),

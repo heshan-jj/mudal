@@ -166,7 +166,7 @@ private fun WebhookEditor(editor: WebhookEditorState, interval: Int, update: ((W
             label = { Text("Name") }, singleLine = true)
         OutlinedTextField(editor.url, { value -> update { it.copy(url = value) } }, Modifier.fillMaxWidth(),
             label = { Text("HTTPS endpoint URL") }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
-        Text(if (editor.enabled) "PennyWise will send the selected financial data outside this phone to this URL every $interval hours. Android may delay background delivery. Only use a URL you trust."
+        Text(if (editor.enabled) "Mudal will send the selected financial data outside this phone to this URL every $interval hours. Android may delay background delivery. Only use a URL you trust."
             else "Automatic delivery is off. Manual sync sends the selected financial data outside this phone to this URL. Only use a URL you trust.",
             style = MaterialTheme.typography.bodyMedium)
         if (editor.url.trim().startsWith("http://", true)) {

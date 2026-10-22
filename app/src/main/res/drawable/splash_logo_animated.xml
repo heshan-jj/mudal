@@ -1,0 +1,142 @@
+<!-- Mudal fork: new file in Mudal, a fork of PennyWise AI (AGPL-3.0-only), 2026-10-22 - see NOTICE. -->
+<!-- Splash version of the website logo hover: the bubbles part and the purse bars dip,
+     then everything settles back. Total 1000ms, matching
+     windowSplashScreenAnimationDuration. -->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/ic_launcher_foreground">
+
+    <target android:name="bubble_back">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="translateX"
+                    android:valueFrom="0"
+                    android:valueTo="-6" />
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="translateY"
+                    android:valueFrom="0"
+                    android:valueTo="-6" />
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="rotation"
+                    android:valueFrom="0"
+                    android:valueTo="-4" />
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="translateX"
+                    android:startOffset="550"
+                    android:valueFrom="-6"
+                    android:valueTo="0" />
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="translateY"
+                    android:startOffset="550"
+                    android:valueFrom="-6"
+                    android:valueTo="0" />
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="rotation"
+                    android:startOffset="550"
+                    android:valueFrom="-4"
+                    android:valueTo="0" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <target android:name="bubble_front">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="translateX"
+                    android:valueFrom="0"
+                    android:valueTo="6" />
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="translateY"
+                    android:valueFrom="0"
+                    android:valueTo="4" />
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="rotation"
+                    android:valueFrom="0"
+                    android:valueTo="4" />
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="translateX"
+                    android:startOffset="550"
+                    android:valueFrom="6"
+                    android:valueTo="0" />
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="translateY"
+                    android:startOffset="550"
+                    android:valueFrom="4"
+                    android:valueTo="0" />
+                <objectAnimator
+                    android:duration="450"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="rotation"
+                    android:startOffset="550"
+                    android:valueFrom="4"
+                    android:valueTo="0" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <target android:name="bar_1">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="350"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY"
+                    android:startOffset="100"
+                    android:valueFrom="1"
+                    android:valueTo="0.6" />
+                <objectAnimator
+                    android:duration="400"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY"
+                    android:startOffset="550"
+                    android:valueFrom="0.6"
+                    android:valueTo="1" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <target android:name="bar_2">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="350"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY"
+                    android:startOffset="180"
+                    android:valueFrom="1"
+                    android:valueTo="0.6" />
+                <objectAnimator
+                    android:duration="400"
+                    android:interpolator="@android:interpolator/overshoot"
+                    android:propertyName="scaleY"
+                    android:startOffset="630"
+                    android:valueFrom="0.6"
+                    android:valueTo="1" />
+            </set>
+        </aapt:attr>
+    </target>
+</animated-vector>

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
+<!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-22 - see NOTICE. -->
 <resources>
     <!-- Base theme -->
-    <style name="Theme.Pennywisecompose" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Pennywisecompose" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/ic_launcher_background</item>
+    </style>
 
     <!-- Transparent host theme for QuickCategoryPickerActivity: a Compose
          bottom-sheet floats over whatever's behind it, no window decor,
@@ -18,15 +20,15 @@
 
     <!-- Splash Screen theme for light mode -->
     <style name="Theme.Mudal.SplashScreen" parent="Theme.SplashScreen">
-        <!-- Set the background color -->
-        <item name="windowSplashScreenBackground">#FFFFFF</item>
-        
-        <!-- Use the app icon as splash icon -->
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
-        
+        <!-- Website background cream -->
+        <item name="windowSplashScreenBackground">#F7F5EF</item>
+
+        <!-- The website logo, animated (Android 12+; older versions show it still) -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo_animated</item>
+
         <!-- Set splash screen duration (Android 12+) -->
         <item name="windowSplashScreenAnimationDuration">1000</item>
-        
+
         <!-- Set the theme to use after splash screen -->
         <item name="postSplashScreenTheme">@style/Theme.Pennywisecompose</item>
     </style>

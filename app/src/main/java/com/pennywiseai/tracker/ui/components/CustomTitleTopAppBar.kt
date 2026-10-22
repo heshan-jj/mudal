@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-22 - see NOTICE.
 package com.pennywiseai.tracker.ui.components
 
 import android.os.Build
@@ -405,7 +406,7 @@ private fun HomeBarTitle(
         }
         Spacer(modifier = Modifier.width(Spacing.smd))
         Text(
-            text = userName.ifBlank { "PennyWise" },
+            text = userName.ifBlank { "Mudal" },
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Start,
         )

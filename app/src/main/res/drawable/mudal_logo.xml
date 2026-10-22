@@ -1,0 +1,46 @@
+<!-- Mudal fork: new file in Mudal, a fork of PennyWise AI (AGPL-3.0-only), 2026-10-22 - see NOTICE. -->
+<!-- The website mark at its own proportions (no icon padding), for in-app use. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="120dp"
+    android:height="104dp"
+    android:viewportWidth="120"
+    android:viewportHeight="104">
+    <path android:pathData="M14,0 H68 A14,14 0 0 1 82,14 V65 A14,14 0 0 1 68,79 H14 A14,14 0 0 1 0,65 V14 A14,14 0 0 1 14,0 Z M18,74 L8,102 L52,80 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0"
+                android:startY="0"
+                android:endX="82"
+                android:endY="79">
+                <item android:offset="0" android:color="#FF93C4B5" />
+                <item android:offset="1" android:color="#FF3F8270" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:fillAlpha="0.93"
+        android:pathData="M62,12 H106 A14,14 0 0 1 120,26 V76 A14,14 0 0 1 106,90 H62 A14,14 0 0 1 48,76 V26 A14,14 0 0 1 62,12 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="48"
+                android:startY="12"
+                android:endX="91.2"
+                android:endY="90">
+                <item android:offset="0" android:color="#FF4A8E7B" />
+                <item android:offset="1" android:color="#FF1E5147" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:fillAlpha="0.93"
+        android:fillColor="#1E5147"
+        android:pathData="M86,86 L116,102 L110,80 Z" />
+    <path
+        android:pathData="M39,35 H83 A10,10 0 0 1 93,45 V60 A10,10 0 0 1 83,70 H39 A10,10 0 0 1 29,60 V45 A10,10 0 0 1 39,35 Z M52,45 V60 M70,45 V60"
+        android:strokeColor="#F4F8F5"
+        android:strokeLineCap="round"
+        android:strokeWidth="5.5" />
+</vector>
