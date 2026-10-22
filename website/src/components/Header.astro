@@ -1,0 +1,263 @@
+---
+import Logo from "./Logo.astro";
+import Icon from "./Icon.astro";
+import { nav, RELEASES_URL } from "../data/site";
+---
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="#top" aria-label="Mudal, back to top">
+      <Logo size={40} id="logo-header" />
+      <span class="wordmark">mudal</span>
+    </a>
+
+    <nav aria-label="Main" class="desktop-nav">
+      <ul>
+        {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <a class="btn btn-primary header-cta" href={RELEASES_URL}>
+      <Icon name="download" />
+      <span>Get the app</span>
+    </a>
+
+    <details class="mobile-nav">
+      <summary aria-label="Open menu">
+        <span class="burger" aria-hidden="true"></span>
+      </summary>
+      <nav aria-label="Mobile">
+        <ul>
+          {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+          <li><a class="btn btn-primary" href={RELEASES_URL}>Get the app</a></li>
+        </ul>
+      </nav>
+    </details>
+  </div>
+</header>
+
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>(".mobile-nav");
+  menu?.querySelectorAll("a").forEach((a) =>
+    a.addEventListener("click", () => menu.removeAttribute("open")),
+  );
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 0.75rem 1rem 0;
+  }
+
+  .bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    width: min(100%, calc(var(--max) + 2rem));
+    min-height: 68px;
+    margin-inline: auto;
+    padding: 0.5rem 0.6rem 0.5rem 1.1rem;
+    border-radius: var(--r-full);
+    background: transparent;
+    transition:
+      background-color var(--dur-m) var(--emphasized),
+      box-shadow var(--dur-m) var(--emphasized),
+      width var(--dur-l) var(--spring-soft);
+  }
+
+  :global(.site-header.is-scrolled) .bar {
+    width: min(100%, 980px);
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    backdrop-filter: saturate(180%) blur(18px);
+    -webkit-backdrop-filter: saturate(180%) blur(18px);
+    box-shadow: var(--shadow-2), inset 0 0 0 1px var(--outline-variant);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: #34453d;
+  }
+
+  .wordmark {
+    font-size: 1.6rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    padding-bottom: 3px;
+  }
+
+  .desktop-nav {
+    margin-left: auto;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .desktop-nav ul {
+    display: flex;
+    gap: 0.15rem;
+  }
+
+  .desktop-nav a {
+    position: relative;
+    display: block;
+    padding: 0.6rem 1rem;
+    border-radius: var(--r-full);
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    isolation: isolate;
+    transition: color var(--dur-s) ease;
+  }
+
+  .desktop-nav a::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--secondary-container);
+    transform: scale(0.4, 0.6);
+    opacity: 0;
+    transition:
+      transform var(--dur-m) var(--spring),
+      opacity var(--dur-s) ease;
+  }
+
+  .desktop-nav a:hover {
+    color: var(--on-secondary-container);
+  }
+
+  .desktop-nav a:hover::before {
+    transform: none;
+    opacity: 1;
+  }
+
+  .header-cta {
+    min-height: 48px;
+    padding: 0.6rem 1.3rem;
+    font-size: 0.98rem;
+  }
+
+  .mobile-nav {
+    display: none;
+    margin-left: auto;
+  }
+
+  .mobile-nav summary {
+    list-style: none;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--r-md);
+    background: var(--secondary-container);
+    cursor: pointer;
+    transition: border-radius var(--dur-m) var(--spring);
+  }
+
+  .mobile-nav[open] summary {
+    border-radius: var(--r-full);
+  }
+
+  .mobile-nav summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .burger,
+  .burger::before,
+  .burger::after {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--on-secondary-container);
+    border-radius: 2px;
+    position: relative;
+    transition: transform var(--dur-m) var(--spring), background-color var(--dur-s);
+  }
+
+  .burger::before,
+  .burger::after {
+    content: "";
+    position: absolute;
+  }
+
+  .burger::before {
+    top: -6px;
+  }
+
+  .burger::after {
+    top: 6px;
+  }
+
+  .mobile-nav[open] .burger {
+    background: transparent;
+  }
+
+  .mobile-nav[open] .burger::before {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .mobile-nav[open] .burger::after {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  .mobile-nav nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-3);
+    padding: 0.75rem;
+    animation: drop var(--dur-m) var(--spring);
+    transform-origin: top right;
+  }
+
+  @keyframes drop {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(-8px);
+    }
+  }
+
+  .mobile-nav li a:not(.btn) {
+    display: block;
+    padding: 0.9rem 1rem;
+    border-radius: var(--r-md);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.1rem;
+  }
+
+  .mobile-nav li a:not(.btn):hover {
+    background: var(--secondary-container);
+  }
+
+  .mobile-nav li .btn {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 900px) {
+    .desktop-nav,
+    .header-cta {
+      display: none;
+    }
+
+    .mobile-nav {
+      display: block;
+    }
+  }
+</style>

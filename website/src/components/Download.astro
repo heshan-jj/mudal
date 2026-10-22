@@ -1,0 +1,226 @@
+---
+import Icon from "./Icon.astro";
+import Logo from "./Logo.astro";
+import Shape from "./Shape.astro";
+import { RELEASES_URL, REPO_URL } from "../data/site";
+---
+
+<section class="section" id="download" aria-labelledby="download-title">
+  <div class="container">
+    <div class="cta" data-reveal>
+      <Shape kind="burst" size={340} class="cta-shape" />
+      <div class="cta-copy">
+        <p class="eyebrow">Download</p>
+        <h2 id="download-title">Get Mudal</h2>
+        <p class="lead">Published on GitHub Releases as a signed APK. Works on Android 8.0 and newer.</p>
+        <div class="actions">
+          <a class="btn btn-primary big" href={RELEASES_URL}>
+            <Icon name="download" />
+            Download the latest APK
+          </a>
+          <a class="btn btn-outline" href={`${REPO_URL}/releases`}>All releases</a>
+        </div>
+        <p class="fine">
+          Every release is signed with the same key, so updates install over the old version and keep your data. Each APK
+          comes with a <code>.sha256</code> file if you want to check the download.
+        </p>
+      </div>
+      <div class="cta-logo" aria-hidden="true">
+        <Logo size={190} id="logo-cta" />
+      </div>
+    </div>
+
+    <div class="install">
+      <div class="card step-card" data-reveal>
+        <h3>Installing from outside the Play Store</h3>
+        <ol>
+          <li>Download <code>Mudal-v….apk</code> on your phone and open it.</li>
+          <li>If asked, allow your browser or file manager to <strong>install unknown apps</strong>.</li>
+          <li>Open Mudal and follow the setup.</li>
+        </ol>
+      </div>
+
+      <div class="card step-card" data-reveal style="--i:1">
+        <h3>Android 14 or newer: allowing SMS access</h3>
+        <p class="muted">
+          Android blocks SMS access for sideloaded apps until you allow it. Mudal shows a button that takes you there, or:
+        </p>
+        <ol>
+          <li>Open <strong>Settings → Apps → Mudal</strong>.</li>
+          <li>Tap the <strong>⋮</strong> menu in the top corner and choose <strong>Allow restricted settings</strong>.</li>
+          <li>Go back to Mudal and grant SMS permission.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 2rem;
+    padding: clamp(2rem, 5vw, 4rem);
+    border-radius: clamp(32px, 5vw, 56px);
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+  }
+
+  .cta :global(.cta-shape) {
+    position: absolute;
+    right: -60px;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: -1;
+    color: var(--sun-container);
+    animation: spin 30s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  .cta .eyebrow {
+    background: var(--surface);
+    color: var(--on-primary-container);
+  }
+
+  .cta h2 {
+    font-size: clamp(2.5rem, 6vw, 4.25rem);
+  }
+
+  .cta .lead {
+    color: var(--on-primary-container);
+    opacity: 0.85;
+    max-width: 34rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin: 2rem 0 1.5rem;
+  }
+
+  .big {
+    min-height: 64px;
+    padding-inline: 2rem;
+    font-size: 1.12rem;
+  }
+
+  .btn-outline {
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--on-primary-container) 40%, transparent);
+    color: var(--on-primary-container);
+  }
+
+  .fine {
+    max-width: 34rem;
+    margin: 0;
+    font-size: 0.95rem;
+    opacity: 0.8;
+  }
+
+  .fine code {
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  .cta-logo {
+    display: grid;
+    place-items: center;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: var(--shadow-3);
+    animation: bob 5s ease-in-out infinite;
+    transition: border-radius var(--dur-l) var(--spring);
+  }
+
+  .cta-logo:hover {
+    border-radius: 72px;
+  }
+
+  @keyframes bob {
+    50% {
+      transform: translateY(-12px) rotate(3deg);
+    }
+  }
+
+  .install {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .step-card {
+    transition: border-radius var(--dur-l) var(--spring), transform var(--dur-l) var(--spring);
+  }
+
+  .step-card:hover {
+    border-radius: var(--r-xl);
+    transform: translateY(-4px);
+  }
+
+  .step-card ol {
+    counter-reset: step;
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .step-card li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 2.75rem;
+    min-height: 2rem;
+  }
+
+  .step-card li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: -0.1rem;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--secondary-container);
+    color: var(--on-secondary-container);
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: transform var(--dur-m) var(--spring), border-radius var(--dur-m) var(--spring);
+  }
+
+  .step-card li:hover::before {
+    transform: scale(1.15) rotate(-10deg);
+    border-radius: 10px;
+  }
+
+  .step-card p {
+    margin: 0.5rem 0 0;
+  }
+
+  @media (max-width: 860px) {
+    .cta {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-logo {
+      display: none;
+    }
+
+    .install {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

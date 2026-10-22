@@ -1,0 +1,405 @@
+---
+const transactions = [
+  { name: "Keells Super", meta: "Today · Groceries", amount: "−Rs. 3,240", kind: "out", initials: "K", tone: "sun" },
+  { name: "Netflix", meta: "21 Oct · Subscription", amount: "−Rs. 1,500", kind: "out", initials: "N", tone: "peach" },
+  { name: "Dialog", meta: "20 Oct · Bills", amount: "−Rs. 1,499", kind: "out", initials: "D", tone: "sage" },
+];
+---
+
+<div class="phone" role="img" aria-label="Mudal's home screen: a bank SMS arrives and appears as a new PickMe income transaction, above this month's spending and a groceries budget">
+  <div class="screen" aria-hidden="true">
+    <div class="status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+
+    <div class="notif">
+      <span class="notif-icon">SB</span>
+      <span class="notif-body">
+        <b>SAMPATHTXN</b>
+        <span>LKR 5,000.00 credited to AC **1234…</span>
+      </span>
+    </div>
+
+    <div class="greeting">
+      <span class="muted-s">October</span>
+      <strong>Hi there</strong>
+    </div>
+
+    <div class="summary">
+      <span class="label">Spent this month</span>
+      <span class="big">Rs. 48,215</span>
+      <div class="split">
+        <span>Income Rs. 125,000</span>
+        <span class="delta">↓ 12% vs Sept</span>
+      </div>
+    </div>
+
+    <div class="budget">
+      <div class="budget-row"><span>Groceries</span><span>Rs. 18,400 / 25,000</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <div class="list-title">Recent</div>
+    <ul>
+      <li class="new">
+        <span class="avatar tone-mint">P</span>
+        <span class="txt">
+          <span class="name">PickMe</span>
+          <span class="meta">Just now · Income</span>
+        </span>
+        <span class="amt in">+Rs. 5,000</span>
+      </li>
+      {
+        transactions.map((t) => (
+          <li>
+            <span class:list={["avatar", `tone-${t.tone}`]}>{t.initials}</span>
+            <span class="txt">
+              <span class="name">{t.name}</span>
+              <span class="meta">{t.meta}</span>
+            </span>
+            <span class="amt">{t.amount}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="tabbar">
+      <span class="on">Home</span><span>Activity</span><span>Insights</span><span>Chat</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .phone {
+    --cycle: 7s;
+    width: min(100%, 330px);
+    aspect-ratio: 9 / 19;
+    padding: 11px;
+    border-radius: 48px;
+    background: #1f2622;
+    box-shadow:
+      var(--shadow-3),
+      inset 0 0 0 2px #3a443f;
+  }
+
+  .screen {
+    position: relative;
+    height: 100%;
+    border-radius: 38px;
+    background: #f7f5ef;
+    color: #191c1a;
+    padding: 14px 14px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    overflow: hidden;
+    font-size: 11.5px;
+    line-height: 1.35;
+  }
+
+  .status {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 11px;
+    padding: 0 8px;
+  }
+
+  .dots {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+  }
+
+  .dots i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #191c1a;
+  }
+
+  /* SMS notification that drops in, then tucks away */
+  .notif {
+    position: absolute;
+    top: 32px;
+    left: 10px;
+    right: 10px;
+    z-index: 2;
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px -8px rgba(30, 81, 71, 0.35);
+    transform: translateY(-140%);
+    animation: notif var(--cycle) var(--emphasized) infinite;
+  }
+
+  .notif-icon {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ffdbc8;
+    color: #3a1604;
+    font-weight: 700;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  .notif-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .notif-body span {
+    color: #46524c;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @keyframes notif {
+    0%,
+    6% {
+      transform: translateY(-140%);
+    }
+    14%,
+    34% {
+      transform: translateY(0);
+    }
+    42%,
+    100% {
+      transform: translateY(-140%);
+    }
+  }
+
+  .greeting {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 6px 0;
+  }
+
+  .greeting strong {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .muted-s {
+    color: #46524c;
+    font-size: 11px;
+  }
+
+  .summary {
+    border-radius: 24px;
+    padding: 14px 16px;
+    background: #2f6a5b;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .summary .label {
+    opacity: 0.85;
+  }
+
+  .summary .big {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  .split {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    margin-top: 4px;
+    opacity: 0.9;
+  }
+
+  .delta {
+    padding: 1px 7px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .budget {
+    background: #ebe9e0;
+    border-radius: 18px;
+    padding: 10px 12px;
+  }
+
+  .budget-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    margin-bottom: 7px;
+  }
+
+  .budget-row span:last-child {
+    color: #46524c;
+    font-weight: 400;
+  }
+
+  .track {
+    height: 8px;
+    border-radius: 99px;
+    background: #d3e8de;
+    overflow: hidden;
+  }
+
+  .fill {
+    width: 74%;
+    height: 100%;
+    border-radius: 99px;
+    background: #2f6a5b;
+    transform-origin: left;
+    animation: fill 1.6s var(--spring-soft) 0.4s both;
+  }
+
+  @keyframes fill {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  .list-title {
+    font-weight: 600;
+    font-size: 13px;
+    padding: 0 6px;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 8px;
+    border-radius: 16px;
+  }
+
+  li.new {
+    background: #b8ead9;
+    animation: arrive var(--cycle) var(--spring) infinite;
+    transform-origin: top center;
+  }
+
+  @keyframes arrive {
+    0%,
+    30% {
+      opacity: 0;
+      transform: scale(0.6);
+      margin-bottom: -46px;
+    }
+    40% {
+      opacity: 1;
+      transform: scale(1.04);
+      margin-bottom: 0;
+    }
+    46%,
+    92% {
+      opacity: 1;
+      transform: scale(1);
+      margin-bottom: 0;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.9);
+      margin-bottom: 0;
+    }
+  }
+
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .tone-mint {
+    background: #2f6a5b;
+    color: #fff;
+    border-radius: 50%;
+  }
+
+  .tone-sun {
+    background: #f9e491;
+    color: #3a2f00;
+  }
+
+  .tone-peach {
+    background: #ffdbc8;
+    color: #3a1604;
+  }
+
+  .tone-sage {
+    background: #d3e8de;
+    color: #173a30;
+  }
+
+  .txt {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .name {
+    font-weight: 600;
+  }
+
+  .meta {
+    color: #46524c;
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .amt {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .amt.in {
+    color: #1e5147;
+  }
+
+  .tabbar {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 6px 18px;
+    background: #f2f0e8;
+    margin-inline: -14px;
+    color: #46524c;
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .tabbar span {
+    padding: 5px 10px;
+    border-radius: 99px;
+  }
+
+  .tabbar .on {
+    background: #b8ead9;
+    color: #0b3a2f;
+    font-weight: 600;
+  }
+</style>

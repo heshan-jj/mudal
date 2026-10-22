@@ -1,0 +1,224 @@
+---
+import { banks, comingBanks, BANK_REQUEST_URL } from "../data/site";
+
+const assetBase = `${import.meta.env.BASE_URL}banks/`;
+---
+
+<section class="section" id="sri-lanka" aria-labelledby="lk-title">
+  <div class="container lk-grid">
+    <div data-reveal>
+      <p class="eyebrow">Built for Sri Lanka</p>
+      <h2 id="lk-title">Made for the way Sri Lankan banks text you</h2>
+      <p class="lead">
+        Most expense trackers are built for somewhere else. Mudal is written against real SMS from Sri Lankan banks,
+        with rupees as the default.
+      </p>
+      <ul class="checks">
+        <li><strong>LKR by default</strong> — amounts shown as <code>Rs. 1,234.50</code>, with USD and EUR when you need them.</li>
+        <li><strong>Understands local formats</strong> — <code>LKR</code>, <code>Rs.</code>, CEFT transfers, POS, ATM and card authorisations.</li>
+        <li><strong>Real samples only</strong> — parsers are built and tested from masked messages people actually received. Formats are never guessed.</li>
+      </ul>
+    </div>
+
+    <div class="banks-card" data-reveal style="--i:1">
+      <div class="banks-head">
+        <h3>Supported banks</h3>
+        <span class="count">{banks.length}</span>
+      </div>
+      <ul class="banks">
+        {
+          banks.map((b, i) => (
+            <li style={`--i:${i}`}>
+              <span class="chip">
+                <img src={`${assetBase}${b.logo}`} width="42" height="42" alt="" loading="lazy" decoding="async" />
+              </span>
+              <span>{b.name}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h3 class="next">Next, once we have samples</h3>
+      <ul class="coming">
+        {comingBanks.map((b) => <li>{b}</li>)}
+      </ul>
+
+      <a class="btn btn-primary" href={BANK_REQUEST_URL}>Request your bank</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lk-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+
+  .checks {
+    list-style: none;
+    padding: 0;
+    margin: 2.25rem 0 0;
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .checks li {
+    position: relative;
+    padding-left: 2.75rem;
+    color: var(--text-muted);
+  }
+
+  .checks strong {
+    color: var(--text);
+  }
+
+  .checks li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.05rem;
+    width: 1.85rem;
+    height: 1.85rem;
+    border-radius: 10px;
+    background:
+      no-repeat center / 60%
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b3a2f' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E"),
+      var(--primary-container);
+    transition: border-radius var(--dur-m) var(--spring), transform var(--dur-m) var(--spring);
+  }
+
+  .checks li:hover::before {
+    border-radius: 50%;
+    transform: rotate(-15deg) scale(1.12);
+  }
+
+  .banks-card {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border-radius: var(--r-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-2), inset 0 0 0 1px var(--outline-variant);
+  }
+
+  .banks-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .banks-head h3 {
+    margin: 0;
+    font-size: 1.35rem;
+  }
+
+  .count {
+    display: grid;
+    place-items: center;
+    min-width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 700;
+  }
+
+  .banks {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.75rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .banks li {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--r-md);
+    background: var(--surface-low);
+    font-weight: 500;
+    cursor: default;
+    transition:
+      background-color var(--dur-s) ease,
+      border-radius var(--dur-m) var(--spring),
+      transform var(--dur-m) var(--spring);
+  }
+
+  .banks li:hover {
+    background: var(--secondary-container);
+    border-radius: var(--r-full);
+    transform: translateX(6px);
+  }
+
+  .chip {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    padding: 4px;
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--outline-variant);
+    flex-shrink: 0;
+    overflow: hidden;
+    transition:
+      border-radius var(--dur-l) var(--spring),
+      transform var(--dur-l) var(--spring),
+      box-shadow var(--dur-m) var(--emphasized);
+  }
+
+  .chip img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .banks li:hover .chip {
+    border-radius: 50%;
+    transform: scale(1.08) rotate(-4deg);
+    box-shadow: var(--shadow-1);
+  }
+
+  .next {
+    font-size: 1rem;
+    margin-bottom: 0.65rem;
+    color: var(--text-muted);
+  }
+
+  .coming {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.75rem;
+  }
+
+  .coming li {
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--r-full);
+    box-shadow: inset 0 0 0 1.5px var(--outline);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: transform var(--dur-m) var(--spring), box-shadow var(--dur-s);
+  }
+
+  .coming li:hover {
+    transform: translateY(-3px);
+    box-shadow: inset 0 0 0 1.5px var(--primary);
+    color: var(--primary);
+  }
+
+  .banks-card .btn {
+    width: 100%;
+  }
+
+  @media (max-width: 920px) {
+    .lk-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

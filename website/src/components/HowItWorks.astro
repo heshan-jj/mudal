@@ -1,0 +1,280 @@
+---
+import Shape from "./Shape.astro";
+
+const steps = [
+  {
+    n: "1",
+    title: "Your bank sends an SMS",
+    body: "Like it always does, for every card payment, transfer and ATM withdrawal.",
+    tone: "peach",
+    shape: "flower",
+  },
+  {
+    n: "2",
+    title: "Mudal reads it on your phone",
+    body: "A parser built for your bank pulls out the amount, merchant, account and balance. Nothing is sent anywhere.",
+    tone: "sun",
+    shape: "burst",
+  },
+  {
+    n: "3",
+    title: "It lands in your budget",
+    body: "Categorised, matched to the right account and counted against your budgets and goals.",
+    tone: "mint",
+    shape: "cookie",
+  },
+] as const;
+---
+
+<section class="section" id="how-it-works" aria-labelledby="how-title">
+  <div class="container">
+    <div class="section-head center" data-reveal>
+      <p class="eyebrow">How it works</p>
+      <h2 id="how-title">From SMS to spending, in under a second</h2>
+      <p class="lead">No bank login, no screen scraping, no manual entry. Just the messages you already get.</p>
+    </div>
+
+    <div class="demo" aria-hidden="true" data-reveal>
+      <div class="sms">
+        <span class="from">SAMPATHTXN</span>
+        <p>LKR 5,000.00 credited to AC **1234 for PICKME - 37419306</p>
+      </div>
+      <div class="flow">
+        <svg viewBox="0 0 120 24" preserveAspectRatio="none">
+          <path class="dash" d="M2 12 H108"></path>
+          <path class="head" d="M100 4 L110 12 L100 20"></path>
+        </svg>
+        <span>parsed on-device</span>
+      </div>
+      <div class="txn">
+        <span class="avatar">P</span>
+        <span class="txt">
+          <strong>PickMe</strong>
+          <span>Sampath Bank ••1234 · Income</span>
+        </span>
+        <span class="amt">+Rs. 5,000</span>
+      </div>
+    </div>
+
+    <ol class="steps">
+      {
+        steps.map((s, i) => (
+          <li class={`step tone-${s.tone}`} data-reveal style={`--i:${i}`}>
+            <span class="num">
+              <Shape kind={s.shape} size={64} />
+              <b>{s.n}</b>
+            </span>
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .demo {
+    display: grid;
+    grid-template-columns: 1fr minmax(90px, 140px) 1fr;
+    gap: 1rem;
+    align-items: center;
+    max-width: 960px;
+    margin: 0 auto 4rem;
+  }
+
+  .sms {
+    background: var(--surface-container);
+    border-radius: 28px 28px 28px 8px;
+    padding: 1.15rem 1.35rem;
+    transition: transform var(--dur-m) var(--spring), border-radius var(--dur-m) var(--spring);
+  }
+
+  .sms:hover {
+    transform: rotate(-1.5deg) scale(1.02);
+    border-radius: 28px 28px 28px 28px;
+  }
+
+  .sms .from {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--tertiary);
+    margin-bottom: 0.35rem;
+  }
+
+  .sms p {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+  }
+
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .flow svg {
+    width: 100%;
+    height: 24px;
+    overflow: visible;
+  }
+
+  .flow path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .dash {
+    stroke-dasharray: 2 10;
+    animation: flow 0.9s linear infinite;
+  }
+
+  @keyframes flow {
+    to {
+      stroke-dashoffset: -12;
+    }
+  }
+
+  .txn {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    padding: 1.1rem 1.3rem;
+    box-shadow: var(--shadow-2), inset 0 0 0 2px var(--primary-container);
+    transition: transform var(--dur-m) var(--spring);
+  }
+
+  .txn:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .txt {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .txt span {
+    color: var(--text-muted);
+    font-size: 0.86rem;
+  }
+
+  .amt {
+    font-weight: 700;
+    color: var(--primary-strong);
+    white-space: nowrap;
+  }
+
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+
+  .step {
+    padding: 2rem;
+    border-radius: var(--r-xl);
+    transition:
+      border-radius var(--dur-l) var(--spring),
+      transform var(--dur-l) var(--spring),
+      box-shadow var(--dur-m) var(--emphasized);
+  }
+
+  .step:hover {
+    border-radius: 56px 20px 56px 20px;
+    transform: translateY(-6px) rotate(-0.6deg);
+    box-shadow: var(--shadow-2);
+  }
+
+  .step p {
+    margin: 0;
+    opacity: 0.85;
+  }
+
+  .tone-peach {
+    background: var(--tertiary-container);
+    color: var(--on-tertiary-container);
+  }
+
+  .tone-sun {
+    background: var(--sun-container);
+    color: var(--on-sun-container);
+  }
+
+  .tone-mint {
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+  }
+
+  .num {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1.25rem;
+  }
+
+  .num :global(svg) {
+    position: absolute;
+    inset: 0;
+    color: currentColor;
+    transition: rotate 900ms var(--spring);
+  }
+
+  .step:hover .num :global(svg) {
+    rotate: 120deg;
+  }
+
+  .num b {
+    position: relative;
+    font-size: 1.4rem;
+    color: var(--surface);
+  }
+
+  @media (max-width: 860px) {
+    .demo {
+      grid-template-columns: 1fr;
+    }
+
+    .flow svg {
+      width: 90px;
+      transform: rotate(90deg);
+      margin: 1.5rem 0;
+    }
+
+    .steps {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

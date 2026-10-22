@@ -1,0 +1,163 @@
+---
+import { REPO_URL, UPSTREAM_URL, NEW_ISSUE_URL, LICENSE_URL } from "../data/site";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+
+<section class="section" id="about" aria-labelledby="about-title">
+  <div class="container about-grid">
+    <div class="story" data-reveal>
+      <p class="eyebrow">About</p>
+      <h2 id="about-title">Why Mudal exists</h2>
+      <p class="lead"><em>Mudal</em> means “money” in Sinhala.</p>
+      <p class="muted">
+        Every Sri Lankan bank already sends an SMS for every transaction, yet keeping a budget still means typing
+        everything into a spreadsheet — or handing your bank details to an app you can’t see inside. Mudal takes the
+        messages you already get and turns them into a clear picture of your money, without anything leaving your phone.
+      </p>
+      <p class="muted">
+        It is built and maintained in Sri Lanka by Heshan Jayakody, with contributions welcome. Bank support grows one
+        bank at a time, from real, masked messages shared by users.
+      </p>
+    </div>
+
+    <div class="side">
+      <figure class="logo-card" data-reveal style="--i:1">
+        <img src={`${base}/mudal-logo.png`} width="1000" height="1000" alt="The Mudal logo: two overlapping green chat bubbles holding a wallet, above the word mudal" loading="lazy" />
+      </figure>
+
+      <div class="cards">
+        <div class="card tone-peach" data-reveal style="--i:2">
+          <h3>Contribute</h3>
+          <p>Report a bug, share masked SMS for a new bank, or send a pull request.</p>
+          <p class="links">
+            <a href={NEW_ISSUE_URL}>Open an issue</a>
+            <a href={REPO_URL}>Source code</a>
+          </p>
+        </div>
+
+        <div class="card tone-sage" data-reveal style="--i:3">
+          <h3>Credits &amp; licence</h3>
+          <p>
+            An independent fork of <a href={UPSTREAM_URL}>PennyWise AI</a> by Mohammad Sarim and contributors, licensed
+            under the <a href={LICENSE_URL}>GNU AGPL-3.0</a>. Not affiliated with, endorsed or sponsored by the PennyWise
+            project; “PennyWise” is a trademark of its owner.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+
+  .lead em {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .side {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .logo-card {
+    margin: 0;
+    align-self: center;
+    aspect-ratio: 1;
+    border-radius: var(--r-xl);
+    background: #f7f5ef;
+    box-shadow: var(--shadow-2), inset 0 0 0 1px var(--outline-variant);
+    overflow: hidden;
+    transition: border-radius var(--dur-l) var(--spring), transform var(--dur-l) var(--spring);
+  }
+
+  .logo-card:hover {
+    border-radius: 50%;
+    transform: rotate(-4deg) scale(1.03);
+  }
+
+  .logo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    scale: 1.85;
+    transition: scale var(--dur-l) var(--spring);
+  }
+
+  .logo-card:hover img {
+    scale: 1.7;
+  }
+
+  .cards {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .card {
+    transition: border-radius var(--dur-l) var(--spring), transform var(--dur-l) var(--spring);
+  }
+
+  .card:hover {
+    border-radius: 16px 44px 16px 44px;
+    transform: translateY(-4px);
+  }
+
+  .card p {
+    margin: 0;
+    font-size: 0.97rem;
+  }
+
+  .card h3 {
+    margin-bottom: 0.4rem;
+  }
+
+  .tone-peach {
+    background: var(--tertiary-container);
+    color: var(--on-tertiary-container);
+    box-shadow: none;
+  }
+
+  .tone-sage {
+    background: var(--secondary-container);
+    color: var(--on-secondary-container);
+    box-shadow: none;
+  }
+
+  .tone-peach a,
+  .tone-sage a {
+    color: inherit;
+    font-weight: 600;
+  }
+
+  .links {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 0.75rem !important;
+  }
+
+  @media (max-width: 960px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .side {
+      grid-template-columns: 1fr;
+    }
+
+    .logo-card {
+      max-width: 260px;
+    }
+  }
+</style>

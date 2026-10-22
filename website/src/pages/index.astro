@@ -1,0 +1,35 @@
+---
+import Base from "../layouts/Base.astro";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import Marquee from "../components/Marquee.astro";
+import HowItWorks from "../components/HowItWorks.astro";
+import Features from "../components/Features.astro";
+import SriLanka from "../components/SriLanka.astro";
+import PrivacyHighlights from "../components/PrivacyHighlights.astro";
+import Download from "../components/Download.astro";
+import Faq from "../components/Faq.astro";
+import PrivacyPolicy from "../components/PrivacyPolicy.astro";
+import About from "../components/About.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Base
+  title="Mudal — private SMS expense tracker for Sri Lanka"
+  description="Mudal turns your bank SMS into an automatic budget. Free, open source and private: everything stays encrypted on your Android phone. Supports Sampath, Commercial Bank, NTB, NSB and NDB."
+>
+  <Header />
+  <main id="main">
+    <Hero />
+    <Marquee />
+    <HowItWorks />
+    <Features />
+    <SriLanka />
+    <PrivacyHighlights />
+    <Download />
+    <Faq />
+    <PrivacyPolicy />
+    <About />
+  </main>
+  <Footer />
+</Base>

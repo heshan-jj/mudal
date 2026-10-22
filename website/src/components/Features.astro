@@ -1,0 +1,175 @@
+---
+import Icon from "./Icon.astro";
+import Shape from "./Shape.astro";
+import { features } from "../data/site";
+
+const tones = ["mint", "peach", "sun", "sage"];
+
+/** First two and last two cards span two columns, so 12 cards fill a 4-column grid exactly. */
+const wideShapes: Record<number, "cookie" | "clover" | "flower" | "burst"> = {
+  0: "cookie",
+  1: "clover",
+  [features.length - 2]: "flower",
+  [features.length - 1]: "burst",
+};
+---
+
+<section class="section features" id="features" aria-labelledby="features-title">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Features</p>
+      <h2 id="features-title">Everything you need to keep track of money</h2>
+      <p class="lead">
+        The complete toolkit, with nothing locked away. No Pro tier, no limits on rules, budgets, goals or exports.
+      </p>
+    </div>
+
+    <ul class="grid">
+      {
+        features.map((f, i) => (
+          <li class:list={["feature", `tone-${tones[i % tones.length]}`, { wide: wideShapes[i] }]} data-reveal style={`--i:${i % 4}`}>
+            {wideShapes[i] && <Shape kind={wideShapes[i]} size={220} class="deco" />}
+            <span class="icon-badge">
+              <Icon name={f.icon} />
+            </span>
+            <h3>{f.title}</h3>
+            <p>{f.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .features {
+    background: var(--surface-low);
+    border-radius: clamp(32px, 5vw, 64px);
+    margin-inline: clamp(0px, 1.5vw, 1.25rem);
+  }
+
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .feature {
+    --tone-bg: var(--primary-container);
+    --tone-fg: var(--on-primary-container);
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding: 1.75rem;
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--outline-variant);
+    transition:
+      background-color var(--dur-m) var(--emphasized),
+      color var(--dur-m) var(--emphasized),
+      border-radius var(--dur-l) var(--spring),
+      transform var(--dur-l) var(--spring),
+      box-shadow var(--dur-m) var(--emphasized);
+  }
+
+  .feature.wide {
+    grid-column: span 2;
+    padding: 2.25rem;
+    background: var(--tone-bg);
+    color: var(--tone-fg);
+  }
+
+  .feature.wide h3 {
+    font-size: 1.6rem;
+    margin-top: 3rem;
+  }
+
+  .feature.wide p {
+    max-width: 26rem;
+    font-size: 1.05rem;
+  }
+
+  .tone-peach {
+    --tone-bg: var(--tertiary-container);
+    --tone-fg: var(--on-tertiary-container);
+  }
+
+  .tone-sun {
+    --tone-bg: var(--sun-container);
+    --tone-fg: var(--on-sun-container);
+  }
+
+  .tone-sage {
+    --tone-bg: var(--secondary-container);
+    --tone-fg: var(--on-secondary-container);
+  }
+
+  .feature :global(.deco) {
+    position: absolute;
+    right: -50px;
+    bottom: -60px;
+    z-index: -1;
+    color: var(--surface);
+    opacity: 0.45;
+    transition: rotate 1.2s var(--spring), scale 1.2s var(--spring);
+  }
+
+  .feature:hover :global(.deco) {
+    rotate: 90deg;
+    scale: 1.15;
+  }
+
+  .feature:hover {
+    background: var(--tone-bg);
+    color: var(--tone-fg);
+    border-radius: 48px 16px 48px 16px;
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-2);
+  }
+
+  .feature .icon-badge {
+    background: var(--tone-bg);
+    color: var(--tone-fg);
+  }
+
+  .feature.wide .icon-badge,
+  .feature:hover .icon-badge {
+    background: var(--surface);
+    color: var(--tone-fg);
+  }
+
+  .feature:hover .icon-badge {
+    border-radius: 50%;
+    transform: rotate(-12deg) scale(1.1);
+  }
+
+  .feature h3 {
+    margin-top: 1.25rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .feature p {
+    margin: 0;
+    font-size: 0.97rem;
+    opacity: 0.82;
+  }
+
+  @media (max-width: 1000px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .feature.wide {
+      grid-column: auto;
+    }
+  }
+</style>

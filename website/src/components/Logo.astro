@@ -1,0 +1,82 @@
+---
+interface Props {
+  size?: number;
+  id?: string;
+  class?: string;
+}
+
+const { size = 40, id = "logo", class: className } = Astro.props;
+const back = `${id}-back`;
+const front = `${id}-front`;
+---
+
+<svg
+  class:list={["mudal-mark", className]}
+  width={size}
+  height={Math.round((size * 104) / 120)}
+  viewBox="0 0 120 104"
+  aria-hidden="true"
+>
+  <defs>
+    <linearGradient id={back} x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#93C4B5"></stop>
+      <stop offset="1" stop-color="#3F8270"></stop>
+    </linearGradient>
+    <linearGradient id={front} x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#4A8E7B"></stop>
+      <stop offset="1" stop-color="#1E5147"></stop>
+    </linearGradient>
+  </defs>
+  <g class="bubble-back">
+    <rect x="0" y="0" width="82" height="79" rx="14" fill={`url(#${back})`}></rect>
+    <path d="M18 74 L8 102 L52 80 Z" fill={`url(#${back})`}></path>
+  </g>
+  <g class="bubble-front">
+    <rect x="48" y="12" width="72" height="78" rx="14" fill={`url(#${front})`} opacity="0.93"></rect>
+    <path d="M86 86 L116 102 L110 80 Z" fill="#1E5147" opacity="0.93"></path>
+  </g>
+  <g class="purse" fill="none" stroke="#F4F8F5" stroke-width="5.5" stroke-linecap="round">
+    <rect x="29" y="35" width="64" height="35" rx="10"></rect>
+    <path class="bar bar-1" d="M52 45 V60"></path>
+    <path class="bar bar-2" d="M70 45 V60"></path>
+  </g>
+</svg>
+
+<style>
+  .mudal-mark {
+    overflow: visible;
+  }
+
+  .mudal-mark g {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 600ms var(--spring);
+  }
+
+  .bar {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    transition: transform 500ms var(--spring);
+  }
+
+  :global(a:hover) > .mudal-mark .bubble-back,
+  .mudal-mark:hover .bubble-back {
+    transform: translate(-3px, -3px) rotate(-4deg);
+  }
+
+  :global(a:hover) > .mudal-mark .bubble-front,
+  .mudal-mark:hover .bubble-front {
+    transform: translate(3px, 2px) rotate(4deg);
+  }
+
+  :global(a:hover) > .mudal-mark .bar-1,
+  .mudal-mark:hover .bar-1 {
+    transform: scaleY(0.6);
+  }
+
+  :global(a:hover) > .mudal-mark .bar-2,
+  .mudal-mark:hover .bar-2 {
+    transform: scaleY(0.6);
+    transition-delay: 80ms;
+  }
+</style>

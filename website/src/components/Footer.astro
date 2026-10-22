@@ -1,0 +1,110 @@
+---
+import Logo from "./Logo.astro";
+import { REPO_URL, RELEASES_URL, LICENSE_URL, ISSUES_URL } from "../data/site";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container foot">
+    <div class="brand">
+      <a href="#top" class="mark-link" aria-label="Back to top">
+        <Logo size={48} id="logo-footer" />
+      </a>
+      <div>
+        <strong class="wordmark">mudal</strong>
+        <p>Private SMS expense tracker for Sri Lanka.</p>
+      </div>
+    </div>
+
+    <nav aria-label="Footer">
+      <ul>
+        <li><a href={RELEASES_URL}>Download</a></li>
+        <li><a href="#privacy">Privacy policy</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href={REPO_URL}>Source code</a></li>
+        <li><a href={ISSUES_URL}>Issues</a></li>
+        <li><a href={LICENSE_URL}>AGPL-3.0</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="container legal">
+    © {year} Heshan Jayakody and the Mudal contributors. Based on PennyWise AI; not affiliated with the PennyWise project.
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin: clamp(0px, 1.5vw, 1.25rem);
+    margin-top: 2rem;
+    padding: 3.5rem 0 2rem;
+    border-radius: clamp(32px, 5vw, 56px);
+    background: var(--surface-container);
+    font-size: 0.97rem;
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .brand {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .wordmark {
+    font-size: 1.8rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: #34453d;
+    line-height: 1;
+  }
+
+  .brand p {
+    margin: 0.3rem 0 0;
+    color: var(--text-muted);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  ul a {
+    display: block;
+    padding: 0.5rem 1rem;
+    border-radius: var(--r-full);
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 500;
+    transition:
+      background-color var(--dur-s) ease,
+      transform var(--dur-m) var(--spring),
+      border-radius var(--dur-m) var(--spring);
+  }
+
+  ul a:hover {
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+    border-radius: var(--r-sm);
+    transform: translateY(-3px);
+  }
+
+  .legal {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--outline-variant);
+    font-size: 0.86rem;
+    color: var(--text-muted);
+  }
+</style>

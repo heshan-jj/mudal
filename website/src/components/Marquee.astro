@@ -1,0 +1,115 @@
+---
+const items = [
+  "POS purchases",
+  "ATM withdrawals",
+  "CEFT transfers",
+  "Card authorisations",
+  "Salary credits",
+  "LKR & Rs.",
+  "Subscriptions",
+  "Utility bills",
+  "Interest",
+  "Reversals",
+  "Credit cards",
+  "USD & EUR",
+];
+const tones = ["mint", "sage", "peach", "sun"];
+---
+
+<section class="marquee" aria-label="Transaction types Mudal understands">
+  <p class="label">Understands</p>
+  <div class="track">
+    {
+      [0, 1].map((copy) => (
+        <ul aria-hidden={copy === 1 ? "true" : undefined}>
+          {items.map((item, i) => (
+            <li class={`tone-${tones[i % tones.length]}`}>{item}</li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .marquee {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 0;
+    background: var(--surface-low);
+    overflow: hidden;
+  }
+
+  .label {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    padding: 0.6rem 1.25rem 0.6rem 1.5rem;
+    background: var(--surface-low);
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+    box-shadow: 16px 0 16px var(--surface-low);
+  }
+
+  .track {
+    display: flex;
+    width: max-content;
+  }
+
+  .marquee:hover ul {
+    animation-play-state: paused;
+  }
+
+  ul {
+    display: flex;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0 0.75rem 0 0;
+    animation: scroll 42s linear infinite;
+  }
+
+  li {
+    padding: 0.6rem 1.15rem;
+    border-radius: var(--r-full);
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      border-radius var(--dur-m) var(--spring),
+      transform var(--dur-m) var(--spring);
+  }
+
+  li:hover {
+    border-radius: var(--r-sm);
+    transform: scale(1.08) rotate(-2deg);
+  }
+
+  .tone-mint {
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+  }
+
+  .tone-sage {
+    background: var(--secondary-container);
+    color: var(--on-secondary-container);
+  }
+
+  .tone-peach {
+    background: var(--tertiary-container);
+    color: var(--on-tertiary-container);
+  }
+
+  .tone-sun {
+    background: var(--sun-container);
+    color: var(--on-sun-container);
+  }
+
+  @keyframes scroll {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+</style>

@@ -1,0 +1,37 @@
+---
+/**
+ * Material 3 Expressive-style decorative shapes, generated as smooth polar curves:
+ * "cookie" (scalloped), "flower" (deep petals), "burst" (sharp sunny) and "pill".
+ */
+interface Props {
+  kind: "cookie" | "flower" | "burst" | "clover";
+  size?: number;
+  class?: string;
+  style?: string;
+}
+
+const { kind, size = 200, class: className, style } = Astro.props;
+
+const presets = {
+  cookie: { lobes: 9, depth: 0.075, sharp: 1 },
+  flower: { lobes: 6, depth: 0.16, sharp: 1 },
+  burst: { lobes: 12, depth: 0.09, sharp: 2.2 },
+  clover: { lobes: 4, depth: 0.2, sharp: 1 },
+};
+
+const { lobes, depth, sharp } = presets[kind];
+const steps = 240;
+const pts: string[] = [];
+for (let i = 0; i <= steps; i++) {
+  const t = (i / steps) * Math.PI * 2;
+  const wave = Math.cos(lobes * t);
+  const shaped = Math.sign(wave) * Math.pow(Math.abs(wave), 1 / sharp);
+  const r = 50 * (1 - depth + depth * shaped);
+  pts.push(`${(50 + r * Math.cos(t)).toFixed(2)},${(50 + r * Math.sin(t)).toFixed(2)}`);
+}
+const d = `M${pts.join(" L")} Z`;
+---
+
+<svg class={className} style={style} width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
+  <path d={d} fill="currentColor"></path>
+</svg>
