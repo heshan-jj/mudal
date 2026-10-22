@@ -1,0 +1,10 @@
+Version 2.24.2
+
+New Features:
+• restyle the home-screen widget previews
+feat: enhance README and branding assets for Mudal
+feat: update cover style to MUDAL across the application
+• remove the UPI / contacts feature
+
+Bug Fixes:
+• correct bank logo URLs on GitHub Pages
