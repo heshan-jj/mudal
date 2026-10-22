@@ -1013,10 +1013,5 @@ class BackupImporter @Inject constructor(
         preferences.app.lastReviewPromptTime?.let {
             userPreferencesRepository.updateLastReviewPromptTime(it)
         }
-
-        // Like the license: fills in a missing UPI ID, never replaces one set here (#346).
-        preferences.app.upiId?.takeIf { com.pennywiseai.tracker.domain.loan.UpiRequest.isValidUpiId(it) }?.let { id ->
-            if (userPreferencesRepository.upiId.first() == null) userPreferencesRepository.setUpiId(id)
-        }
     }
 }

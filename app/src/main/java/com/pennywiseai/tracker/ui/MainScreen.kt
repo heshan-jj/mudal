@@ -30,8 +30,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.pennywiseai.tracker.data.contacts.LocalMerchantDisplay
-import com.pennywiseai.tracker.data.contacts.displayMerchantName
+import com.pennywiseai.tracker.data.merchant.LocalMerchantDisplay
+import com.pennywiseai.tracker.data.merchant.displayMerchantName
 import com.pennywiseai.tracker.navigation.safePopBackStack
 import com.pennywiseai.tracker.presentation.navigation.BottomNavItem
 import com.pennywiseai.tracker.presentation.accounts.AddAccountScreen
@@ -78,17 +78,14 @@ fun MainScreen(
     // What's New dialog state
     val whatsNewVersion by mainViewModel.whatsNewVersion.collectAsState()
 
-    // UPI VPA → contact name. Read the toggle as state; the lambda closes
-    // over the current value + the singleton resolver, and is provided
-    // through a CompositionLocal so every transaction-rendering composable
-    // (TransactionItem, TransactionDetailScreen header, etc.) can apply the
-    // same rule without prop-drilling the resolver everywhere.
-    val useContactsForVpa by mainViewModel.useContactsForVpa.collectAsState()
+    // The rule every merchant label goes through: a user-defined alias wins,
+    // otherwise the bank's own text is shown. Provided through a
+    // CompositionLocal so every transaction-rendering composable
+    // (TransactionItem, TransactionDetailScreen header, etc.) applies the same
+    // rule without prop-drilling the alias map everywhere.
     val merchantAliases by mainViewModel.merchantAliases.collectAsState()
-    val merchantDisplay = remember(useContactsForVpa, merchantAliases) {
-        { raw: String? ->
-            displayMerchantName(raw, useContactsForVpa, mainViewModel.contactsResolver, merchantAliases)
-        }
+    val merchantDisplay = remember(merchantAliases) {
+        { raw: String? -> displayMerchantName(raw, merchantAliases) }
     }
 
     // Haze state for blur effects

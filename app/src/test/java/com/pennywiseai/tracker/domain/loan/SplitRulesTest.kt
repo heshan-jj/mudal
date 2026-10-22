@@ -156,35 +156,4 @@ class SplitRulesTest {
         // Not split: everything is recorded.
         assertEquals(apps, apps.landedOn(raw, raw))
     }
-
-    @Test
-    fun `upi id format`() {
-        assertTrue(UpiRequest.isValidUpiId("you@okbank"))
-        assertTrue(UpiRequest.isValidUpiId("first.last-1_x@ybl"))
-        assertTrue(UpiRequest.isValidUpiId(" name.2026@upi "))
-        assertFalse(UpiRequest.isValidUpiId("you"))
-        assertFalse(UpiRequest.isValidUpiId("you@"))
-        assertFalse(UpiRequest.isValidUpiId("@bank"))
-        assertFalse(UpiRequest.isValidUpiId("you@bank@x"))
-        assertFalse(UpiRequest.isValidUpiId("y ou@bank"))
-        assertFalse(UpiRequest.isValidUpiId("you@1bank"))
-        assertFalse(UpiRequest.isValidUpiId("you&am=1@bank"))
-    }
-
-    @Test
-    fun `pay link carries the amount in rupees and encodes the name and note`() {
-        val uri = UpiRequest.payUri("you@okbank", "Alex Kim", d("333.3"), "Dinner & drinks at Café 9")
-        assertEquals(
-            "upi://pay?pa=you@okbank&pn=Alex%20Kim&am=333.30&cu=INR&tn=Dinner%20%26%20drinks%20at%20Caf%C3%A9%209",
-            uri
-        )
-    }
-
-    @Test
-    fun `pay link leaves out a missing name and note and keeps notes short`() {
-        assertEquals("upi://pay?pa=you@okbank&am=1000.00&cu=INR", UpiRequest.payUri("you@okbank", null, d("1000"), " "))
-        val long = UpiRequest.payUri("you@okbank", "", d("1"), "x".repeat(80))
-        assertTrue(long.endsWith("&tn=" + "x".repeat(50)))
-        assertFalse(long.contains("pn="))
-    }
 }

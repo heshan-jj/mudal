@@ -51,8 +51,6 @@ import com.pennywiseai.tracker.core.Constants
 import com.pennywiseai.tracker.ui.UiText
 import com.pennywiseai.tracker.ui.components.CustomTitleTopAppBar
 import com.pennywiseai.tracker.ui.components.cards.GroupedColumn
-import com.pennywiseai.tracker.domain.loan.UpiRequest
-import com.pennywiseai.tracker.presentation.split.UpiIdDialog
 import com.pennywiseai.tracker.ui.components.cards.GroupedList
 import com.pennywiseai.tracker.ui.components.cards.GroupedRow
 import com.pennywiseai.tracker.ui.components.cards.IconTile
@@ -137,23 +135,12 @@ fun SettingsScreen(
     val availableCurrencies by settingsViewModel.availableCurrencies.collectAsStateWithLifecycle()
     val accounts by settingsViewModel.accounts.collectAsStateWithLifecycle()
     val mainAccountKey by settingsViewModel.mainAccountKey.collectAsStateWithLifecycle()
-    val useContactsForVpa by settingsViewModel.useContactsForVpa.collectAsStateWithLifecycle(initialValue = false)
-    val upiId by settingsViewModel.upiId.collectAsStateWithLifecycle(initialValue = null)
-    var showUpiIdDialog by remember { mutableStateOf(false) }
     val isProEntitled by settingsViewModel.isProEntitled.collectAsStateWithLifecycle()
     val scheduledFolderBackupEnabled by settingsViewModel.scheduledFolderBackupEnabled.collectAsStateWithLifecycle(initialValue = false)
     val scheduledFolderBackupLastTimestamp by settingsViewModel.scheduledFolderBackupLastTimestamp.collectAsStateWithLifecycle(initialValue = null)
     val exportIncludeReceipts by settingsViewModel.exportIncludeReceipts.collectAsStateWithLifecycle(initialValue = true)
     val folderBackupIncludeReceipts by settingsViewModel.folderBackupIncludeReceipts.collectAsStateWithLifecycle(initialValue = false)
     val requestFolderPicker by settingsViewModel.requestFolderPicker.collectAsStateWithLifecycle()
-    // Launches the runtime permission request. If granted, we flip the
-    // preference on; if denied, leave the switch off so the user can try
-    // again without us silently turning the feature on later.
-    val readContactsLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) settingsViewModel.setUseContactsForVpa(true)
-    }
     var showSmsScanDialog by remember { mutableStateOf(false) }
     var showSmsScanDatePicker by remember { mutableStateOf(false) }
     var showExportOptionsDialog by remember { mutableStateOf(false) }
@@ -426,46 +413,6 @@ fun SettingsScreen(
                     onClick = { showBudgetCycleDialog = true },
                     position = ListItemPosition.Single,
                     trailingText = ordinalSuffix(budgetCycleStartDay)
-                )
-            }
-
-            // ── Contacts ──
-            SectionHeaderV2(title = stringResource(R.string.settings_contacts_section))
-            SettingsGroup {
-                SettingsSwitchRow(
-                    icon = Icons.Default.Contacts,
-                    iconBgColor = teal_light,
-                    iconTint = teal_dark,
-                    title = stringResource(R.string.settings_contacts_vpa_title),
-                    subtitle = stringResource(R.string.settings_contacts_vpa_subtitle),
-                    checked = useContactsForVpa,
-                    onCheckedChange = { wantsOn ->
-                        if (wantsOn) {
-                            val alreadyGranted = androidx.core.content.ContextCompat
-                                .checkSelfPermission(
-                                    context,
-                                    android.Manifest.permission.READ_CONTACTS
-                                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-                            if (alreadyGranted) {
-                                settingsViewModel.setUseContactsForVpa(true)
-                            } else {
-                                readContactsLauncher.launch(android.Manifest.permission.READ_CONTACTS)
-                            }
-                        } else {
-                            settingsViewModel.setUseContactsForVpa(false)
-                        }
-                    },
-                    position = ListItemPosition.Top
-                )
-                SettingsNavItem(
-                    icon = Icons.Default.QrCode2,
-                    iconBgColor = teal_light,
-                    iconTint = teal_dark,
-                    title = stringResource(R.string.settings_upi_title),
-                    subtitle = upiId ?: stringResource(R.string.settings_upi_subtitle),
-                    onClick = { showUpiIdDialog = true },
-                    position = ListItemPosition.Bottom,
-                    trailingText = if (upiId == null) stringResource(R.string.settings_upi_not_set) else null
                 )
             }
 
@@ -935,21 +882,6 @@ fun SettingsScreen(
     }
 
     // Budget Cycle Start Day Dialog
-    if (showUpiIdDialog) {
-        UpiIdDialog(
-            initial = upiId.orEmpty(),
-            allowClear = true,
-            onDismiss = { showUpiIdDialog = false },
-            onSave = { id ->
-                val ok = id.isBlank() || UpiRequest.isValidUpiId(id)
-                if (ok) {
-                    settingsViewModel.setUpiId(id)
-                    showUpiIdDialog = false
-                }
-                ok
-            }
-        )
-    }
 
     if (showBudgetCycleDialog) {
         AlertDialog(

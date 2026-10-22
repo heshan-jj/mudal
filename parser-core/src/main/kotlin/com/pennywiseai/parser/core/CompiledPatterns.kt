@@ -20,9 +20,8 @@ object CompiledPatterns {
             """(?:Ref|Reference|Txn|Transaction)\.?(?:\s+No\.?)?[:\s]+([A-Z0-9]+)""",
             RegexOption.IGNORE_CASE
         )
-        val UPI_REF = Regex("""UPI[:\s]+([0-9]+)""", RegexOption.IGNORE_CASE)
         val REF_NUMBER = Regex("""Reference\s+Number[:\s]+([A-Z0-9]+)""", RegexOption.IGNORE_CASE)
-        val ALL_PATTERNS = listOf(GENERIC_REF, UPI_REF, REF_NUMBER)
+        val ALL_PATTERNS = listOf(GENERIC_REF, REF_NUMBER)
     }
 
     object Account {
@@ -79,8 +78,6 @@ object CompiledPatterns {
             Regex("""SALARY[- ]([^\.\n]+?)(?:\s+Info|$)""", RegexOption.IGNORE_CASE)
         val INFO_PATTERN =
             Regex("""Info:\s*(?:UPI/)?([^/\.\n]+?)(?:/|$)""", RegexOption.IGNORE_CASE)
-        val VPA_WITH_NAME = Regex("""VPA\s+[^@\s]+@[^\s]+\s*\(([^)]+)\)""", RegexOption.IGNORE_CASE)
-        val VPA_PATTERN = Regex("""VPA\s+([^@\s]+)@""", RegexOption.IGNORE_CASE)
         val SPENT_PATTERN = Regex("""at\s+([^\.\n]+?)\s+on\s+\d{2}""", RegexOption.IGNORE_CASE)
         val DEBIT_FOR_PATTERN =
             Regex("""debited\s+for\s+([^\.\n]+?)\s+on\s+\d{2}""", RegexOption.IGNORE_CASE)
@@ -88,7 +85,6 @@ object CompiledPatterns {
             Regex("""To\s+([^\n]+?)\s*(?:\n|\d{2}/\d{2})""", RegexOption.IGNORE_CASE)
 
         val REF_SIMPLE = Regex("""Ref\s+(\d{9,12})""", RegexOption.IGNORE_CASE)
-        val UPI_REF_NO = Regex("""UPI\s+Ref\s+No\s+(\d{12})""", RegexOption.IGNORE_CASE)
         val REF_NO = Regex("""Ref\s+No\.?\s+([A-Z0-9]+)""", RegexOption.IGNORE_CASE)
         val REF_END = Regex(
             """(?:Ref|Reference)[:.\s]+([A-Z0-9]{6,})(?:\s*$|\s*Not\s+You)""",

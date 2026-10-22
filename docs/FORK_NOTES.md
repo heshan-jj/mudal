@@ -504,3 +504,62 @@ opens the App info screen for Mudal.
 SHA256, tagged and pushed without intervention — the fix from §11 does its
 job. Only `gh release create` failed, on a transient network drop
 (`wsarecv: connection forcibly closed`); the release was created by hand.
+
+---
+
+## 14. Phase 9 — the UPI / contacts feature is gone (2026-10-22)
+
+Planned in [`REMOVE_UPI_PLAN.md`](REMOVE_UPI_PLAN.md), executed in full. The app
+no longer declares `READ_CONTACTS` and never reads the address book.
+
+### What was removed
+- **The permission** — `READ_CONTACTS` is out of the manifest.
+- **The lookup** — `ContactsResolver`, `MerchantContactDisplay` and
+  `LocalMerchantDisplay` are deleted.
+- **The preference** — `useContactsForVpa` (the toggle) and `upiId` (the user's
+  own UPI id) are gone, along with the Settings rows, the backup field and the
+  import/export of it.
+- **The UPI payment-request flow** — the split sheet's "request payment"
+  button, the `upi://pay` deep links, the UPI QR generator (`UpiQr`) and the
+  `UpiRequest` object. Those build an INR UPI link, which is India's instant
+  payment system and means nothing here.
+- **Dead code** — the app module's own unused copy of `CompiledPatterns`, and
+  four UPI/VPA regexes in `parser-core` that nothing referenced once the Indian
+  parsers were gone.
+- **Strings** — the three `settings_contacts_*` keys in all 11 locales that had
+  them, the eight `split_upi_*` / `split_request*` keys, and the
+  `settings_upi_*` keys.
+
+### What was kept, and why
+- **The split-bill contact picker** — it uses the *system* picker
+  (`PickContact`), which grants a one-off read of the one contact the user
+  picks. It needs no permission, and splitting a shared bill is as relevant in
+  Sri Lanka as anywhere.
+- **The user's merchant aliases** — the display rule used to do two things
+  (alias, then contact lookup). It now does only the first, in a new small
+  `data/merchant/MerchantDisplay.kt`. Aliases are a core feature and were not
+  collateral damage.
+- **The VPA masking in the parse-report flow** — a privacy feature (it redacts
+  VPA-like strings before an issue link leaves the device).
+- **`UPI_SUFFIX` in the shared `BankParser`** — upstream's base class strips a
+  trailing "UPI…" from a merchant name. Touching it would diverge from upstream
+  base code for no gain.
+- **The five statement PDF parsers** (GPay, ICICI, Paytm, PhonePe, Slice) —
+  all Indian, but they are statement *formats*, not UPI features. Removing them
+  is a separate product decision and was not taken here.
+
+### The stale preferences
+The two DataStore keys are deleted once, on the first start after the upgrade:
+a leftover UPI id is a personal identifier and there is no reason to keep it in
+the app's storage now that nothing reads it.
+
+### Verification
+- `:parser-core:jvmTest` and `:app:testDebugUnitTest` — green.
+- The built APK declares no contacts permission; `aapt2 dump badging` confirms
+  it, and `dumpsys package` on the device does not list `READ_CONTACTS`.
+- The permission list is now: `READ_SMS`, `RECEIVE_SMS`, `POST_NOTIFICATIONS`,
+  `INTERNET`, `USE_BIOMETRIC`, `USE_FINGERPRINT` — plus `WAKE_LOCK`,
+  `ACCESS_NETWORK_STATE`, `RECEIVE_BOOT_COMPLETED` and `FOREGROUND_SERVICE`,
+  which come from WorkManager and cannot be removed.
+- On the device the Settings screen has no Contacts section, and the split
+  sheet's contact picker still works.

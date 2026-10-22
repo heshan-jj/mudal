@@ -67,11 +67,9 @@ import com.pennywiseai.tracker.R
 import com.pennywiseai.tracker.data.database.entity.LoanStatus
 import com.pennywiseai.tracker.data.database.entity.TransactionEntity
 import com.pennywiseai.tracker.data.database.entity.TransactionType
-import com.pennywiseai.tracker.data.share.UpiQr
 import com.pennywiseai.tracker.domain.loan.SplitError
 import com.pennywiseai.tracker.domain.loan.SplitPerson
 import com.pennywiseai.tracker.domain.loan.SplitRules
-import com.pennywiseai.tracker.domain.loan.UpiRequest
 import com.pennywiseai.tracker.ui.components.cards.GroupedList
 import com.pennywiseai.tracker.ui.components.cards.GroupedRow
 import com.pennywiseai.tracker.ui.components.cards.ListItemPosition
@@ -96,12 +94,9 @@ fun canSplit(txn: TransactionEntity): Boolean = txn.transactionType == Transacti
 internal fun owedFor(person: SplitPerson): BigDecimal =
     person.loan?.remainingAmount?.let { minOf(it, person.share.amount) }?.coerceAtLeast(BigDecimal.ZERO) ?: person.share.amount
 
-/** UPI requests are INR only (#346). */
-private fun TransactionEntity.isInr() = currency.equals("INR", ignoreCase = true)
-
 /**
  * "Split with" on the transaction screen: each person's share (tap for their
- * loan) with a UPI request for INR bills, and your part.
+ * loan) and your part.
  */
 @Composable
 fun SplitSection(
@@ -111,25 +106,8 @@ fun SplitSection(
     modifier: Modifier = Modifier,
 ) {
     val people by viewModel.split.collectAsStateWithLifecycle()
-    val upiId by viewModel.upiId.collectAsStateWithLifecycle()
-    val payeeName by viewModel.payeeName.collectAsStateWithLifecycle()
     if (people.isEmpty()) return
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var askUpiFor by remember { mutableStateOf<SplitPerson?>(null) }
     val currency = transaction.currency
-
-    fun request(person: SplitPerson, id: String) {
-        val owed = owedFor(person)
-        val amount = CurrencyFormatter.formatCurrency(owed, currency)
-        val uri = UpiRequest.payUri(id, payeeName, owed, transaction.merchantName)
-        val text = context.getString(R.string.split_request_text, amount, id, transaction.merchantName) + "\n" + uri
-        val title = context.getString(R.string.split_request, amount)
-        scope.launch {
-            runCatching { context.startActivity(UpiQr.shareIntent(context, uri, text, title)) }
-                .onFailure { Toast.makeText(context, R.string.split_request_failed, Toast.LENGTH_SHORT).show() }
-        }
-    }
 
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.Layout.headerToContent)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -154,15 +132,7 @@ fun SplitSection(
                         title = loan?.personName.orEmpty(),
                         subtitle = if (settled) stringResource(R.string.split_settled) else null,
                     )
-                    if (transaction.isInr() && !settled) {
-                        FilledTonalButton(onClick = { upiId?.let { request(person, it) } ?: run { askUpiFor = person } }) {
-                            Icon(Icons.Default.QrCode2, contentDescription = null, modifier = Modifier.size(Dimensions.Icon.small))
-                            Spacer(Modifier.width(Spacing.xs))
-                            Text(stringResource(R.string.split_request, CurrencyFormatter.formatCurrency(owed, currency)))
-                        }
-                    } else {
-                        Text(amount, style = PennyWiseText.amountRow, color = MaterialTheme.colorScheme.onSurface)
-                    }
+                    Text(amount, style = PennyWiseText.amountRow, color = MaterialTheme.colorScheme.onSurface)
                 }
             }
             GroupedRow(position = ListItemPosition.from(people.size, rows)) {
@@ -176,54 +146,8 @@ fun SplitSection(
         }
     }
 
-    askUpiFor?.let { person ->
-        UpiIdDialog(
-            initial = "",
-            onDismiss = { askUpiFor = null },
-            onSave = { id ->
-                viewModel.saveUpiId(id).also { saved ->
-                    if (saved) {
-                        askUpiFor = null
-                        request(person, id.trim())
-                    }
-                }
-            },
-        )
-    }
 }
 
-/** Asks for your own UPI ID; [onSave] returns false to keep the dialog open on an invalid one. */
-@Composable
-fun UpiIdDialog(initial: String, onDismiss: () -> Unit, onSave: (String) -> Boolean, allowClear: Boolean = false) {
-    var value by rememberSaveable { mutableStateOf(initial) }
-    var invalid by rememberSaveable { mutableStateOf(false) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.split_upi_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
-                Text(stringResource(R.string.split_upi_message), style = MaterialTheme.typography.bodyMedium)
-                OutlinedTextField(
-                    value = value,
-                    onValueChange = { value = it.trim(); invalid = false },
-                    placeholder = { Text(stringResource(R.string.split_upi_hint)) },
-                    singleLine = true,
-                    isError = invalid,
-                    supportingText = if (invalid) { { Text(stringResource(R.string.split_upi_invalid)) } } else null,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                if (allowClear && value.isBlank()) { onSave(""); return@TextButton }
-                invalid = !onSave(value)
-            }) { Text(stringResource(R.string.split_upi_save)) }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.txn_detail_action_cancel)) } },
-    )
-}
 
 /** The split sheet, when open. Contacts permission is asked only when "Pick from contacts" is tapped. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)

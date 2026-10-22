@@ -12,7 +12,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.net.Uri
-import com.pennywiseai.tracker.data.contacts.LocalMerchantDisplay
+import com.pennywiseai.tracker.data.merchant.LocalMerchantDisplay
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut

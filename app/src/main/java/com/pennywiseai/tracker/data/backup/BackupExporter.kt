@@ -293,8 +293,7 @@ class BackupExporter @Inject constructor(
                     },
                     bankAccountMerges = if (privacy == ExportPrivacy.FULL) {
                         BankAccountMergeStore(context).mappings()
-                    } else emptyMap(),
-                    upiId = if (privacy == ExportPrivacy.FULL) userPreferencesRepository.upiId.first() else null
+                    } else emptyMap()
                 )
             ),
             receipts = exportedReceipts

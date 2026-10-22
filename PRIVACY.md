@@ -48,10 +48,6 @@ Mudal is built with privacy as the core principle. We believe your financial dat
 ### Biometrics (`USE_BIOMETRIC`)
 - Optional app lock via fingerprint or face unlock
 
-### Contacts (`READ_CONTACTS`, off by default)
-- Mudal ships this permission for one opt-in feature: contact lookup, which can resolve a UPI VPA like `merchant@ybl` into a name from your address book so merchant lists read naturally
-- The lookup runs on-device and the feature stays dormant until you enable it in Settings
-
 ### Internet Permission
 - **AI assistant**: Optional. Uses the Google Gemini API (`https://generativelanguage.googleapis.com/`) with your own API key, stored locally in the app's private storage. Off until you configure a key.
 - **Exchange Rates**: Multi-currency features fetch current rates from open.er-api.com; only the currency code is sent
@@ -112,7 +108,7 @@ Any changes to this privacy policy will be:
 
 For privacy concerns or questions:
 - Open an issue on [GitHub](https://github.com/heshan-jj/mudal/issues)
-- Join our [Discord community](https://discord.gg/H3xWeMWjKQ)
+- Email the maintainer: `jayakodyheshan@gmail.com`
 
 ## Summary
 

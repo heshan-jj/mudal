@@ -9,7 +9,6 @@ import com.pennywiseai.tracker.domain.loan.SplitError
 import com.pennywiseai.tracker.domain.loan.SplitPerson
 import com.pennywiseai.tracker.domain.loan.SplitRules
 import com.pennywiseai.tracker.domain.loan.SplitShare
-import com.pennywiseai.tracker.domain.loan.UpiRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -69,8 +68,8 @@ fun SplitForm.preview(total: BigDecimal, currency: String): SplitPreview {
 }
 
 /**
- * Split a bill (#346) on the transaction screen: the "Split with" rows, the
- * split sheet and the UPI ID used to request each share.
+ * Split a bill (#346) on the transaction screen: the "Split with" rows and the
+ * split sheet.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -90,14 +89,6 @@ class SplitBillViewModel @Inject constructor(
     /** Names you've already lent to or borrowed from (open loans, like "Mark as loan"). */
     val suggestions: StateFlow<List<String>> = loanRepository.getRecentPersonNames()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
-    val upiId: StateFlow<String?> = preferences.upiId
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-
-    /** Your name for the UPI request, unless it's still the default. */
-    val payeeName: StateFlow<String?> = preferences.userPreferences
-        .map { prefs -> prefs.userName.trim().takeIf { it.isNotEmpty() && it != DEFAULT_USER_NAME } }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private val _form = MutableStateFlow<SplitForm?>(null)
     val form: StateFlow<SplitForm?> = _form.asStateFlow()
@@ -192,13 +183,6 @@ class SplitBillViewModel @Inject constructor(
                 }
                 .onFailure { e -> _form.update { it?.copy(saving = false, failure = e.message.orEmpty()) } }
         }
-    }
-
-    /** Saves [id] as your UPI ID; false (and nothing saved) when it isn't name@handle. */
-    fun saveUpiId(id: String): Boolean {
-        if (!UpiRequest.isValidUpiId(id)) return false
-        viewModelScope.launch { preferences.setUpiId(id) }
-        return true
     }
 
     private companion object {

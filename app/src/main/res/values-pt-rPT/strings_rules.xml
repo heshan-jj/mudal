@@ -69,7 +69,6 @@
     <string name="import_statement_result_total_parsed">Total analisado de PDF</string>
     <string name="import_statement_result_duplicates">Duplicações ignoradas: %1$d</string>
     <string name="import_statement_result_exact">Reimportadores exatos</string>
-    <string name="import_statement_result_by_reference">Por referência UPI</string>
     <string name="import_statement_result_by_amount_date">Por quantidade &amp; data</string>
     <string name="import_statement_import_another">Importar outro</string>
     <string name="import_statement_done">Concluído</string>

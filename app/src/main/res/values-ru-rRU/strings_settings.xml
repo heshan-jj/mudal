@@ -50,9 +50,6 @@
     <string name="settings_budget_cycle_subtitle">Переключает начало каждого месячного бюджетного периода; например, 25 означает, что ваш цикл проходит 25 → 24</string>
     <string name="settings_budget_cycle_dialog_body">Выберите день каждого месячного бюджетного цикла, например 25 означает, что цикл проходит с 25 по 24 следующего месяца.</string>
     <!-- Contacts -->
-    <string name="settings_contacts_section">Контакты</string>
-    <string name="settings_contacts_vpa_title">Заменить UPI VPA контактными именами</string>
-    <string name="settings_contacts_vpa_subtitle">Показывать \'John Doe\' вместо \'9876543210@paytm\'. Нужно разрешение для контактов.</string>
     <!-- Security -->
     <string name="settings_security_section">Безопасность</string>
     <string name="settings_app_lock_title">Блокировка приложения</string>

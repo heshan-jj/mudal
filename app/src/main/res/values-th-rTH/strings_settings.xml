@@ -19,7 +19,6 @@
     <string name="settings_currency_field_label">สกุลเงิน</string>
     <!-- Budget -->
     <!-- Contacts -->
-    <string name="settings_contacts_section">รายชื่อติดต่อ</string>
     <!-- Security -->
     <string name="settings_security_section">ความปลอดภัย</string>
     <string name="settings_app_lock_title">ล็อกแอป</string>

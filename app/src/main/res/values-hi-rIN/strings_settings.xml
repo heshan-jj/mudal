@@ -19,7 +19,6 @@
     <string name="settings_currency_field_label">मुद्रा</string>
     <!-- Budget -->
     <!-- Contacts -->
-    <string name="settings_contacts_section">संपर्क</string>
     <!-- Security -->
     <string name="settings_security_section">सुरक्षा</string>
     <string name="settings_app_lock_title">एप लॉक</string>

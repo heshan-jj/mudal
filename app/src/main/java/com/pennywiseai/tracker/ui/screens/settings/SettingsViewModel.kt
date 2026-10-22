@@ -66,7 +66,6 @@ class SettingsViewModel @Inject constructor(
     private val importCsvUseCase: com.pennywiseai.tracker.data.csv.ImportCsvUseCase,
     private val folderBackupWriter: FolderBackupWriter,
     private val scheduledFolderBackupScheduler: ScheduledFolderBackupScheduler,
-    private val contactsResolver: com.pennywiseai.tracker.data.contacts.ContactsResolver,
     entitlementGate: EntitlementGate,
 ) : ViewModel() {
 
@@ -153,17 +152,6 @@ class SettingsViewModel @Inject constructor(
 
     // Count credit-card spend toward the "Spent this month" total (#705)
     val countCreditCardAsExpense = userPreferencesRepository.countCreditCardAsExpense
-
-    // Replace UPI VPAs with contact names (gated by READ_CONTACTS).
-    val useContactsForVpa = userPreferencesRepository.useContactsForVpa
-
-    // Your own UPI ID for split-bill requests (#346).
-    val upiId = userPreferencesRepository.upiId
-
-    /** Blank clears it; the dialog only passes a valid UPI ID otherwise. */
-    fun setUpiId(id: String) {
-        viewModelScope.launch { userPreferencesRepository.setUpiId(id) }
-    }
 
     // Derive the selectable set from the user's ACTUAL data (transaction + account
     // currencies) on top of the common seed list. This way any currency the user
@@ -318,19 +306,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Flip the UPI-contact-resolution preference. The screen is responsible
-     * for ensuring READ_CONTACTS is granted before passing `true` — this
-     * just persists. Toggling either direction wipes the resolver cache so
-     * stale results don't leak across the flag flip (and so a re-enable
-     * after permission grant picks up the user's contacts immediately).
-     */
-    fun setUseContactsForVpa(enabled: Boolean) {
-        viewModelScope.launch {
-            userPreferencesRepository.setUseContactsForVpa(enabled)
-            contactsResolver.clearCache()
-        }
-    }
     
     fun updateSmsScanMonths(months: Int) {
         viewModelScope.launch {

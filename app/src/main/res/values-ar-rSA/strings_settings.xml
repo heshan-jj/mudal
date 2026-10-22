@@ -50,9 +50,6 @@
     <string name="settings_budget_cycle_subtitle">يغير بداية كل فترة ميزانية شهرية؛ على سبيل المثال، 25 يعني أن دورتك تعمل 25 → 24</string>
     <string name="settings_budget_cycle_dialog_body">اختر اليوم الذي تبدأ فيه كل دورة ميزانية شهرية. على سبيل المثال، 25 يعني أن الدورة تمتد من 25 إلى 24 من الشهر التالي.</string>
     <!-- Contacts -->
-    <string name="settings_contacts_section">جهات الاتصال</string>
-    <string name="settings_contacts_vpa_title">استبدال UPI VPN بأسماء جهات الاتصال</string>
-    <string name="settings_contacts_vpa_subtitle">إظهار \'John Doe\' بدلا من \'9876543210@paytm\' يحتاج إلى إذن جهات الاتصال.</string>
     <!-- Security -->
     <string name="settings_security_section">الأمان</string>
     <string name="settings_app_lock_title">قفل التطبيق</string>

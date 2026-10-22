@@ -21,7 +21,6 @@
 
     <!-- Read contacts to replace UPI VPAs with contact names at display time.
          Opt-in via Settings; the app degrades gracefully if denied. -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <!-- Explicitly remove AD_ID permission to ensure privacy -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />

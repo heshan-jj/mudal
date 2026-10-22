@@ -382,11 +382,7 @@ data class AppPreferences(
     val ignoredAccounts: List<String> = emptyList(),
 
     @SerialName("bank_account_merges")
-    val bankAccountMerges: Map<String, String> = emptyMap(),
-
-    // The user's own UPI ID for split-bill requests (#346). FULL exports only.
-    @SerialName("upi_id")
-    val upiId: String? = null
+    val bankAccountMerges: Map<String, String> = emptyMap()
 )
 
 /**

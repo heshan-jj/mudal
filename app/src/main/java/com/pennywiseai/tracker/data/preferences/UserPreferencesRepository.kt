@@ -18,8 +18,12 @@ import com.pennywiseai.tracker.data.preferences.HomeSection
 import com.pennywiseai.tracker.data.preferences.HomeSectionLayout
 import com.pennywiseai.tracker.widget.WidgetRefresher
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -63,6 +67,29 @@ open class UserPreferencesRepository(
 
     private val activeDataStore: DataStore<Preferences> = customDataStore ?: context.defaultDataStore
     private val Context.dataStore: DataStore<Preferences> get() = activeDataStore
+
+    /**
+     * Keys left behind by the removed UPI / contacts feature. They are
+     * deleted once, on the first start after the upgrade: a stale UPI id is a
+     * personal identifier, and there is no reason to keep it in the app's
+     * storage now that nothing reads it.
+     */
+    private val staleUpiPreferenceKeys = listOf(
+        stringPreferencesKey("use_contacts_for_vpa"),
+        stringPreferencesKey("upi_id")
+    )
+
+    private val purgeScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    init {
+        purgeScope.launch {
+            val stale = activeDataStore.data.first()
+            if (staleUpiPreferenceKeys.none { stale.contains(it) }) return@launch
+            activeDataStore.edit { preferences ->
+                staleUpiPreferenceKeys.forEach { preferences.remove(it) }
+            }
+        }
+    }
 
     private object PreferencesKeys {
         val GEMINI_API_KEY = stringPreferencesKey("gemini_api_key")
@@ -180,12 +207,6 @@ open class UserPreferencesRepository(
         // True once the user explicitly picks a currency in the Settings selector.
         // While true, the main-account-derived currency must not override their choice.
         val BASE_CURRENCY_USER_SET = booleanPreferencesKey("base_currency_user_set")
-
-        // UPI VPA → contact name lookup (opt-in; gated by READ_CONTACTS).
-        val USE_CONTACTS_FOR_VPA = booleanPreferencesKey("use_contacts_for_vpa")
-
-        // The user's own UPI ID, for asking people to pay their share of a split bill (#346).
-        val UPI_ID = stringPreferencesKey("upi_id")
 
         // Scheduled folder backup (SAF tree URI; shared by standard and F-Droid).
         val SCHEDULED_FOLDER_BACKUP_ENABLED = booleanPreferencesKey("scheduled_folder_backup_enabled")
@@ -882,31 +903,6 @@ open class UserPreferencesRepository(
     suspend fun setBalanceHidden(hidden: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.BALANCE_HIDDEN] = hidden
-        }
-    }
-
-    // Replace UPI VPAs with matching contact names at display time.
-    // Off by default — turning on prompts for READ_CONTACTS.
-    val useContactsForVpa: Flow<Boolean> = context.dataStore.data
-        .map { preferences ->
-            preferences[PreferencesKeys.USE_CONTACTS_FOR_VPA] ?: false
-        }
-
-    suspend fun setUseContactsForVpa(enabled: Boolean) {
-        context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.USE_CONTACTS_FOR_VPA] = enabled
-        }
-    }
-
-    /** The user's own UPI ID (#346), or null until they enter one. */
-    val upiId: Flow<String?> = context.dataStore.data
-        .map { preferences -> preferences[PreferencesKeys.UPI_ID]?.takeIf { it.isNotBlank() } }
-
-    /** Blank or null clears it. */
-    suspend fun setUpiId(id: String?) {
-        context.dataStore.edit { preferences ->
-            val trimmed = id?.trim().orEmpty()
-            if (trimmed.isEmpty()) preferences.remove(PreferencesKeys.UPI_ID) else preferences[PreferencesKeys.UPI_ID] = trimmed
         }
     }
 

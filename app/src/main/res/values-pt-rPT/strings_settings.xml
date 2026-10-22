@@ -50,9 +50,6 @@
     <string name="settings_budget_cycle_subtitle">Desloca o início de cada período de orçamento mensal; por exemplo, 25 significa que seu ciclo roda 25th → 24th</string>
     <string name="settings_budget_cycle_dialog_body">Escolha o dia que cada ciclo de orçamento mensal começa. Por exemplo, 25 significa que o ciclo corre a partir do dia 25 até o dia 24 do próximo mês.</string>
     <!-- Contacts -->
-    <string name="settings_contacts_section">Contatos</string>
-    <string name="settings_contacts_vpa_title">Substituir APV UPI por nomes de contatos</string>
-    <string name="settings_contacts_vpa_subtitle">Mostrar \'John Doe\' em vez de \'9876543210@paytm\'. Precisa de permissão de contatos.</string>
     <!-- Security -->
     <string name="settings_security_section">Segurança</string>
     <string name="settings_app_lock_title">Bloqueio de apps</string>

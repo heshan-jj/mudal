@@ -1,6 +1,7 @@
 # Plan: remove the UPI / contacts feature
 
-**Status:** planned, not started.
+**Status:** **done** — 2026-10-22. Executed in full; see `docs/FORK_NOTES.md` §14 for
+what actually changed and how it was verified.
 **Why now:** the next release is the first one people install by hand, and the
 app currently asks for `READ_CONTACTS`. A finance app that wants to read the
 whole address book to prettify a merchant name is a bad look — to Play
@@ -63,6 +64,10 @@ It is spread over four layers:
 | 10 | The strings | `strings_settings.xml` + every locale: `settings_contacts_section`, `settings_contacts_vpa_title`, `settings_contacts_vpa_subtitle` |
 | 11 | The dead pattern copy | `app/src/main/java/com/pennywiseai/tracker/core/CompiledPatterns.kt` — **nothing in the app module uses it**; delete |
 | 12 | The dead UPI patterns | `parser-core/.../core/CompiledPatterns.kt` — `UPI_REF`, `VPA_WITH_NAME`, `VPA_PATTERN`, `UPI_REF_NO` are **defined but never referenced** now that the Indian parsers are gone; delete |
+| 13 | The UPI payment-request flow | `domain/loan/SplitRules.kt` — the `UpiRequest` object (`isValidUpiId`, `payUri`); `data/share/UpiQr.kt` — the UPI QR generator. Both build an INR `upi://pay` link, which is India's instant-payment system and means nothing in Sri Lanka. |
+| 14 | The split sheet's request button | `presentation/split/SplitBill.kt` (the "request payment" button, the "ask for UPI id" dialog, the share intent) and `presentation/split/SplitBillViewModel.kt` (`upiId`, `setUpiId`, the `askUpiFor` state) |
+| 15 | The UPI id in Settings | `SettingsScreen.kt` (the "your UPI id" row and its dialog) and `SettingsViewModel.kt` (`upiId`, `setUpiId`) |
+| 16 | The UPI id in backups | `BackupImporter.kt` — stop restoring it (in addition to the export side) |
 
 ### 3.2 Deliberately kept (with the reason)
 
@@ -70,7 +75,9 @@ It is spread over four layers:
 |---|---|
 | `SplitBill.kt` — the "pick from contacts" button in the split sheet | It uses the **system contact picker** (`ActivityResultContracts.PickContact`), which grants a one-off read of the one contact the user picks. It needs **no `READ_CONTACTS` permission**. Splitting a shared bill with friends is exactly as relevant in Sri Lanka as anywhere — and it costs nothing permission-wise. |
 | The VPA/email masking in the "report a parsing problem" flow (`docs/PRIVACY.md`) | That is a **privacy** feature: it redacts VPA-like strings before an issue link leaves the device. Unrelated to the contact lookup. |
-| `import_statement_result_by_reference` ("By UPI reference" in the statement-import UI) | It is the label for *how* a statement row was matched. Rename to a generic "By reference" (see §4, step 8) — the matcher itself is generic. |
+| `import_statement_result_by_reference` ("By UPI reference" in the statement-import UI) | It is the label for *how* a statement row was matched. The matcher itself is generic, so the label is renamed to "By reference" (see §4, step 5) and the outdated translations are dropped so they fall back to English until Crowdin re-translates. |
+| The **split sheet itself** — who owes whom | Only the UPI "request payment" button goes. The split bookkeeping stays; collecting the money is up to the user (cash, eZ Cash, PayHere, a bank transfer). Splitting a shared bill is as relevant in Sri Lanka as anywhere. |
+| The five **statement PDF parsers** (GPay, ICICI, Paytm, PhonePe, Slice) | They are statement *formats*, not UPI features. All five are Indian, so they are dead weight for a Sri Lankan user, but removing them is a separate product decision — flagged as a follow-up, not done here. |
 | `BankParser.kt:598` — `CompiledPatterns.Cleaning.UPI_SUFFIX` | It strips a trailing "UPI…" from a merchant name. It lives in upstream's shared base class, it is harmless for Sri Lankan merchants, and touching it means diverging from upstream base code for no gain. Rule 1 of the fork plan: keep the diff small. |
 | `rules_summary_upi_cashback` ("Amount < 10 from NPCI") | That is a summary of a **user-authored rule** about a bank, not a UPI feature. |
 
@@ -103,10 +110,20 @@ Each step is independently committable. Do them in order.
 
 **Step 4 — the backup**
 8. `BackupModels.kt`: remove `upiId` from `PreferencesSnapshot`.
-9. `BackupExporter.kt`: stop writing it.
+9. `BackupExporter.kt`: stop writing it. `BackupImporter.kt`: stop restoring it.
 10. `BackupModelsTest.kt`: drop the field from the fixture if the test asserts on it.
     *Old backups are unaffected: `backupJson` sets `ignoreUnknownKeys = true`, so a
     backup that still contains `"upiId"` decodes fine and the value is ignored.*
+
+**Step 4b — the UPI payment-request flow**
+11. Delete `data/share/UpiQr.kt` and the `UpiRequest` object in `domain/loan/SplitRules.kt`.
+12. `presentation/split/SplitBill.kt`: remove the "request payment" button, the
+    "ask for UPI id" dialog, the `upi://pay` share intent and the `askUpiFor` state.
+13. `presentation/split/SplitBillViewModel.kt`: remove `upiId`, `setUpiId` and the
+    `askUpiFor` plumbing.
+14. `SettingsScreen.kt` / `SettingsViewModel.kt`: remove the "your UPI id" row,
+    its dialog and `setUpiId`.
+15. The strings for all of the above, in every locale.
 
 **Step 5 — strings**
 11. Remove the three `settings_contacts_*` strings from `strings_settings.xml` **and every locale**
@@ -151,16 +168,20 @@ Each step is independently committable. Do them in order.
 
 ```bash
 # 1. Nothing reads the address book any more
-git grep -n -I -E "ContactsContract|ContactsResolver|LocalMerchantDisplay|MerchantContactDisplay" -- app/src parser-core/src shared/src
-#    → no output
+#    (SplitBill.kt is the one expected hit: it reads the single contact the
+#    user picked through the system picker, which needs no permission)
+git grep -n -I -E "ContactsContract|ContactsResolver|MerchantContactDisplay" -- app/src parser-core/src shared/src
+#    → only app/src/main/java/com/pennywiseai/tracker/presentation/split/SplitBill.kt
 
 # 2. The permission is gone from the source
-git grep -n "READ_CONTACTS" -- app/src
-#    → no output
+git grep -n "READ_CONTACTS" -- app/src parser-core/src shared/src
+#    → only the comment in SplitBill.kt that explains why it needs no permission
 
 # 3. No UPI/VPA lookup is left in the app
-git grep -n -I -i -E "useContactsForVpa|upiId|settings_contacts|VPA_PATTERN|VPA_WITH_NAME|UPI_REF" -- app/src parser-core/src
-#    → no output (UPI_SUFFIX in BankParser is expected and stays)
+#    (GPayPdfParser.kt is the one expected hit: it reads a UPI *reference* out
+#    of a Google Pay statement PDF — that is the statement-import feature)
+git grep -n -I -i -E "useContactsForVpa|upiId|settings_contacts|VPA_PATTERN|VPA_WITH_NAME|UPI_REF|split_upi|settings_upi|UpiRequest" -- app/src parser-core/src shared/src
+#    → only app/src/main/java/com/pennywiseai/tracker/data/statement/GPayPdfParser.kt
 
 # 4. The build and the tests
 ./gradlew :parser-core:jvmTest :app:testDebugUnitTest

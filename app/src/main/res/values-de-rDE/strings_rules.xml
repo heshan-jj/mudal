@@ -69,7 +69,6 @@
     <string name="import_statement_result_total_parsed">Insgesamt analysiert aus PDF</string>
     <string name="import_statement_result_duplicates">Duplikate übersprungen: %1$d</string>
     <string name="import_statement_result_exact">Exakte Re-Importe</string>
-    <string name="import_statement_result_by_reference">Nach UPI-Referenz</string>
     <string name="import_statement_result_by_amount_date">Nach Betrag &amp; Datum</string>
     <string name="import_statement_import_another">Weitere importieren</string>
     <string name="import_statement_done">Fertig</string>

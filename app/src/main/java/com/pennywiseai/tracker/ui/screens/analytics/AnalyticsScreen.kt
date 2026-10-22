@@ -42,7 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.pennywiseai.tracker.data.contacts.LocalMerchantDisplay
+import com.pennywiseai.tracker.data.merchant.LocalMerchantDisplay
 import com.pennywiseai.tracker.data.database.entity.ProfileEntity
 import com.pennywiseai.tracker.presentation.common.TimePeriod
 import com.pennywiseai.tracker.presentation.common.chipLabel

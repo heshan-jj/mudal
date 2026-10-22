@@ -50,9 +50,6 @@
     <string name="settings_budget_cycle_subtitle">Verschiebt den Beginn jeder monatlichen Budgetperiode; z. B. 25 bedeutet, dass dein Zyklus 25. → 24. läuft</string>
     <string name="settings_budget_cycle_dialog_body">Wählen Sie den Tag, an dem jeder monatliche Budgetzyklus beginnt, z. B. 25 bedeutet der Zyklus vom 25. bis zum 24. des nächsten Monats.</string>
     <!-- Contacts -->
-    <string name="settings_contacts_section">Kontakte</string>
-    <string name="settings_contacts_vpa_title">UPI VPAs durch Kontaktnamen ersetzen</string>
-    <string name="settings_contacts_vpa_subtitle">Zeige \'John Doe\' statt \'9876543210@paytm\'. Benötigt Kontakte Berechtigung.</string>
     <!-- Security -->
     <string name="settings_security_section">Sicherheit</string>
     <string name="settings_app_lock_title">App-Sperre</string>

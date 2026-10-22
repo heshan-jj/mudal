@@ -81,7 +81,6 @@
     <string name="import_statement_result_total_parsed">إجمالي التحليل من PDF</string>
     <string name="import_statement_result_duplicates">تم تخطي التكرار: %1$d</string>
     <string name="import_statement_result_exact">إعادة الاستيراد بالضبط</string>
-    <string name="import_statement_result_by_reference">حسب مرجع UPI</string>
     <string name="import_statement_result_by_amount_date">حسب المبلغ &amp; تاريخ</string>
     <string name="import_statement_import_another">استيراد آخر</string>
     <string name="import_statement_done">تم</string>

@@ -75,7 +75,6 @@
     <string name="import_statement_result_total_parsed">Celkem analyzováno z PDF</string>
     <string name="import_statement_result_duplicates">Duplikáty přeskočeny: %1$d</string>
     <string name="import_statement_result_exact">Přesný zpětný dovoz</string>
-    <string name="import_statement_result_by_reference">Podle UPI</string>
     <string name="import_statement_result_by_amount_date">Podle částky &amp; datum</string>
     <string name="import_statement_import_another">Importovat další</string>
     <string name="import_statement_done">Hotovo</string>

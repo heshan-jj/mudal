@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pennywiseai.tracker.BuildConfig
-import com.pennywiseai.tracker.data.contacts.ContactsResolver
 import com.pennywiseai.tracker.data.preferences.UserPreferencesRepository
 import com.pennywiseai.tracker.data.repository.MerchantAliasRepository
 import kotlinx.coroutines.flow.map
@@ -24,18 +23,11 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val merchantAliasRepository: MerchantAliasRepository,
-    internal val contactsResolver: ContactsResolver
+    private val merchantAliasRepository: MerchantAliasRepository
 ) : ViewModel() {
 
     private val _whatsNewVersion = MutableStateFlow<WhatsNewVersion?>(null)
     val whatsNewVersion: StateFlow<WhatsNewVersion?> = _whatsNewVersion.asStateFlow()
-
-    // Project the toggle as a StateFlow so MainScreen can synchronously
-    // build a CompositionLocal closure over the latest value without
-    // collecting on every render path.
-    val useContactsForVpa: StateFlow<Boolean> = userPreferencesRepository.useContactsForVpa
-        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     // Raw merchant name -> user alias (#583). Projected as a StateFlow so
     // MainScreen can build the merchant-display closure over the latest map

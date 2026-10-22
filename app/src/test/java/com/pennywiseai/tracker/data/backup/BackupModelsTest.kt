@@ -1067,7 +1067,7 @@ class BackupModelsTest {
         val backup = PennyWiseBackup(
             metadata = BackupMetadata(statistics = BackupStatistics(totalLoanShares = 1)),
             database = DatabaseSnapshot(transactions = listOf(bill), loans = listOf(loan), loanShares = listOf(share)),
-            preferences = PreferencesSnapshot(app = AppPreferences(upiId = "you@okbank"))
+            preferences = PreferencesSnapshot()
         )
 
         val json = backupJson.encodeToString(backup)
@@ -1078,7 +1078,6 @@ class BackupModelsTest {
         assertEquals(listOf(loan), restored.database.loans)
         assertEquals(listOf(share), restored.database.loanShares)
         assertEquals(1, restored.metadata.statistics.totalLoanShares)
-        assertEquals("you@okbank", restored.preferences.app.upiId)
     }
 
     /** #346. A backup from before split bills still restores: no shares, no lent total, no UPI ID. */
@@ -1103,7 +1102,6 @@ class BackupModelsTest {
         assertTrue(backup.database.loanShares.isEmpty())
         assertEquals(0, backup.metadata.statistics.totalLoanShares)
         assertNull(backup.database.transactions.single().lentSharesTotal)
-        assertNull(backup.preferences.app.upiId)
 
         // A share missing keys falls back to defaults.
         val minimal = backupJson.decodeFromString<PennyWiseBackup>("""{ "database": { "loan_shares": [ { "loanId": 1 } ] } }""")

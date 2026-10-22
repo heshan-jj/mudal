@@ -75,7 +75,6 @@
     <string name="import_statement_result_total_parsed">Всего обработано из PDF</string>
     <string name="import_statement_result_duplicates">Дубликаты пропущены: %1$d</string>
     <string name="import_statement_result_exact">Точный повторный импорт</string>
-    <string name="import_statement_result_by_reference">По ссылке UPI</string>
     <string name="import_statement_result_by_amount_date">Сумма &amp; даты</string>
     <string name="import_statement_import_another">Импорт другого</string>
     <string name="import_statement_done">Готово</string>

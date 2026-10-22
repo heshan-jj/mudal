@@ -91,25 +91,3 @@ object SplitRules {
     private fun List<BigDecimal>.sum(): BigDecimal = fold(BigDecimal.ZERO, BigDecimal::add)
 }
 
-/** Asking someone to pay their share over UPI (INR only). */
-object UpiRequest {
-    // name@handle, e.g. "name.surname@bank". The handle starts with a letter.
-    private val UPI_ID = Regex("^[A-Za-z0-9._-]{2,256}@[A-Za-z][A-Za-z0-9]{1,63}$")
-
-    // UPI apps cut long notes; keep the merchant readable.
-    private const val MAX_NOTE = 50
-
-    fun isValidUpiId(id: String): Boolean = UPI_ID.matches(id.trim())
-
-    /** `upi://pay` link for [amount] INR to [upiId]; [payeeName] and [note] are optional and encoded. */
-    fun payUri(upiId: String, payeeName: String?, amount: BigDecimal, note: String?): String = buildString {
-        append("upi://pay?pa=").append(upiId.trim())
-        payeeName?.trim()?.takeIf { it.isNotEmpty() }?.let { append("&pn=").append(encode(it)) }
-        append("&am=").append(amount.setScale(2, RoundingMode.HALF_UP).toPlainString())
-        append("&cu=INR")
-        note?.trim()?.takeIf { it.isNotEmpty() }?.let { append("&tn=").append(encode(it.take(MAX_NOTE))) }
-    }
-
-    // Percent-encoding with %20 for spaces: some UPI apps show a literal "+".
-    private fun encode(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
-}

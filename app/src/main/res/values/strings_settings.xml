@@ -56,9 +56,6 @@
     <string name="settings_budget_cycle_dialog_body">Pick the day each monthly budget cycle starts. e.g. 25 means the cycle runs from the 25th through the 24th of the next month.</string>
 
     <!-- Contacts -->
-    <string name="settings_contacts_section">Contacts</string>
-    <string name="settings_contacts_vpa_title">Replace UPI VPAs with contact names</string>
-    <string name="settings_contacts_vpa_subtitle">Show \'John Doe\' instead of \'9876543210@paytm\'. Needs contacts permission.</string>
 
     <!-- Security -->
     <string name="settings_security_section">Security</string>

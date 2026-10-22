@@ -65,7 +65,6 @@
     <string name="import_statement_result_total_parsed">Total analysé à partir de PDF</string>
     <string name="import_statement_result_duplicates">Doublons ignorés : %1$d</string>
     <string name="import_statement_result_exact">Réimportations exactes</string>
-    <string name="import_statement_result_by_reference">Par référence UPI</string>
     <string name="import_statement_result_by_amount_date">Par montant &amp; date</string>
     <string name="import_statement_import_another">Importer un autre</string>
     <string name="import_statement_done">Fait</string>

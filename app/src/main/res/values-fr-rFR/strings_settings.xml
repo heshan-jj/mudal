@@ -49,9 +49,6 @@
     <string name="settings_budget_cycle_subtitle">Change le début de chaque période budgétaire mensuelle; par exemple 25 signifie que votre cycle se déroule 25e → 24e</string>
     <string name="settings_budget_cycle_dialog_body">Choisissez le jour où commence chaque cycle budgétaire mensuel. Par exemple, 25 signifie que le cycle se déroule du 25 au 24 du mois suivant.</string>
     <!-- Contacts -->
-    <string name="settings_contacts_section">Contacts</string>
-    <string name="settings_contacts_vpa_title">Remplacer les VPN UPI par des noms de contacts</string>
-    <string name="settings_contacts_vpa_subtitle">Afficher \'John Doe\' au lieu de \'9876543210@paytm\'. Nécessite la permission des contacts.</string>
     <!-- Security -->
     <string name="settings_security_section">Sécurité</string>
     <string name="settings_app_lock_title">Verrouillage de l\'application</string>

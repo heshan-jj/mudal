@@ -50,9 +50,6 @@
     <string name="settings_budget_cycle_subtitle">Shrne začátek každého měsíčního rozpočtového období; např. 25 znamená, že váš cyklus běží 25. → 24.</string>
     <string name="settings_budget_cycle_dialog_body">Vyberte den zahájení každého měsíčního rozpočtového cyklu, např. 25 znamená, že cyklus probíhá od 25. do 24. dne následujícího měsíce.</string>
     <!-- Contacts -->
-    <string name="settings_contacts_section">Kontakty</string>
-    <string name="settings_contacts_vpa_title">Nahradit VPA UPI pomocí jmen kontaktů</string>
-    <string name="settings_contacts_vpa_subtitle">Zobrazit \"John Doe\" místo \"9876543210@paytm\". Potřebuje oprávnění ke kontaktům.</string>
     <!-- Security -->
     <string name="settings_security_section">Zabezpečení</string>
     <string name="settings_app_lock_title">Zámek aplikací</string>

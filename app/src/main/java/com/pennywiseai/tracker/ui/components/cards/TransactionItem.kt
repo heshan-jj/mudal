@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextOverflow
 import android.view.HapticFeedbackConstants
-import com.pennywiseai.tracker.data.contacts.LocalMerchantDisplay
+import com.pennywiseai.tracker.data.merchant.LocalMerchantDisplay
 import com.pennywiseai.tracker.data.database.entity.ProfileEntity
 import com.pennywiseai.tracker.data.database.entity.TransactionEntity
 import com.pennywiseai.tracker.data.database.entity.TransactionType

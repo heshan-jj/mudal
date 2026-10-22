@@ -31,15 +31,24 @@ for none.
 | 6 | Budget rollover + alerts | optional, post-v1.0 |
 | 7 | Offline build variant | optional, post-v1.0 |
 | 8 | Release (F-Droid + GitHub Releases) | **v2.24.1 published** — https://github.com/heshan-jj/mudal/releases/tag/v2.24.1 |
-| 9 | Remove the UPI / contacts feature | **planned** — see [`REMOVE_UPI_PLAN.md`](REMOVE_UPI_PLAN.md) |
+| 9 | Remove the UPI / contacts feature | **done** — no `READ_CONTACTS`, no UPI. See [`REMOVE_UPI_PLAN.md`](REMOVE_UPI_PLAN.md) |
 
-**Next phase: Phase 9 — remove the UPI / contacts feature.** The plan, the
-inventory and the verification gates are in
-[`docs/REMOVE_UPI_PLAN.md`](REMOVE_UPI_PLAN.md). It is small, self-contained and
-unblocks the next release: the app should not be asking for `READ_CONTACTS`.
+**Next phase: none queued.** The v1.0 scope (Phases 1–4) is complete except for
+Phase 2's outstanding items (the plaintext→encrypted upgrade path, the
+in-memory fallback, close-before-delete) and Phase 4 (recurring transactions &
+subscriptions, SMS-aware). Phase 8 has published v2.24.1.
 
-Phase 2 is still open (the outstanding items are listed in its section), but
-none of them block a release.
+Phase 9 was a scope-reduction change: the app no longer asks for
+`READ_CONTACTS` and has no UPI code left. It was planned in
+[`docs/REMOVE_UPI_PLAN.md`](docs/REMOVE_UPI_PLAN.md) and is done.
+
+**Open follow-ups** (not phases, decisions to make):
+- The five statement PDF parsers (GPay, ICICI, Paytm, PhonePe, Slice) are all
+  Indian formats and are dead weight for a Sri Lankan user.
+- The AI model still downloads from upstream's R2 bucket — actually resolved:
+  the on-device model was removed on 2026-10-22 and the optional assistant now
+  uses the user's own Gemini API key.
+- The F-Droid listing images are still upstream's screenshots.
 
 ---
 
