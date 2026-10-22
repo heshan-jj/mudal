@@ -118,7 +118,7 @@ class ThemeViewModel @Inject constructor(
 
 data class ThemeUiState(
     val isLoading: Boolean = true,
-    val isDarkTheme: Boolean? = null, // null = follow system
+    val isDarkTheme: Boolean? = true, // null = follow system
     val isDynamicColorEnabled: Boolean = false,
     val themeStyle: ThemeStyle = ThemeStyle.DYNAMIC,
     val accentColor: AccentColor = AccentColor.SURFACE,
@@ -128,7 +128,7 @@ data class ThemeUiState(
     val blurEffectsEnabled: Boolean = true,
     val navBarStyle: NavBarStyle = NavBarStyle.NORMAL,
     val hiddenNavTabs: Set<String> = emptySet(),
-    val coverStyle: CoverStyle = CoverStyle.AURORA,
+    val coverStyle: CoverStyle = CoverStyle.MUDAL,
     val hasCompletedOnboarding: Boolean = false,
     val userName: String = "User",
     val profileImageUri: String? = null,

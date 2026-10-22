@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-22 - see NOTICE.
 package com.pennywiseai.tracker.ui.components
 
 import androidx.compose.foundation.background
@@ -55,6 +56,12 @@ fun getCoverGradientColors(
 
     return when (style) {
         CoverStyle.NONE -> emptyList()
+        // The logo's gradient stops (website/src/components/Logo.astro).
+        CoverStyle.MUDAL -> listOf(
+            Color(0xFF93C4B5).copy(alpha = alpha),
+            Color(0xFF4A8E7B).copy(alpha = alpha),
+            Color(0xFF1E5147).copy(alpha = alpha)
+        )
         CoverStyle.AURORA -> listOf(
             Color(0xFF7B2FBE).copy(alpha = alpha),
             Color(0xFF2DD4BF).copy(alpha = alpha),

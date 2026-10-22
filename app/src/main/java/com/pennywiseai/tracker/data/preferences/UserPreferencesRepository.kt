@@ -94,6 +94,9 @@ open class UserPreferencesRepository(
     private object PreferencesKeys {
         val GEMINI_API_KEY = stringPreferencesKey("gemini_api_key")
         val DARK_THEME_ENABLED = booleanPreferencesKey("dark_theme_enabled")
+        // Set when the user explicitly picks "System"; without it a missing
+        // DARK_THEME_ENABLED means the dark default.
+        val THEME_FOLLOWS_SYSTEM = booleanPreferencesKey("theme_follows_system")
         val DYNAMIC_COLOR_ENABLED = booleanPreferencesKey("dynamic_color_enabled")
         val THEME_STYLE = stringPreferencesKey("theme_style")
         val ACCENT_COLOR = stringPreferencesKey("accent_color")
@@ -227,7 +230,8 @@ open class UserPreferencesRepository(
     val userPreferences: Flow<UserPreferences> = context.dataStore.data
         .map { preferences ->
             UserPreferences(
-                isDarkThemeEnabled = preferences[PreferencesKeys.DARK_THEME_ENABLED],
+                isDarkThemeEnabled = preferences[PreferencesKeys.DARK_THEME_ENABLED]
+                    ?: if (preferences[PreferencesKeys.THEME_FOLLOWS_SYSTEM] == true) null else true,
                 isDynamicColorEnabled = preferences[PreferencesKeys.DYNAMIC_COLOR_ENABLED] ?: false,
                 themeStyle = preferences[PreferencesKeys.THEME_STYLE]?.let {
                     try { ThemeStyle.valueOf(it) } catch (_: Exception) { ThemeStyle.DYNAMIC }
@@ -254,8 +258,8 @@ open class UserPreferencesRepository(
                 } ?: NavBarStyle.FLOATING,
                 hiddenNavTabs = preferences[PreferencesKeys.HIDDEN_NAV_TABS] ?: emptySet(),
                 coverStyle = preferences[PreferencesKeys.COVER_STYLE]?.let {
-                    try { CoverStyle.valueOf(it) } catch (_: Exception) { CoverStyle.AURORA }
-                } ?: CoverStyle.AURORA,
+                    try { CoverStyle.valueOf(it) } catch (_: Exception) { CoverStyle.MUDAL }
+                } ?: CoverStyle.MUDAL,
                 userName = preferences[PreferencesKeys.USER_NAME] ?: "User",
                 profileImageUri = preferences[PreferencesKeys.PROFILE_IMAGE_URI]
                     ?: if (preferences[PreferencesKeys.HAS_COMPLETED_ONBOARDING] == true) "avatar://0" else null,
@@ -313,8 +317,10 @@ open class UserPreferencesRepository(
         context.dataStore.edit { preferences ->
             if (enabled == null) {
                 preferences.remove(PreferencesKeys.DARK_THEME_ENABLED)
+                preferences[PreferencesKeys.THEME_FOLLOWS_SYSTEM] = true
             } else {
                 preferences[PreferencesKeys.DARK_THEME_ENABLED] = enabled
+                preferences.remove(PreferencesKeys.THEME_FOLLOWS_SYSTEM)
             }
         }
     }
@@ -1110,7 +1116,7 @@ data class UserPreferences(
     val blurEffectsEnabled: Boolean = true,
     val navBarStyle: NavBarStyle = NavBarStyle.FLOATING,
     val hiddenNavTabs: Set<String> = emptySet(),
-    val coverStyle: CoverStyle = CoverStyle.AURORA,
+    val coverStyle: CoverStyle = CoverStyle.MUDAL,
     val userName: String = "User",
     val profileImageUri: String? = null,
     val profileBackgroundColor: Int = 0,

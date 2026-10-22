@@ -250,16 +250,6 @@ fun AppearanceScreen(
                     }
                 }
 
-                // Navigation Style Section
-                SectionHeaderV2(
-                    title = stringResource(R.string.appearance_navigation_section),
-                    modifier = Modifier.padding(start = Dimensions.Padding.content)
-                )
-                NavBarStyleSelector(
-                    currentStyle = themeUiState.navBarStyle,
-                    onStyleSelected = { themeViewModel.updateNavBarStyle(it) }
-                )
-
                 // Bottom bar tabs (#912). Home always stays, so it isn't listed.
                 SectionHeaderV2(
                     title = stringResource(R.string.appearance_bottom_bar_section),
@@ -299,16 +289,6 @@ fun AppearanceScreen(
                     currentStyle = themeUiState.coverStyle,
                     isDark = themeUiState.isDarkTheme ?: isSystemInDarkTheme(),
                     onStyleSelected = { themeViewModel.updateCoverStyle(it) }
-                )
-
-                // Font Selection Section
-                SectionHeaderV2(
-                    title = stringResource(R.string.appearance_fonts_section),
-                    modifier = Modifier.padding(start = Dimensions.Padding.content)
-                )
-                FontSelector(
-                    currentFont = themeUiState.appFont,
-                    onFontSelected = { themeViewModel.updateAppFont(it) }
                 )
 
                 Spacer(modifier = Modifier.height(Spacing.xl))

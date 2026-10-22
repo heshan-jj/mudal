@@ -678,7 +678,6 @@ fun MainScreen(
                 PennyWiseBottomNavigation(
                     navController = navController,
                     currentDestination = navBackStackEntry?.destination,
-                    navBarStyle = themeState.navBarStyle,
                     hiddenTabs = hiddenTabs,
                     blurEffects = themeState.blurEffectsEnabled,
                     hazeState = hazeState,

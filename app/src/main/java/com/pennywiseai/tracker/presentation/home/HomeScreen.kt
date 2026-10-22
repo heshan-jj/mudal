@@ -137,7 +137,7 @@ private val STACKED_AVATAR_RING = Spacing.xxs
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     navController: NavController,
-    coverStyle: CoverStyle = CoverStyle.AURORA,
+    coverStyle: CoverStyle = CoverStyle.MUDAL,
     blurEffects: Boolean = false,
     onNavigateToSettings: () -> Unit = {},
     onNavigateToTransactions: () -> Unit = {},
