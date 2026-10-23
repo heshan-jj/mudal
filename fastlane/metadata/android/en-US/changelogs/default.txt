@@ -1,10 +1,9 @@
-Version 2.24.2
+Version 2.24.3
 
 New Features:
-• Restyled home-screen widget previews
-• Enhanced README and branding assets for Mudal
-• Updated default cover style to Mudal greens
-• Removed the UPI / contacts feature
+• update font usage and privacy policy
+• shorten the homepage
+• detect repeating charges as subscriptions
+• recognize Sri Lankan merchants and keep the Home tab reliable
+• update feature graphics and icons for improved visual consistency
 
-Bug Fixes:
-• Corrected bank logo URLs on GitHub Pages
