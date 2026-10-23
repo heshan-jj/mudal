@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-23 - see NOTICE.
 package com.pennywiseai.tracker.presentation.navigation
 
 import com.pennywiseai.tracker.R
@@ -8,6 +9,8 @@ import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 
 sealed class BottomNavItem(
     val route: String,
@@ -57,5 +60,23 @@ sealed class BottomNavItem(
          */
         fun fallbackFor(route: String, hiddenRoutes: Set<String>): String? =
             Home.route.takeIf { route != Home.route && route in hiddenRoutes }
+    }
+}
+
+/**
+ * Home is the nav graph start destination. `navigate("home")` with
+ * `launchSingleTop` and `restoreState` is a no-op on some taps, so pop back
+ * to the start entry instead.
+ */
+fun NavHostController.goHome() {
+    val start = graph.findStartDestination()
+    val here = currentDestination?.route?.substringBefore('?')
+    val startRoute = start.route?.substringBefore('?')
+    if (here != null && here == startRoute) return
+    if (!popBackStack(start.id, inclusive = false)) {
+        navigate(startRoute ?: BottomNavItem.Home.route) {
+            popUpTo(start.id) { inclusive = false }
+            launchSingleTop = true
+        }
     }
 }

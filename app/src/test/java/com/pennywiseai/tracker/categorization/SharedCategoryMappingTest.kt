@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-23 - see NOTICE.
 package com.pennywiseai.tracker.categorization
 
 import com.pennywiseai.shared.domain.mapping.SharedCategoryMapping
@@ -104,5 +105,50 @@ class SharedCategoryMappingTest {
     @Test
     fun `an unknown merchant still falls back to Others`() {
         assertCategory("Others", "QWERTYUIOP PRIVATE LIMITED")
+    }
+
+    // --- Sri Lankan merchants, including the messy POS text banks send ---
+
+    @Test
+    fun `sri lankan shops from real sms land in the right category`() {
+        assertCategory("Bills & Utilities", "Dialog Axiata PLC")
+        assertCategory("Bills & Utilities", "Dialog")
+        assertCategory("Bills & Utilities", "HUTCHISON TELECOM LANKA COLOMBO 04")
+        assertCategory("Bills & Utilities", "CEB")
+        assertCategory("Bills & Utilities", "LAUGFS GAS")
+        assertCategory("Food & Dining", "KFC-KURUNEGALA")
+        assertCategory("Food & Dining", "PERERA - SONS BAKERS")
+        assertCategory("Food & Dining", "PERERA & SONS BAKERS PVT HOMAGAMA")
+        assertCategory("Food & Dining", "Ransiri Bake And House")
+        assertCategory("Food & Dining", "SERENTY INN HOMAGAMA")
+        assertCategory("Food & Dining", "TERRA LOUNGE CAFE & RESKURUNEGALA")
+        assertCategory("Groceries", "keels")
+        assertCategory("Groceries", "Finagle Minimart _ NSBM")
+        assertCategory("Groceries", "FINAGLE_MINIMART")
+        assertCategory("Groceries", "CARGILLS FOOD CITY")
+        assertCategory("Groceries", "LAUGFS SUPER")
+        assertCategory("Transportation", "PickMe")
+        assertCategory("Transportation", "CEYPETCO")
+        assertCategory("Transportation", "Uber")
+        assertCategory("Food & Dining", "Uber Eats")
+        assertCategory("Shopping", "MINTPAY")
+        assertCategory("Shopping", "Microsoft*Store")
+        assertCategory("Shopping", "Softlogic")
+        assertCategory("Entertainment", "Google Spotify Music")
+        assertCategory("Entertainment", "Google One")
+        assertCategory("Insurance", "Softlogic Life")
+        assertCategory("Education", "NSBM")
+        assertCategory("Banking", "NSB")
+        assertCategory("Personal Care", "Spa Ceylon")
+    }
+
+    @Test
+    fun `separator normalisation does not drop existing matches`() {
+        assertCategory("Groceries", "7-11")
+        assertCategory("Groceries", "ZOOM-SITE")
+        assertCategory("Bank Charges", "non-maintenance fee")
+        assertCategory("Travel", "Holiday Inn")
+        assertCategory("Travel", "Residence Inn")
+        assertCategory("Food & Dining", "IIT CANTEEN")
     }
 }

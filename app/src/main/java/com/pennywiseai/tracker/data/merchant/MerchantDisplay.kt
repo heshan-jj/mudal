@@ -6,8 +6,9 @@ import androidx.compose.runtime.compositionLocalOf
 /**
  * How a merchant label is rendered everywhere in the app.
  *
- * The rule is one rule: a **user-defined alias** (#583) wins, otherwise the
- * bank's own text is shown exactly as it arrived.
+ * The rule is one rule: a **user-defined alias** (#583) wins, otherwise a
+ * known shop is shown under its brand name, and everything else keeps the
+ * bank's text with the trailing city or terminal code removed.
  *
  * The previous version of this rule also resolved a UPI VPA
  * (`9876543210@paytm`) to a contact name from the address book. That is gone
@@ -20,7 +21,7 @@ fun displayMerchantName(
 ): String? {
     if (merchant.isNullOrBlank()) return merchant
     aliases[merchant]?.let { if (it.isNotBlank()) return it }
-    return merchant
+    return cleanMerchantName(merchant)
 }
 
 /**

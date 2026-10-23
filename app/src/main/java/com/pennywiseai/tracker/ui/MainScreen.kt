@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-23 - see NOTICE.
 package com.pennywiseai.tracker.ui
 
 import com.pennywiseai.tracker.R
@@ -34,6 +35,7 @@ import com.pennywiseai.tracker.data.merchant.LocalMerchantDisplay
 import com.pennywiseai.tracker.data.merchant.displayMerchantName
 import com.pennywiseai.tracker.navigation.safePopBackStack
 import com.pennywiseai.tracker.presentation.navigation.BottomNavItem
+import com.pennywiseai.tracker.presentation.navigation.goHome
 import com.pennywiseai.tracker.presentation.accounts.AddAccountScreen
 import com.pennywiseai.tracker.presentation.accounts.ManageAccountsScreen
 import com.pennywiseai.tracker.presentation.accounts.ManageAccountsViewModel
@@ -95,13 +97,7 @@ fun MainScreen(
 
     // Back from non-Home tab goes to Home instead of popping (prevents overlap)
     BackHandler(enabled = !isHomeScreen) {
-        navController.navigate("home") {
-            popUpTo(navController.graph.startDestinationId) {
-                saveState = true
-            }
-            launchSingleTop = true
-            restoreState = true
-        }
+        navController.goHome()
     }
 
     // Hiding the tab you're on (or the one under Settings) sends you Home, once,
@@ -120,11 +116,8 @@ fun MainScreen(
     LaunchedEffect(fallBackPending, baseRoute) {
         if (!fallBackPending || BottomNavItem.all.none { it.route == baseRoute }) return@LaunchedEffect
         fallBackPending = false
-        BottomNavItem.fallbackFor(baseRoute, hiddenTabs)?.let { home ->
-            navController.navigate(home) {
-                popUpTo(navController.graph.startDestinationId)
-                launchSingleTop = true
-            }
+        if (BottomNavItem.fallbackFor(baseRoute, hiddenTabs) != null) {
+            navController.goHome()
         }
     }
 
@@ -380,13 +373,7 @@ fun MainScreen(
                             onNavigateBack = {
                                 if (navController.currentBackStackEntry?.lifecycle?.currentState == androidx.lifecycle.Lifecycle.State.RESUMED) {
                                     if (!navController.popBackStack()) {
-                                        navController.navigate("home") {
-                                            popUpTo(navController.graph.startDestinationId) {
-                                                saveState = true
-                                            }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
+                                        navController.goHome()
                                     }
                                 }
                             },
@@ -453,13 +440,7 @@ fun MainScreen(
                                 }
                             },
                             onNavigateToHome = {
-                                navController.navigate("home") {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
+                                navController.goHome()
                             }
                         )
                     }

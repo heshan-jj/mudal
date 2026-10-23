@@ -1,6 +1,28 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-23 - see NOTICE.
 package com.pennywiseai.shared.domain.mapping
 
 object SharedCategoryMapping {
+
+    // Cities banks glue onto the merchant ("RESKURUNEGALA", "CHomagama").
+    private val GLUED_PLACE = Regex(
+        "(?<=[a-z])(kurunegala|homagama|colombo|pitipana|baddegama|nuwaraeliya|" +
+            "maharagama|negombo|kandy|galle|matara|jaffna|gampaha|kelaniya|" +
+            "kaduwela|nugegoda|dehiwala|moratuwa|ratnapura|anuradhapura|" +
+            "batticaloa|trincomalee|kalutara|panadura|wattala|kiribathgoda|" +
+            "malabe|rajagiriya|chilaw|puttalam|horana|beruwala|hikkaduwa)(?![a-z])"
+    )
+
+    /**
+     * Bank POS text uses `_`, `*`, `/` and `-` as spaces, and `_` is a word
+     * character so a keyword boundary would miss `MINIMART_NSBM`.
+     */
+    private fun normalize(raw: String): String {
+        val separated = raw.lowercase()
+            .replace(Regex("[_*/&]+"), " ")
+            .replace(Regex("-+"), " ")
+        val splitPlaces = GLUED_PLACE.replace(separated) { " ${it.value}" }
+        return splitPlaces.replace(Regex("\\s+"), " ").trim()
+    }
 
     // --- helpers ---
     private fun matches(
@@ -8,15 +30,18 @@ object SharedCategoryMapping {
         anyOf: Set<String>,
         noneOf: Set<String> = emptySet()
     ): Boolean {
-        val m = merchantRaw.lowercase()
-        if (noneOf.any { m.contains(it) }) return false
+        val m = normalize(merchantRaw)
+        if (noneOf.any { m.contains(normalize(it)) }) return false
 
         return anyOf.any { keyword ->
-            if (!keyword.contains(" ")) {
-                val regex = "\\b${keyword.replace(".", "\\.")}\\b".toRegex()
-                regex.containsMatchIn(m)
+            val key = normalize(keyword)
+            if (key.isEmpty()) return@any false
+            // "\b" only sits on a letter or digit. "transfer:" ends on a colon,
+            // so a boundary there never matches "Transfer: 002".
+            if (key.all { it.isLetterOrDigit() }) {
+                Regex("\\b${Regex.escape(key)}\\b").containsMatchIn(m)
             } else {
-                m.contains(keyword)
+                m.contains(key)
             }
         }
     }
@@ -507,7 +532,6 @@ object SharedCategoryMapping {
         "empire tower",
         "the empire tower",
         "aliexpress",
-        "arpico",
         "nolimit",
         "lady j"
     )
@@ -541,7 +565,6 @@ object SharedCategoryMapping {
         "tamdeed projects",
         "smart dubai government",
         "paysolut",
-        "ceypetco",
         "mobitel",
         "slt",
         "dialog axiata"
@@ -843,6 +866,185 @@ object SharedCategoryMapping {
         "magnoliasservicedrbangkok"
     )
 
+    // Sri Lankan merchants. Checked with the category they belong to, so a
+    // longer phrase in an earlier category still beats a shorter one later
+    // ("laugfs super" is groceries, "laugfs gas" is a bill, "softlogic life"
+    // is insurance).
+    private val FOOD_LK = setOf(
+        "perera & sons",
+        "perera and sons",
+        "the fab",
+        "fab",
+        "barista",
+        "java lounge",
+        "sen-saal",
+        "sensaal",
+        "sponge",
+        "dinemore",
+        "popeyes",
+        "mcdonald's",
+        "domino's",
+        "breadtalk",
+        "bread talk",
+        "manhattan fish",
+        "kottu",
+        "rice & curry",
+        "bake house",
+        "bake and house",
+        "uber eats",
+        "serenty",
+        "serenity",
+        "lounge"
+    )
+
+    private val FOOD_EXCLUDE = setOf(
+        "food city",
+        "holiday inn",
+        "residence inn"
+    )
+
+    private val GROCERY_LK = setOf(
+        "keels",
+        "jaykay",
+        "cargills",
+        "food city",
+        "arpico",
+        "richard pieris",
+        "laugfs super",
+        "laugfs",
+        "lanka sathosa",
+        "sathosa",
+        "finagle",
+        "minimart"
+    )
+
+    private val GROCERY_EXCLUDE = setOf("laugfs gas")
+
+    private val TRANSPORT_LK = setOf(
+        "ceypetco",
+        "ceylon petroleum",
+        "lanka ioc",
+        "sinopec",
+        "kangaroo cabs",
+        "kangaroo",
+        "filling station",
+        "fuel station",
+        "service station"
+    )
+
+    private val SHOPPING_LK = setOf(
+        "daraz",
+        "kapruka",
+        "odel",
+        "no limit",
+        "cool planet",
+        "fashion bug",
+        "softlogic",
+        "abans",
+        "singer mega",
+        "singer",
+        "damro",
+        "singhagiri",
+        "takas",
+        "wasi",
+        "simplytek",
+        "idealz",
+        "barefoot",
+        "laksala",
+        "dsi",
+        "bata",
+        "sarasavi",
+        "vijitha yapa",
+        "mydeal",
+        "mintpay",
+        "paykoko",
+        "koko",
+        "payhere",
+        "webxpay",
+        "microsoft"
+    )
+
+    private val SHOPPING_LK_EXCLUDE = setOf("softlogic life")
+
+    private val UTILITIES_LK = setOf(
+        "dialog",
+        "hutch",
+        "hutchison",
+        "telecom",
+        "lanka bell",
+        "sri lanka telecom",
+        "peotv",
+        "peo tv",
+        "dialog tv",
+        "dialog broadband",
+        "airtel",
+        "ceb",
+        "ceylon electricity",
+        "leco",
+        "lanka electricity",
+        "nwsdb",
+        "national water",
+        "water board",
+        "litro",
+        "laugfs gas"
+    )
+
+    private val ENTERTAINMENT_LK = setOf(
+        "google one",
+        "mytickets"
+    )
+
+    private val HEALTHCARE_LK = setOf(
+        "healthguard",
+        "osu sala",
+        "osusala",
+        "asiri",
+        "nawaloka",
+        "durdans",
+        "hemas",
+        "ninewells",
+        "doc990",
+        "echannelling",
+        "vision care"
+    )
+
+    private val BANKING_LK = setOf(
+        "sampath",
+        "combank",
+        "hnb",
+        "hatton national",
+        "boc",
+        "seylan",
+        "nations trust",
+        "ndb",
+        "dfcc",
+        "nsb",
+        "pan asia",
+        "frimi",
+        "genie",
+        "ez cash",
+        "ezcash"
+    )
+
+    private val EDUCATION_LK = setOf(
+        "sliit",
+        "nsbm",
+        "nibm",
+        "iit",
+        "esoft",
+        "apiit",
+        "icbt",
+        "british council"
+    )
+
+    private val INSURANCE_LK = setOf(
+        "ceylinco",
+        "softlogic life",
+        "fairfirst",
+        "janashakthi",
+        "sri lanka insurance"
+    )
+
     // --- single ordered rule list (priority preserved) ---
     private data class Rule(
         val categoryName: String,
@@ -854,20 +1056,20 @@ object SharedCategoryMapping {
         Rule("Tax", TAX),
         Rule("Bank Charges", BANK_CHARGE),
         Rule("Credit Card Payment", CC_PAYMENT),
-        Rule("Food & Dining", FOOD),
-        Rule("Groceries", GROCERY),
-        Rule("Transportation", TRANSPORT),
-        Rule("Shopping", SHOPPING + SHOPPING_EXTENDED, SHOPPING_EXCLUDE),
-        Rule("Bills & Utilities", UTILITIES),
-        Rule("Entertainment", ENTERTAINMENT),
-        Rule("Healthcare", HEALTHCARE),
+        Rule("Food & Dining", FOOD + FOOD_LK, FOOD_EXCLUDE),
+        Rule("Groceries", GROCERY + GROCERY_LK, GROCERY_EXCLUDE),
+        Rule("Transportation", TRANSPORT + TRANSPORT_LK),
+        Rule("Shopping", SHOPPING + SHOPPING_EXTENDED + SHOPPING_LK, SHOPPING_EXCLUDE + SHOPPING_LK_EXCLUDE),
+        Rule("Bills & Utilities", UTILITIES + UTILITIES_LK),
+        Rule("Entertainment", ENTERTAINMENT + ENTERTAINMENT_LK),
+        Rule("Healthcare", HEALTHCARE + HEALTHCARE_LK),
         Rule("Investments", INVESTMENT),
-        Rule("Banking", BANKING),
+        Rule("Banking", BANKING + BANKING_LK),
         Rule("Personal Care", PERSONAL_CARE),
-        Rule("Education", EDUCATION),
+        Rule("Education", EDUCATION + EDUCATION_LK),
         Rule("Mobile", MOBILE),
         Rule("Fitness", FITNESS),
-        Rule("Insurance", INSURANCE),
+        Rule("Insurance", INSURANCE + INSURANCE_LK),
         Rule("Travel", TRAVEL),
     )
 

@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-23 - see NOTICE.
 package com.pennywiseai.tracker.ui.effects
 
 import android.graphics.Bitmap
@@ -66,12 +67,21 @@ fun BlurredAnimatedVisibility(
         ) {
             Box(
                 modifier = Modifier.graphicsLayer {
-                    renderEffect = BlurEffect(
-                        radiusX = blurRadius,
-                        radiusY = blurRadius,
-                        edgeTreatment = TileMode.Decal
-                    )
-                    alpha = 0.95f + (0.05f * (1f - blurRadius / 5f))
+                    // Keep the layer so the nav bar's unbounded blur stays inside
+                    // the bar. A blur effect left on after the animation settles
+                    // darkens the whole screen and drops taps, so clear it then.
+                    clip = true
+                    if (blurRadius > 0f) {
+                        renderEffect = BlurEffect(
+                            radiusX = blurRadius,
+                            radiusY = blurRadius,
+                            edgeTreatment = TileMode.Decal
+                        )
+                        alpha = 0.95f + (0.05f * (1f - blurRadius / 5f))
+                    } else {
+                        renderEffect = null
+                        alpha = 1f
+                    }
                 }
             ) {
                 content()

@@ -1,6 +1,8 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-23 - see NOTICE.
 package com.pennywiseai.tracker.data.mapper
 
 import com.pennywiseai.parser.core.ParsedTransaction
+import com.pennywiseai.tracker.data.merchant.cleanMerchantName
 import com.pennywiseai.tracker.core.Constants
 import com.pennywiseai.tracker.data.database.entity.TransactionEntity
 import com.pennywiseai.tracker.data.database.entity.TransactionType
@@ -18,8 +20,8 @@ fun ParsedTransaction.toEntity(): TransactionEntity {
         ZoneId.systemDefault()
     )
 
-    // Normalize merchant name to proper case
-    val normalizedMerchant = merchant?.let { normalizeMerchantName(it) }
+    // Brand name when we know the shop. Category still uses the raw SMS text.
+    val normalizedMerchant = merchant?.let { cleanMerchantName(it) }
 
     // Map TransactionType from parser-core to database entity
     val entityType = when (type) {
@@ -99,24 +101,6 @@ internal fun ParsedTransaction.forDeferredBalance(saved: TransactionEntity): Par
     // confirmed aliases first; a move anywhere else must not overwrite its target.
     if (bankName != saved.bankName || (accountLast4 != null && accountLast4 != saved.accountNumber)) return null
     return this
-}
-
-/**
- * Normalizes merchant name to consistent format.
- * Converts all-caps to proper case, preserves already mixed case.
- */
-private fun normalizeMerchantName(name: String): String {
-    val trimmed = name.trim()
-
-    // If it's all uppercase, convert to proper case
-    return if (trimmed == trimmed.uppercase()) {
-        trimmed.lowercase().split(" ").joinToString(" ") { word ->
-            if (word.isEmpty()) word else word.substring(0, 1).uppercase() + word.substring(1)
-        }
-    } else {
-        // Already has mixed case, keep as is
-        trimmed
-    }
 }
 
 /**

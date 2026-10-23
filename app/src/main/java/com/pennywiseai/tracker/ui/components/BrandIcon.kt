@@ -1,3 +1,4 @@
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-23 - see NOTICE.
 package com.pennywiseai.tracker.ui.components
 
 import androidx.compose.foundation.Image
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -54,6 +56,11 @@ fun BrandIcon(
             ?: MaterialTheme.colorScheme.surfaceVariant
     }
     
+    // A fixed 8dp inset left a gap inside the circle, so a round logo floated
+    // and a square one never met the edge. Brand art fills the circle. A
+    // category glyph stays inset so the stroke does not touch the rim.
+    val glyphInset = if (showBackground) size * 0.22f else 0.dp
+
     Box(
         modifier = modifier
             .size(size)
@@ -62,7 +69,6 @@ fun BrandIcon(
                     Modifier
                         .clip(CircleShape)
                         .background(backgroundColor)
-                        .padding(8.dp)
                 } else {
                     Modifier
                 }
@@ -71,20 +77,21 @@ fun BrandIcon(
     ) {
         when (iconResource) {
             is IconResource.DrawableResource -> {
-                // Brand logo from drawable
                 Image(
                     painter = painterResource(id = iconResource.resId),
                     contentDescription = merchantName,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
             }
             is IconResource.VectorIcon -> {
-                // Category icon fallback
                 Icon(
                     imageVector = iconResource.icon,
                     contentDescription = merchantName,
                     tint = if (showBackground) Color.White else iconResource.tint,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(glyphInset)
                 )
             }
             is IconResource.Emoji -> EmojiGlyph(iconResource.emoji, size * 0.5f)

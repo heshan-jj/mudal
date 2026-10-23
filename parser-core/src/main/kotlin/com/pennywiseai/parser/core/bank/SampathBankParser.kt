@@ -1,4 +1,4 @@
-// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-23 - see NOTICE.
 package com.pennywiseai.parser.core.bank
 
 import com.pennywiseai.parser.core.ParsedTransaction
@@ -104,8 +104,11 @@ class SampathBankParser : BankParser() {
         val posPattern = Regex("""\bvia\s+POS\s+at\s+(.+?)(?:\n|$)""", RegexOption.IGNORE_CASE)
         posPattern.find(message)?.let { match ->
             var merchant = match.groupValues[1].trim()
-            // Strip trailing branch/terminal codes: e.g. "( MA 51001413", "KU 80401564", "76131020"
-            merchant = merchant.replace(Regex("""\s*(?:\(\s*)?[A-Z]{2}\s+\d{6,}\s*$"""), "")
+            // Strip a separate terminal code ("KU 80401564", "( MA 51001413"),
+            // then a bare terminal id. The code has to be its own token so
+            // "LANKA 76131020" does not lose the "KA".
+            merchant = merchant.replace(Regex("""(?:^|\s)\(\s*[A-Z]{2}\s+\d{6,}\s*$"""), "")
+            merchant = merchant.replace(Regex("""(?:^|\s)[A-Z]{2}\s+\d{6,}\s*$"""), "")
             merchant = merchant.replace(Regex("""\s+\d{6,}\s*$"""), "").trim()
             if (merchant.isNotEmpty()) return merchant
         }

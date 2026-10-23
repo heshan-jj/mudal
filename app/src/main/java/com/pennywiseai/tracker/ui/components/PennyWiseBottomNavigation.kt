@@ -23,6 +23,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import com.pennywiseai.tracker.presentation.navigation.BottomNavItem
+import com.pennywiseai.tracker.presentation.navigation.goHome
 import com.pennywiseai.tracker.ui.effects.BlurredAnimatedVisibility
 import dev.chrisbanes.haze.HazeDefaults
 import dev.chrisbanes.haze.HazeEffectScope
@@ -72,7 +73,10 @@ fun PennyWiseBottomNavigation(
                     } == true
                     NavigationBarItem(
                         selected = selected,
-                        onClick = {
+                    onClick = {
+                        if (item == BottomNavItem.Home) {
+                            navController.goHome()
+                        } else {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     saveState = true
@@ -80,7 +84,8 @@ fun PennyWiseBottomNavigation(
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        },
+                        }
+                    },
                         icon = { Icon(imageVector = item.icon, contentDescription = null) },
                         label = { Text(stringResource(item.titleRes)) }
                     )
