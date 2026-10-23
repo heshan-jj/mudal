@@ -179,8 +179,11 @@ fun PennyWiseTheme(
         }
     }
 
-    // Google Sans is the only font; appFont is kept for stored-preference compatibility.
-    val fontFamily = GoogleSansFontFamily
+    val fontFamily = when (appFont) {
+        AppFont.GOOGLE_SANS -> GoogleSansFontFamily
+        AppFont.SN_PRO -> SNProFontFamily
+        AppFont.SYSTEM -> FontFamily.Default
+    }
 
     CompositionLocalProvider(LocalBlurEffects provides blurEffects) {
         MaterialExpressiveTheme(

@@ -2,22 +2,34 @@
 package com.pennywiseai.tracker.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.pennywiseai.tracker.R
 
+// SIL OFL 1.1 variable font (google/fonts ofl/googlesans). wght runs 400–700.
+@OptIn(ExperimentalTextApi::class)
+private fun googleSans(weight: FontWeight, italic: Boolean = false) = Font(
+    resId = if (italic) R.font.google_sans_italic else R.font.google_sans,
+    weight = weight,
+    style = if (italic) FontStyle.Italic else FontStyle.Normal,
+    variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)),
+)
+
 val GoogleSansFontFamily = FontFamily(
-    Font(R.font.google_sans_regular, FontWeight.Normal),
-    Font(R.font.google_sans_italic, FontWeight.Normal, FontStyle.Italic),
-    Font(R.font.google_sans_medium, FontWeight.Medium),
-    Font(R.font.google_sans_medium_italic, FontWeight.Medium, FontStyle.Italic),
-    Font(R.font.google_sans_bold, FontWeight.SemiBold),
-    Font(R.font.google_sans_bold, FontWeight.Bold),
-    Font(R.font.google_sans_bold_italic, FontWeight.Bold, FontStyle.Italic),
+    googleSans(FontWeight.Normal),
+    googleSans(FontWeight.Normal, italic = true),
+    googleSans(FontWeight.Medium),
+    googleSans(FontWeight.Medium, italic = true),
+    googleSans(FontWeight.SemiBold),
+    googleSans(FontWeight.SemiBold, italic = true),
+    googleSans(FontWeight.Bold),
+    googleSans(FontWeight.Bold, italic = true),
 )
 
 val SNProFontFamily = FontFamily(

@@ -52,7 +52,7 @@ derivative work to state what was changed. Mudal never merges upstream
 - `app/src/androidTest/java/com/pennywiseai/tracker/data/database/` — `SqlCipherEncryptionTest.kt`
 - `app/src/main/java/com/pennywiseai/tracker/data/database/` — `DatabaseKeyManager.kt`, `KeyStoreHelper.kt`
 - `app/src/main/java/com/pennywiseai/tracker/ui/screens/database/` — `DatabaseErrorScreen.kt`
-- `app/src/main/res/font/` — `google_sans_bold.ttf`, `google_sans_bold_italic.ttf`, `google_sans_italic.ttf`, `google_sans_medium.ttf`, `google_sans_medium_italic.ttf`, `google_sans_regular.ttf`
+- `app/src/main/res/font/` — `google_sans.ttf`, `google_sans_italic.ttf`. On 2026-10-23 the proprietary Google Sans binaries were replaced with a subset of the SIL OFL 1.1 variable font. The licence is `app/src/main/assets/licenses/google-sans/OFL.txt`.
 - `app/src/test/java/com/pennywiseai/tracker/data/database/` — `DatabaseKeyManagerTest.kt`
 - `app/src/test/java/com/pennywiseai/tracker/utils/` — `SmsReportUrlBuilderTest.kt`
 - `docs/` — `FORK_NOTES.md`, `FORK_PLAN.md`, `PRIVACY.md`

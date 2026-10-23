@@ -53,7 +53,7 @@ No ads, no subscription and no Pro tier. Unlimited rules, CSV export, PDF statem
 
 ### Look and feel
 
-Mudal uses a single green palette taken from its logo, with a cream light theme and a dark theme (the default). Text is set in Google Sans, the bottom bar is the standard Material 3 navigation bar with optional blur, and the home screen has a soft gradient in the logo's greens. The app opens on an animated version of the logo.
+Mudal uses a single green palette taken from its logo, with a cream light theme and a dark theme (the default). Text is set in Google Sans, under the SIL Open Font License 1.1. The bottom bar is the standard Material 3 navigation bar with optional blur, and the home screen has a soft gradient in the logo's greens. The app opens on an animated version of the logo.
 
 ---
 

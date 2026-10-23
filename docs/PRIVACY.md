@@ -45,4 +45,4 @@ Mudal only makes network calls for user-requested, explicit functionality:
 
 ## Local Data Storage
 
-All data (accounts, transactions, categories, budgets, and encrypted backups) is stored locally in SQLite / Room on the device.
+Accounts, transactions, categories, budgets and backups stay on the device. The Room database is encrypted with SQLCipher. The passphrase is a random 256-bit key wrapped by the Android Keystore; uninstalling the app deletes that key with the database.

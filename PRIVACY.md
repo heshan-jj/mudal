@@ -1,119 +1,56 @@
 <!-- Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE. -->
 # Privacy Policy
 
-**Last Updated: August 2026**
+**Last Updated: 23 October 2026**
 
-## Our Commitment to Privacy
+Mudal is a private expense tracker. Parsing, categorisation, budgets and storage run on your phone. There is no account, no analytics and no server that receives your transactions.
 
-Mudal is built with privacy as the core principle. We believe your financial data should remain yours alone.
+## What stays on the device
 
-## On-Device Processing
+- Transaction fields taken from bank SMS (amount, merchant, date, category), plus notes, categories, rules, budgets and goals
+- App settings, including an optional Gemini API key if you choose to enter one
+- The transaction database, encrypted with SQLCipher. The passphrase is a random key wrapped by the Android Keystore and never leaves the phone
 
-**Transaction processing runs locally on your device.** Parsing, categorisation, budgets and storage never leave the phone. The only data that ever leaves your device goes through the explicit outbound requests listed under Internet Permission below (the optional AI assistant is the one feature that sends transaction context to a server — and only if you turn it on with your own API key):
-
-- ✅ **Local by default** - Parsing, categorisation and budgets run on your device; your transaction database never uploads anywhere. The optional AI assistant is off unless you give it your own API key.
-- ✅ **No data collection** - No analytics, telemetry, or accounts; the one exception is the parse-report flow (see Internet Permission)
-- ✅ **No tracking** - No analytics, no telemetry, no user tracking
-- ✅ **No ads** - No advertising networks or tracking pixels
-- ✅ **Offline core** - Everything except the optional AI assistant works with no internet connection at all
-
-## Data Storage
-
-### What We Store (Locally Only)
-- Transaction details extracted from SMS (amount, merchant, date, category)
-- Your custom categories and notes
-- App preferences and settings
-
-### Where It's Stored
-- All data is stored in a local SQLite database on your device
-- Database is protected by Android's app sandboxing
-- Data is only accessible to Mudal app
-
-### Data Deletion
-- Uninstalling the app completely removes all data
-- You can delete individual transactions at any time
-- Export your data before uninstalling if you want to keep records
+Uninstalling the app deletes the database and the Keystore key. Export a backup first if you want to keep the data. You can also delete individual transactions inside the app.
 
 ## Permissions
 
-### SMS Permissions (Read-Only)
-- **`READ_SMS` / `RECEIVE_SMS`**: to read bank transaction SMS as they arrive
-- **Scope**: Read-only access, we cannot send or modify messages
-- **Processing**: SMS parsing happens entirely on-device
-- **Storage**: Only extracted transaction fields are stored, not full messages
+- **`READ_SMS` / `RECEIVE_SMS`** — read bank transaction messages. Read-only: the app cannot send or edit SMS. Only the extracted transaction fields are stored, not a copy of your inbox.
+- **`POST_NOTIFICATIONS`** — budget alerts and subscription reminders.
+- **`USE_BIOMETRIC`** — optional app lock.
+- **`INTERNET`** — only for the requests listed below.
 
-### Notifications (`POST_NOTIFICATIONS`)
-- Subscription due-date reminders and budget alerts
+Mudal does not request contacts, location, camera or microphone access.
 
-### Biometrics (`USE_BIOMETRIC`)
-- Optional app lock via fingerprint or face unlock
+## What can leave the device
 
-### Internet Permission
-- **AI assistant**: Optional. Uses the Google Gemini API (`https://generativelanguage.googleapis.com/`) with your own API key, stored locally in the app's private storage. Off until you configure a key.
-- **Exchange Rates**: Multi-currency features fetch current rates from open.er-api.com; only the currency code is sent
-- **Parse Reports**: The "report a parsing problem" action opens pennywise.zynth.dev with the SMS text and sender ID pre-filled. The link also carries an encrypted device identifier — your Android device ID plus a timestamp, RSA-encrypted on-device before it leaves. Opening the page sends these details to the server right away to generate a parsed preview; submitting the report itself remains a separate user action
-- **App Updates**: Google Play Store variant uses Play Services for app updates (F-Droid variant does not)
-- **Without the AI assistant**: everything works offline, no internet required
+Nothing is sent unless you use one of these. With none of them turned on, the app makes no network requests of its own.
 
-No location, camera, or microphone permission is requested.
+1. **AI assistant (optional).** If you save your own Gemini API key and start a chat, Mudal sends the message and the spending context needed to answer it (merchant names, amounts, categories and dates) to `https://generativelanguage.googleapis.com/`. The key stays in the app's private storage. There is no Mudal-hosted key and no model download. Without a key, the assistant stays off.
+2. **Exchange rates.** When multi-currency conversion is on, the app requests `https://open.er-api.com/v6/latest/{currency}`. Only the currency code is sent. Rates are cached on the device.
+3. **Webhooks (optional).** If you configure one, transaction JSON is posted to the HTTPS address you entered. Off unless you set it up.
+4. **Parser reports.** "Report a parsing problem" opens a GitHub issue draft on `https://github.com/heshan-jj/mudal` in your browser. Account numbers, amounts and VPAs are masked on the device first. Nothing is submitted until you post the issue yourself.
 
-## Third-Party Services
+## What Mudal does not use
 
-Mudal does **NOT** use:
-- ❌ Cloud storage, backup, or sync of your transaction data
-- ❌ Analytics services (Google Analytics, Firebase, etc.)
-- ❌ Crash reporting services
-- ❌ Advertising networks
-- ❌ Social media SDKs
-- ❌ Payment processors
+- Analytics, crash reporting or other telemetry
+- Advertising
+- Cloud sync of your transactions
+- Google Play Services, in-app billing or a payments SDK
 
-**Note**: The Google Play Store variant includes Play Services for app updates only. The F-Droid variant has no Google services.
+## Source
 
-## AI Features
+Mudal is AGPL-3.0-only. The code is at [github.com/heshan-jj/mudal](https://github.com/heshan-jj/mudal). The network list above is the same one kept in [`docs/PRIVACY.md`](docs/PRIVACY.md).
 
-### On-Device AI Assistant
-- Uses the Google Gemini API with your own API key; Mudal runs no model locally and downloads nothing
-- Model runs entirely on your device; inference needs no network
-- After initial download, no internet connection required
-- Chat history is saved locally in the app's database so conversations survive restarts; it's never transmitted
-- AI insights are generated locally from your local transaction data
-- Model file stored in app's private storage
+## Children
 
-## Data Export
+Mudal is not directed at children under 13, and it does not knowingly collect information from them.
 
-When you export your data:
-- CSV/PDF files are created locally on your device
-- You control where to share or save them
-- No automatic uploads or backups
+## Changes
 
-## Open Source Transparency
-
-Mudal is fully open source:
-- Review our code at [GitHub](https://github.com/heshan-jj/mudal)
-- Verify our privacy claims yourself
-- Contribute to make it even better
-
-## Children's Privacy
-
-Mudal is not directed at children under 13. We do not knowingly collect information from children.
-
-## Changes to Privacy Policy
-
-Any changes to this privacy policy will be:
-- Updated in the app repository
-- Reflected in the "Last Updated" date
-- Communicated through release notes
+Updates to this policy are committed to the repository and reflected in the date above.
 
 ## Contact
 
-For privacy concerns or questions:
-- Open an issue on [GitHub](https://github.com/heshan-jj/mudal/issues)
-- Email the maintainer: `jayakodyheshan@gmail.com`
-
-## Summary
-
-**Your financial data lives on your phone.** Transactions, balances, budgets, and chat history all sit in a local database inside the app sandbox, and uninstalling removes everything. Mudal has no analytics or cloud-sync backend; the outbound requests listed under Internet Permission are the complete list.
-
----
-
-*Mudal - Privacy-first expense tracking with on-device AI*
+- [GitHub issues](https://github.com/heshan-jj/mudal/issues)
+- `jayakodyheshan@gmail.com`

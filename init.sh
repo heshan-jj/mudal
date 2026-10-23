@@ -80,12 +80,12 @@ run() {
 }
 
 verify_parser() {
-  run ./gradlew :parser-core:test
+  run ./gradlew :parser-core:jvmTest
 }
 
 verify_app() {
-  run ./gradlew :app:compileStandardDebugKotlin
-  run ./gradlew :app:testStandardDebugUnitTest
+  run ./gradlew :app:compileDebugKotlin
+  run ./gradlew :app:testDebugUnitTest
 }
 
 case "$TARGET" in

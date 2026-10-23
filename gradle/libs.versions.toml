@@ -1,8 +1,6 @@
 # Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 [versions]
 agp = "9.2.1"
-appUpdate = "2.1.0"
-appUpdateKtx = "2.1.0"
 biometric = "1.1.0"
 colorpickerCompose = "1.1.4"
 coreSplashscreen = "1.2.0"
@@ -32,17 +30,13 @@ mockk = "1.14.9"
 navVersion = "2.9.6"
 opencsv = "5.12.0"
 pdfboxAndroid = "2.0.27.0"
-review = "2.0.2"
-reviewKtx = "2.0.2"
 roomVersion = "2.8.4"
-visionInternalVkp = "18.2.3"
 workVersion = "2.11.2"
 coil = "2.7.0"
 zxing = "3.5.3"
 material3 = "1.5.0-alpha12"
 haze = "1.7.1"
 composeCharts = "0.2.5"
-billingKtx = "9.0.0"
 sqlcipher = "4.19.1"
 
 [libraries]
@@ -70,8 +64,6 @@ androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "
 androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version = "2.6.1" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workVersion" }
 androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "workVersion" }
-app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
-app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateKtx" }
 colorpicker-compose = { module = "com.github.skydoves:colorpicker-compose", version.ref = "colorpickerCompose" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
@@ -100,13 +92,9 @@ ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktorVer
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 opencsv = { module = "com.opencsv:opencsv", version.ref = "opencsv" }
 pdfbox-android = { module = "com.tom-roush:pdfbox-android", version.ref = "pdfboxAndroid" }
-review = { module = "com.google.android.play:review", version.ref = "review" }
-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "reviewKtx" }
-vision-internal-vkp = { group = "com.google.mlkit", name = "vision-internal-vkp", version.ref = "visionInternalVkp" }
 
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 compose-charts = { module = "io.github.ehsannarmani:compose-charts", version.ref = "composeCharts" }
-billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billingKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
