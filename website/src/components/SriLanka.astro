@@ -13,11 +13,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
         Most expense trackers are built for somewhere else. Mudal is written against real SMS from Sri Lankan banks,
         with rupees as the default.
       </p>
-      <ul class="checks">
-        <li><strong>LKR by default</strong> — amounts shown as <code>Rs. 1,234.50</code>, with USD and EUR when you need them.</li>
-        <li><strong>Understands local formats</strong> — <code>LKR</code>, <code>Rs.</code>, CEFT transfers, POS, ATM and card authorisations.</li>
-        <li><strong>Real samples only</strong> — parsers are built and tested from masked messages people actually received. Formats are never guessed.</li>
-      </ul>
     </div>
 
     <div class="banks-card" data-reveal style="--i:1">
@@ -54,44 +49,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     grid-template-columns: 1.05fr 0.95fr;
     gap: clamp(2rem, 5vw, 4.5rem);
     align-items: center;
-  }
-
-  .checks {
-    list-style: none;
-    padding: 0;
-    margin: 2.25rem 0 0;
-    display: grid;
-    gap: 1.1rem;
-  }
-
-  .checks li {
-    position: relative;
-    padding-left: 2.75rem;
-    color: var(--text-muted);
-  }
-
-  .checks strong {
-    color: var(--text);
-  }
-
-  .checks li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.05rem;
-    width: 1.85rem;
-    height: 1.85rem;
-    border-radius: 10px;
-    background:
-      no-repeat center / 60%
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b3a2f' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E"),
-      var(--primary-container);
-    transition: border-radius var(--dur-m) var(--spring), transform var(--dur-m) var(--spring);
-  }
-
-  .checks li:hover::before {
-    border-radius: 50%;
-    transform: rotate(-15deg) scale(1.12);
   }
 
   .banks-card {

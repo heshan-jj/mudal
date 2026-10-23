@@ -223,7 +223,6 @@ code {
   color: var(--text-muted);
 }
 
-/* Buttons: pill at rest, squarer when pressed (M3 Expressive shape morph) */
 .btn {
   position: relative;
   isolation: isolate;
@@ -243,7 +242,6 @@ code {
   cursor: pointer;
   transition:
     transform var(--dur-m) var(--spring),
-    border-radius var(--dur-m) var(--spring),
     box-shadow var(--dur-m) var(--emphasized),
     background-color var(--dur-s) ease;
 }
@@ -260,7 +258,6 @@ code {
 
 .btn:hover {
   transform: translateY(-2px);
-  border-radius: var(--r-lg);
   box-shadow: var(--shadow-2);
 }
 
@@ -270,7 +267,6 @@ code {
 
 .btn:active {
   transform: scale(0.95);
-  border-radius: var(--r-md);
   transition-duration: 120ms;
 }
 

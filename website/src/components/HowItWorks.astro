@@ -1,37 +1,8 @@
----
-import Shape from "./Shape.astro";
-
-const steps = [
-  {
-    n: "1",
-    title: "Your bank sends an SMS",
-    body: "Like it always does, for every card payment, transfer and ATM withdrawal.",
-    tone: "peach",
-    shape: "flower",
-  },
-  {
-    n: "2",
-    title: "Mudal reads it on your phone",
-    body: "A parser built for your bank pulls out the amount, merchant, account and balance. Nothing is sent anywhere.",
-    tone: "sun",
-    shape: "burst",
-  },
-  {
-    n: "3",
-    title: "It lands in your budget",
-    body: "Categorised, matched to the right account and counted against your budgets and goals.",
-    tone: "mint",
-    shape: "cookie",
-  },
-] as const;
----
-
 <section class="section" id="how-it-works" aria-labelledby="how-title">
   <div class="container">
     <div class="section-head center" data-reveal>
       <p class="eyebrow">How it works</p>
       <h2 id="how-title">From SMS to spending, in under a second</h2>
-      <p class="lead">No bank login, no screen scraping, no manual entry. Just the messages you already get.</p>
     </div>
 
     <div class="demo" aria-hidden="true" data-reveal>
@@ -55,21 +26,6 @@ const steps = [
         <span class="amt">+Rs. 5,000</span>
       </div>
     </div>
-
-    <ol class="steps">
-      {
-        steps.map((s, i) => (
-          <li class={`step tone-${s.tone}`} data-reveal style={`--i:${i}`}>
-            <span class="num">
-              <Shape kind={s.shape} size={64} />
-              <b>{s.n}</b>
-            </span>
-            <h3>{s.title}</h3>
-            <p>{s.body}</p>
-          </li>
-        ))
-      }
-    </ol>
   </div>
 </section>
 
@@ -80,7 +36,7 @@ const steps = [
     gap: 1rem;
     align-items: center;
     max-width: 960px;
-    margin: 0 auto 4rem;
+    margin: 0 auto;
   }
 
   .sms {
@@ -192,76 +148,6 @@ const steps = [
     white-space: nowrap;
   }
 
-  .steps {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
-  }
-
-  .step {
-    padding: 2rem;
-    border-radius: var(--r-xl);
-    transition:
-      border-radius var(--dur-l) var(--spring),
-      transform var(--dur-l) var(--spring),
-      box-shadow var(--dur-m) var(--emphasized);
-  }
-
-  .step:hover {
-    border-radius: 56px 20px 56px 20px;
-    transform: translateY(-6px) rotate(-0.6deg);
-    box-shadow: var(--shadow-2);
-  }
-
-  .step p {
-    margin: 0;
-    opacity: 0.85;
-  }
-
-  .tone-peach {
-    background: var(--tertiary-container);
-    color: var(--on-tertiary-container);
-  }
-
-  .tone-sun {
-    background: var(--sun-container);
-    color: var(--on-sun-container);
-  }
-
-  .tone-mint {
-    background: var(--primary-container);
-    color: var(--on-primary-container);
-  }
-
-  .num {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 64px;
-    height: 64px;
-    margin-bottom: 1.25rem;
-  }
-
-  .num :global(svg) {
-    position: absolute;
-    inset: 0;
-    color: currentColor;
-    transition: rotate 900ms var(--spring);
-  }
-
-  .step:hover .num :global(svg) {
-    rotate: 120deg;
-  }
-
-  .num b {
-    position: relative;
-    font-size: 1.4rem;
-    color: var(--surface);
-  }
-
   @media (max-width: 860px) {
     .demo {
       grid-template-columns: 1fr;
@@ -271,10 +157,6 @@ const steps = [
       width: 90px;
       transform: rotate(90deg);
       margin: 1.5rem 0;
-    }
-
-    .steps {
-      grid-template-columns: 1fr;
     }
   }
 </style>

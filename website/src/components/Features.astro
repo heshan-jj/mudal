@@ -1,34 +1,21 @@
 ---
 import Icon from "./Icon.astro";
-import Shape from "./Shape.astro";
 import { features } from "../data/site";
 
 const tones = ["mint", "peach", "sun", "sage"];
-
-/** First two and last two cards span two columns, so 12 cards fill a 4-column grid exactly. */
-const wideShapes: Record<number, "cookie" | "clover" | "flower" | "burst"> = {
-  0: "cookie",
-  1: "clover",
-  [features.length - 2]: "flower",
-  [features.length - 1]: "burst",
-};
 ---
 
 <section class="section features" id="features" aria-labelledby="features-title">
   <div class="container">
     <div class="section-head" data-reveal>
       <p class="eyebrow">Features</p>
-      <h2 id="features-title">Everything you need to keep track of money</h2>
-      <p class="lead">
-        The complete toolkit, with nothing locked away. No Pro tier, no limits on rules, budgets, goals or exports.
-      </p>
+      <h2 id="features-title">What Mudal keeps track of</h2>
     </div>
 
     <ul class="grid">
       {
         features.map((f, i) => (
-          <li class:list={["feature", `tone-${tones[i % tones.length]}`, { wide: wideShapes[i] }]} data-reveal style={`--i:${i % 4}`}>
-            {wideShapes[i] && <Shape kind={wideShapes[i]} size={220} class="deco" />}
+          <li class:list={["feature", `tone-${tones[i % tones.length]}`]} data-reveal style={`--i:${i % 3}`}>
             <span class="icon-badge">
               <Icon name={f.icon} />
             </span>
@@ -53,13 +40,14 @@ const wideShapes: Record<number, "cookie" | "clover" | "flower" | "burst"> = {
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 1rem;
   }
 
   .feature {
     --tone-bg: var(--primary-container);
     --tone-fg: var(--on-primary-container);
+    grid-column: span 2;
     position: relative;
     overflow: hidden;
     isolation: isolate;
@@ -75,21 +63,12 @@ const wideShapes: Record<number, "cookie" | "clover" | "flower" | "burst"> = {
       box-shadow var(--dur-m) var(--emphasized);
   }
 
-  .feature.wide {
-    grid-column: span 2;
-    padding: 2.25rem;
-    background: var(--tone-bg);
-    color: var(--tone-fg);
+  .feature:nth-child(4) {
+    grid-column: 2 / span 2;
   }
 
-  .feature.wide h3 {
-    font-size: 1.6rem;
-    margin-top: 3rem;
-  }
-
-  .feature.wide p {
-    max-width: 26rem;
-    font-size: 1.05rem;
+  .feature:nth-child(5) {
+    grid-column: 4 / span 2;
   }
 
   .tone-peach {
@@ -107,21 +86,6 @@ const wideShapes: Record<number, "cookie" | "clover" | "flower" | "burst"> = {
     --tone-fg: var(--on-secondary-container);
   }
 
-  .feature :global(.deco) {
-    position: absolute;
-    right: -50px;
-    bottom: -60px;
-    z-index: -1;
-    color: var(--surface);
-    opacity: 0.45;
-    transition: rotate 1.2s var(--spring), scale 1.2s var(--spring);
-  }
-
-  .feature:hover :global(.deco) {
-    rotate: 90deg;
-    scale: 1.15;
-  }
-
   .feature:hover {
     background: var(--tone-bg);
     color: var(--tone-fg);
@@ -135,13 +99,9 @@ const wideShapes: Record<number, "cookie" | "clover" | "flower" | "burst"> = {
     color: var(--tone-fg);
   }
 
-  .feature.wide .icon-badge,
   .feature:hover .icon-badge {
     background: var(--surface);
     color: var(--tone-fg);
-  }
-
-  .feature:hover .icon-badge {
     border-radius: 50%;
     transform: rotate(-12deg) scale(1.1);
   }
@@ -157,9 +117,21 @@ const wideShapes: Record<number, "cookie" | "clover" | "flower" | "burst"> = {
     opacity: 0.82;
   }
 
-  @media (max-width: 1000px) {
+  @media (max-width: 760px) {
     .grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .feature,
+    .feature:nth-child(4),
+    .feature:nth-child(5) {
+      grid-column: auto;
+    }
+
+    .feature:last-child {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: calc(50% - 0.5rem);
     }
   }
 
@@ -168,8 +140,8 @@ const wideShapes: Record<number, "cookie" | "clover" | "flower" | "burst"> = {
       grid-template-columns: 1fr;
     }
 
-    .feature.wide {
-      grid-column: auto;
+    .feature:last-child {
+      width: auto;
     }
   }
 </style>

@@ -3,8 +3,6 @@ import Icon from "./Icon.astro";
 import Shape from "./Shape.astro";
 import PhoneMockup from "./PhoneMockup.astro";
 import { RELEASES_URL, REPO_URL } from "../data/site";
-
-const pills = ["100% on-device", "Encrypted database", "No ads, no paywall", "Android 8.0+"];
 ---
 
 <section class="hero" id="top">
@@ -36,16 +34,6 @@ const pills = ["100% on-device", "Encrypted database", "No ads, no paywall", "An
           View the source
         </a>
       </div>
-
-      <ul class="pills" aria-label="At a glance">
-        {
-          pills.map((p, i) => (
-            <li data-reveal style={`--i:${i + 4}`}>
-              {p}
-            </li>
-          ))
-        }
-      </ul>
     </div>
 
     <div class="visual" data-reveal style="--i:2">
@@ -155,51 +143,7 @@ const pills = ["100% on-device", "Encrypted database", "No ads, no paywall", "An
     display: flex;
     flex-wrap: wrap;
     gap: 0.8rem;
-    margin: 2.25rem 0 2rem;
-  }
-
-  .pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .pills li {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.92rem;
-    font-weight: 500;
-    color: var(--on-secondary-container);
-    padding: 0.45rem 0.95rem 0.45rem 0.6rem;
-    border-radius: var(--r-sm);
-    background: var(--secondary-container);
-    transition:
-      border-radius var(--dur-m) var(--spring),
-      transform var(--dur-m) var(--spring),
-      background-color var(--dur-s) ease;
-  }
-
-  .pills li::before {
-    content: "✓";
-    display: grid;
-    place-items: center;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 700;
-  }
-
-  .pills li:hover {
-    border-radius: var(--r-full);
-    transform: translateY(-2px);
-    background: var(--primary-container);
+    margin-top: 2.25rem;
   }
 
   .visual {

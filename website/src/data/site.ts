@@ -10,10 +10,9 @@ export const PRIVACY_EFFECTIVE_DATE = "22 October 2026";
 
 export const nav = [
   { href: "#features", label: "Features" },
-  { href: "#privacy", label: "Privacy" },
+  { href: "#sri-lanka", label: "Banks" },
   { href: "#download", label: "Download" },
   { href: "#faq", label: "FAQ" },
-  { href: "#about", label: "About" },
 ];
 
 /** Stroke icons, 24×24 viewBox, drawn for this site. */
@@ -45,7 +44,7 @@ export const features: { icon: IconName; title: string; body: string }[] = [
   {
     icon: "sms",
     title: "Automatic from bank SMS",
-    body: "Card payments, ATM withdrawals and transfers become transactions the moment the SMS arrives. No typing, no bank login.",
+    body: "Card payments, ATM withdrawals and transfers become transactions the moment the SMS arrives.",
   },
   {
     icon: "bank",
@@ -58,16 +57,6 @@ export const features: { icon: IconName; title: string; body: string }[] = [
     body: "Weekly, monthly or one-off budgets over the categories you choose, with progress that updates as you spend.",
   },
   {
-    icon: "piggyBank",
-    title: "Savings goals",
-    body: "Put money aside for the insurance bill or the Ella trip. See what you have saved and whether you are on pace.",
-  },
-  {
-    icon: "repeat",
-    title: "Subscriptions & recurring",
-    body: "Track Netflix, Dialog and the electricity bill, and schedule the things your bank never texts you about.",
-  },
-  {
     icon: "chart",
     title: "Clear analytics",
     body: "Category breakdowns, trends and month-on-month comparisons, so you can see where the rupees actually go.",
@@ -75,32 +64,7 @@ export const features: { icon: IconName; title: string; body: string }[] = [
   {
     icon: "tag",
     title: "Your rules",
-    body: "Auto-categorise by merchant, amount or text. Unlimited rules, applied to new and past transactions.",
-  },
-  {
-    icon: "users",
-    title: "Loans & split bills",
-    body: "Keep track of money lent and borrowed, and split a dinner bill without a spreadsheet.",
-  },
-  {
-    icon: "widgets",
-    title: "Home-screen widgets",
-    body: "Recent transactions, a category chart and your goals, right on the home screen.",
-  },
-  {
-    icon: "fileExport",
-    title: "Backups & CSV export",
-    body: "Export everything to a file you control, schedule daily backups to a folder, or export CSV for a spreadsheet.",
-  },
-  {
-    icon: "lock",
-    title: "App lock & hidden previews",
-    body: "Lock Mudal behind your fingerprint or PIN, and hide its contents in the recent-apps switcher.",
-  },
-  {
-    icon: "sparkles",
-    title: "Optional AI assistant",
-    body: "Ask “how much did I spend on food last month?” using your own Google Gemini key. Off unless you turn it on.",
+    body: "Auto-categorise by merchant, amount or text, applied to new and past transactions.",
   },
 ];
 
@@ -122,15 +86,7 @@ export const faqs: { q: string; a: string }[] = [
   },
   {
     q: "Does any of my data leave my phone?",
-    a: "Not unless you turn on a feature that needs the internet. SMS parsing, categories, budgets and the database all stay on the device. The only network calls are the ones you opt into: exchange rates for multi-currency, the Gemini assistant with your own key, webhooks you configure, and a pre-filled GitHub issue when you report an unrecognised SMS. The privacy policy below lists each one.",
-  },
-  {
-    q: "Is it really free? What is the catch?",
-    a: "There is no catch. Mudal has no ads, no subscription, no in-app purchases and no Pro tier — every feature is unlocked. It is open source under the AGPL-3.0, so the code is public and anyone can check what it does.",
-  },
-  {
-    q: "Android won’t let me allow SMS permission. What do I do?",
-    a: "On Android 14 and newer, apps installed from outside the Play Store have SMS access restricted by default. Open Settings → Apps → Mudal, tap the ⋮ menu in the top corner and choose “Allow restricted settings”, then grant SMS permission. Mudal shows a button that takes you straight to that screen.",
+    a: "Not unless you turn on a feature that needs the internet. SMS parsing, categories, budgets and the database all stay on the device. The only network calls are the ones you opt into: exchange rates, an AI assistant with your own key, webhooks you configure, and a pre-filled GitHub issue when you report an unrecognised SMS. The privacy policy lists each one.",
   },
   {
     q: "My bank isn’t supported. Can you add it?",
@@ -139,21 +95,5 @@ export const faqs: { q: string; a: string }[] = [
   {
     q: "Will my data survive if I change phones?",
     a: "Use Settings → Data Management to export a backup file and import it on the new phone. The database itself is encrypted with a key that never leaves the old device, so a backup file is the way to move. Backup files are not encrypted, so keep them somewhere private.",
-  },
-  {
-    q: "Do I need the AI assistant?",
-    a: "No. The assistant is optional and off by default. It only works after you paste in your own free Google Gemini API key, and it only sends the chat and the spending details it needs to answer you, directly to Google.",
-  },
-  {
-    q: "Is Mudal on the Play Store?",
-    a: "Not yet. Google has strict rules for apps that read SMS, so Mudal is published on GitHub Releases for now. Each release is signed with the same key and comes with a SHA-256 checksum, so updates install over the old version and keep your data.",
-  },
-  {
-    q: "Is there an iPhone version?",
-    a: "No. iOS does not let apps read SMS, which is what Mudal is built around, so it is Android only.",
-  },
-  {
-    q: "How is Mudal related to PennyWise AI?",
-    a: "Mudal is an independent fork of the open-source PennyWise AI tracker, reworked for Sri Lanka: Sri Lankan bank parsers, LKR defaults, no paywall and an encrypted database. It is not affiliated with or endorsed by the PennyWise project.",
   },
 ];

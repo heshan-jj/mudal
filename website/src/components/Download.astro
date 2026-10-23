@@ -2,7 +2,7 @@
 import Icon from "./Icon.astro";
 import Logo from "./Logo.astro";
 import Shape from "./Shape.astro";
-import { RELEASES_URL, REPO_URL } from "../data/site";
+import { RELEASES_URL } from "../data/site";
 ---
 
 <section class="section" id="download" aria-labelledby="download-title">
@@ -12,45 +12,28 @@ import { RELEASES_URL, REPO_URL } from "../data/site";
       <div class="cta-copy">
         <p class="eyebrow">Download</p>
         <h2 id="download-title">Get Mudal</h2>
-        <p class="lead">Published on GitHub Releases as a signed APK. Works on Android 8.0 and newer.</p>
+        <p class="lead">A signed APK for Android 8.0 and newer.</p>
         <div class="actions">
           <a class="btn btn-primary big" href={RELEASES_URL}>
             <Icon name="download" />
             Download the latest APK
           </a>
-          <a class="btn btn-outline" href={`${REPO_URL}/releases`}>All releases</a>
         </div>
-        <p class="fine">
-          Every release is signed with the same key, so updates install over the old version and keep your data. Each APK
-          comes with a <code>.sha256</code> file if you want to check the download.
-        </p>
       </div>
       <div class="cta-logo" aria-hidden="true">
         <Logo size={190} id="logo-cta" />
       </div>
     </div>
 
-    <div class="install">
-      <div class="card step-card" data-reveal>
-        <h3>Installing from outside the Play Store</h3>
-        <ol>
-          <li>Download <code>Mudal-v….apk</code> on your phone and open it.</li>
-          <li>If asked, allow your browser or file manager to <strong>install unknown apps</strong>.</li>
-          <li>Open Mudal and follow the setup.</li>
-        </ol>
-      </div>
-
-      <div class="card step-card" data-reveal style="--i:1">
-        <h3>Android 14 or newer: allowing SMS access</h3>
-        <p class="muted">
-          Android blocks SMS access for sideloaded apps until you allow it. Mudal shows a button that takes you there, or:
-        </p>
-        <ol>
-          <li>Open <strong>Settings → Apps → Mudal</strong>.</li>
-          <li>Tap the <strong>⋮</strong> menu in the top corner and choose <strong>Allow restricted settings</strong>.</li>
-          <li>Go back to Mudal and grant SMS permission.</li>
-        </ol>
-      </div>
+    <div class="card step-card install" data-reveal>
+      <h3>How to install</h3>
+      <ol>
+        <li>Download the APK on your phone and open it. If asked, allow your browser to install unknown apps.</li>
+        <li>
+          On Android 14 or newer, open <strong>Settings → Apps → Mudal</strong>, tap the <strong>⋮</strong> menu and
+          choose <strong>Allow restricted settings</strong>, then grant SMS permission.
+        </li>
+      </ol>
     </div>
   </div>
 </section>
@@ -114,22 +97,6 @@ import { RELEASES_URL, REPO_URL } from "../data/site";
     font-size: 1.12rem;
   }
 
-  .btn-outline {
-    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--on-primary-container) 40%, transparent);
-    color: var(--on-primary-container);
-  }
-
-  .fine {
-    max-width: 34rem;
-    margin: 0;
-    font-size: 0.95rem;
-    opacity: 0.8;
-  }
-
-  .fine code {
-    background: rgba(255, 255, 255, 0.6);
-  }
-
   .cta-logo {
     display: grid;
     place-items: center;
@@ -153,9 +120,6 @@ import { RELEASES_URL, REPO_URL } from "../data/site";
   }
 
   .install {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
     margin-top: 1rem;
   }
 
@@ -206,10 +170,6 @@ import { RELEASES_URL, REPO_URL } from "../data/site";
     border-radius: 10px;
   }
 
-  .step-card p {
-    margin: 0.5rem 0 0;
-  }
-
   @media (max-width: 860px) {
     .cta {
       grid-template-columns: 1fr;
@@ -217,10 +177,6 @@ import { RELEASES_URL, REPO_URL } from "../data/site";
 
     .cta-logo {
       display: none;
-    }
-
-    .install {
-      grid-template-columns: 1fr;
     }
   }
 </style>
