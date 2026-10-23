@@ -220,6 +220,9 @@ open class UserPreferencesRepository(
         // the daily folder backup defaults OFF (photos make every copy large).
         val EXPORT_INCLUDE_RECEIPTS = booleanPreferencesKey("export_include_receipts")
         val FOLDER_BACKUP_INCLUDE_RECEIPTS = booleanPreferencesKey("folder_backup_include_receipts")
+
+        // Merchants the user rejected on the subscriptions screen ("not a subscription").
+        val DISMISSED_SUBSCRIPTION_SUGGESTIONS = stringSetPreferencesKey("dismissed_subscription_suggestions")
     }
 
     private companion object {
@@ -1095,6 +1098,16 @@ open class UserPreferencesRepository(
 
     suspend fun setFolderBackupIncludeReceipts(include: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.FOLDER_BACKUP_INCLUDE_RECEIPTS] = include }
+    }
+
+    val dismissedSubscriptionSuggestions: Flow<Set<String>> = context.dataStore.data
+        .map { it[PreferencesKeys.DISMISSED_SUBSCRIPTION_SUGGESTIONS] ?: emptySet() }
+
+    suspend fun dismissSubscriptionSuggestion(key: String) {
+        context.dataStore.edit { prefs ->
+            val current = prefs[PreferencesKeys.DISMISSED_SUBSCRIPTION_SUGGESTIONS] ?: emptySet()
+            prefs[PreferencesKeys.DISMISSED_SUBSCRIPTION_SUGGESTIONS] = current + key
+        }
     }
 }
 

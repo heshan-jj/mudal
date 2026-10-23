@@ -379,7 +379,7 @@ fun MainScreen(
                             },
                             onAddSubscriptionClick = {
                                 rootNavController?.navigate(
-                                    com.pennywiseai.tracker.navigation.AddTransaction()
+                                    com.pennywiseai.tracker.navigation.AddTransaction(startOnSubscription = true)
                                 ) { launchSingleTop = true }
                             }
                         )

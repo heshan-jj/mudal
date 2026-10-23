@@ -42,6 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.pennywiseai.tracker.data.database.entity.AccountBalanceEntity
 import com.pennywiseai.tracker.data.database.entity.SubscriptionEntity
 import com.pennywiseai.tracker.data.database.entity.SubscriptionState
+import com.pennywiseai.tracker.domain.service.DetectedSubscription
 import com.pennywiseai.tracker.domain.model.getAccountType
 import com.pennywiseai.tracker.domain.model.icon
 import com.pennywiseai.tracker.presentation.accounts.AccountType
@@ -212,6 +213,25 @@ fun SubscriptionsScreen(
                 }
             }
 
+            if (uiState.detected.isNotEmpty()) {
+                item(key = "detected-header") {
+                    SectionHeaderV2(
+                        title = stringResource(R.string.subscriptions_detected_section),
+                        subtitle = stringResource(R.string.subscriptions_detected_subtitle),
+                    )
+                }
+                items(
+                    items = uiState.detected,
+                    key = { "detected-${it.key}" },
+                ) { suggestion ->
+                    DetectedSubscriptionCard(
+                        suggestion = suggestion,
+                        onAdd = { viewModel.addDetected(suggestion) },
+                        onDismiss = { viewModel.dismissDetected(suggestion) },
+                    )
+                }
+            }
+
             // Active Subscriptions (staggered 50ms per item, starting at 50ms)
             if (uiState.activeSubscriptions.isNotEmpty()) {
                 item {
@@ -275,13 +295,16 @@ fun SubscriptionsScreen(
             // Cancelled section, which is contradictory.
             if (uiState.activeSubscriptions.isEmpty() &&
                 uiState.endedSubscriptions.isEmpty() &&
+                uiState.detected.isEmpty() &&
                 !uiState.isLoading
             ) {
                 item {
                     PennyWiseEmptyState(
                         icon = Icons.Default.Subscriptions,
                         headline = stringResource(R.string.subscriptions_empty_headline),
-                        description = stringResource(R.string.subscriptions_empty_description)
+                        description = stringResource(R.string.subscriptions_empty_description),
+                        actionLabel = stringResource(R.string.subscriptions_empty_action),
+                        onAction = onAddSubscriptionClick,
                     )
                 }
             }
@@ -310,6 +333,57 @@ fun SubscriptionsScreen(
                 viewModel.linkExistingTransaction(target.id, txn.id)
             },
         )
+    }
+}
+
+@Composable
+private fun DetectedSubscriptionCard(
+    suggestion: DetectedSubscription,
+    onAdd: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    PennyWiseCardV2(modifier = Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = suggestion.merchantName,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        text = pluralStringResource(
+                            R.plurals.subscriptions_detected_charges,
+                            suggestion.chargeCount,
+                            suggestion.billingCycle,
+                            suggestion.chargeCount,
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Text(
+                    text = CurrencyFormatter.formatCurrency(suggestion.amount, suggestion.currency),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.subscriptions_detected_dismiss))
+                }
+                FilledTonalButton(onClick = onAdd) {
+                    Text(stringResource(R.string.subscriptions_detected_add))
+                }
+            }
+        }
     }
 }
 

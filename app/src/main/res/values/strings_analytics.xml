@@ -242,8 +242,17 @@
     <string name="subscriptions_snackbar_hidden">%1$s hidden</string>
     <string name="subscriptions_snackbar_ended">%1$s ended</string>
     <string name="subscriptions_active_section">Active Subscriptions</string>
-    <string name="subscriptions_empty_headline">No subscriptions detected yet</string>
-    <string name="subscriptions_empty_description">Sync your SMS to detect subscriptions</string>
+    <string name="subscriptions_empty_headline">No subscriptions yet</string>
+    <string name="subscriptions_empty_description">Add a bill yourself, or wait until a charge repeats and it shows up here.</string>
+    <string name="subscriptions_empty_action">Add manually</string>
+    <string name="subscriptions_detected_section">Detected</string>
+    <string name="subscriptions_detected_subtitle">Repeating charges from your transactions</string>
+    <string name="subscriptions_detected_add">Add</string>
+    <string name="subscriptions_detected_dismiss">Dismiss</string>
+    <plurals name="subscriptions_detected_charges">
+        <item quantity="one">%1$s · %2$d charge</item>
+        <item quantity="other">%1$s · %2$d charges</item>
+    </plurals>
     <string name="subscriptions_cancelled_section">Cancelled (%1$d)</string>
     <string name="subscriptions_collapse">Collapse</string>
     <string name="subscriptions_expand">Expand</string>

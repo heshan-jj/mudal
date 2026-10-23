@@ -20,9 +20,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddScreen(
     viewModel: AddViewModel = hiltViewModel(),
+    initialPage: Int = 0,
     onNavigateBack: () -> Unit = {}
 ) {
-    val pagerState = rememberPagerState(pageCount = { 2 })
+    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
     

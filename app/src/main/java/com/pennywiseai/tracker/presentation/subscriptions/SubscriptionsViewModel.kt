@@ -8,20 +8,29 @@ import com.pennywiseai.tracker.data.currency.CurrencyConversionService
 import com.pennywiseai.tracker.data.database.entity.AccountBalanceEntity
 import com.pennywiseai.tracker.data.database.entity.SubscriptionEntity
 import com.pennywiseai.tracker.data.database.entity.SubscriptionState
+import com.pennywiseai.tracker.data.database.entity.TransactionEntity
+import com.pennywiseai.tracker.data.database.entity.TransactionType
 import com.pennywiseai.tracker.data.preferences.UserPreferencesRepository
 import com.pennywiseai.tracker.data.repository.AccountBalanceRepository
 import com.pennywiseai.tracker.data.repository.SubscriptionRepository
+import com.pennywiseai.tracker.domain.service.DetectedSubscription
+import com.pennywiseai.tracker.domain.service.SubscriptionCharge
+import com.pennywiseai.tracker.domain.service.SubscriptionDetector
+import com.pennywiseai.tracker.domain.usecase.AddSubscriptionUseCase
 import com.pennywiseai.tracker.domain.usecase.MarkSubscriptionPaidUseCase
 import com.pennywiseai.tracker.utils.Money
 import com.pennywiseai.tracker.utils.sumByCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -31,12 +40,20 @@ class SubscriptionsViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val currencyConversionService: CurrencyConversionService,
     private val markSubscriptionPaidUseCase: MarkSubscriptionPaidUseCase,
+    private val addSubscriptionUseCase: AddSubscriptionUseCase,
     private val transactionRepository: com.pennywiseai.tracker.data.repository.TransactionRepository,
     accountBalanceRepository: AccountBalanceRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SubscriptionsUiState())
     val uiState: StateFlow<SubscriptionsUiState> = _uiState.asStateFlow()
+
+    /**
+     * Detected cards whose save is in flight. A second tap arrives before Room
+     * emits the new row, so the card would still be on screen and [addDetected]
+     * would insert a duplicate. The key stays here until that row is observed.
+     */
+    private val addingDetectedKeys = mutableSetOf<String>()
 
     /** Accounts offered as the funding source in the edit dialog (#570). */
     val accounts: StateFlow<List<AccountBalanceEntity>> =
@@ -49,22 +66,41 @@ class SubscriptionsViewModel @Inject constructor(
 
     private fun loadSubscriptions() {
         viewModelScope.launch {
+            val ledger = combine(
+                subscriptionRepository.getAllSubscriptions(),
+                transactionRepository.getAllTransactions(),
+                userPreferencesRepository.dismissedSubscriptionSuggestions,
+            ) { subscriptions, transactions, dismissed ->
+                SubscriptionLedger(subscriptions, transactions, dismissed)
+            }
             combine(
-                subscriptionRepository.getActiveSubscriptions(),
-                subscriptionRepository.getEndedSubscriptions(),
+                ledger,
                 userPreferencesRepository.unifiedCurrencyMode,
                 userPreferencesRepository.displayCurrency,
                 userPreferencesRepository.baseCurrency
-            ) { subscriptions, ended, isUnified, displayCurrency, baseCurrency ->
-                arrayOf(subscriptions, ended, isUnified, displayCurrency, baseCurrency)
-            }.collect { values ->
-                @Suppress("UNCHECKED_CAST")
-                val subscriptions = values[0] as List<SubscriptionEntity>
-                @Suppress("UNCHECKED_CAST")
-                val endedSubscriptions = values[1] as List<SubscriptionEntity>
-                val isUnified = values[2] as Boolean
-                val displayCurrency = values[3] as String
-                val baseCurrency = values[4] as String
+            ) { snapshot, isUnified, displayCurrency, baseCurrency ->
+                snapshot to CurrencyPrefs(isUnified, displayCurrency, baseCurrency)
+            }.collect { (snapshot, prefs) ->
+                val subscriptions = snapshot.subscriptions.filter { it.state == SubscriptionState.ACTIVE }
+                val endedSubscriptions = snapshot.subscriptions.filter { it.state == SubscriptionState.ENDED }
+                val isUnified = prefs.isUnified
+                val displayCurrency = prefs.displayCurrency
+                val baseCurrency = prefs.baseCurrency
+                val savedKeys = snapshot.subscriptions
+                    .map { SubscriptionDetector.key(it.merchantName, it.currency) }
+                    .toSet()
+                val detected = withContext(Dispatchers.Default) {
+                    SubscriptionDetector.detect(
+                        charges = snapshot.transactions.mapNotNull { it.toSubscriptionCharge() },
+                        existingKeys = savedKeys,
+                        dismissedKeys = snapshot.dismissed,
+                        today = java.time.LocalDate.now(),
+                    )
+                }
+                // Drop keys Room has now persisted, then keep any still-saving
+                // card off the list so a transaction emission can't bring it back.
+                addingDetectedKeys.removeAll { it in savedKeys }
+                val visibleDetected = detected.filterNot { it.key in addingDetectedKeys }
                 // Unified mode collapses everything into displayCurrency, so a
                 // single figure is honest. Native mode keeps each currency apart —
                 // a ₹ + $ mix can't be one figure — so we expose a per-currency map
@@ -135,7 +171,8 @@ class SubscriptionsViewModel @Inject constructor(
                     convertedAmounts = convertedAmounts,
                     displayCurrency = if (isUnified) displayCurrency else baseCurrency,
                     isUnifiedMode = isUnified,
-                    isLoading = false
+                    isLoading = false,
+                    detected = visibleDetected,
                 )
             }
         }
@@ -210,6 +247,45 @@ class SubscriptionsViewModel @Inject constructor(
                     updatedAt = java.time.LocalDateTime.now()
                 )
             )
+        }
+    }
+
+    fun addDetected(suggestion: DetectedSubscription) {
+        // Guard and hide the card before the first suspend, so a second tap
+        // in the same frame cannot start another insert.
+        if (!addingDetectedKeys.add(suggestion.key)) return
+        _uiState.value = _uiState.value.copy(
+            detected = _uiState.value.detected.filterNot { it.key == suggestion.key }
+        )
+        viewModelScope.launch {
+            try {
+                val alreadySaved = subscriptionRepository.getAllSubscriptions().first().any { existing ->
+                    SubscriptionDetector.key(existing.merchantName, existing.currency) == suggestion.key
+                }
+                if (alreadySaved) {
+                    addingDetectedKeys.remove(suggestion.key)
+                    return@launch
+                }
+                addSubscriptionUseCase.execute(
+                    merchantName = suggestion.merchantName,
+                    amount = suggestion.amount,
+                    nextPaymentDate = suggestion.nextPaymentDate,
+                    billingCycle = suggestion.billingCycle,
+                    category = suggestion.category ?: "Others",
+                    currency = suggestion.currency,
+                    bankName = suggestion.bankName,
+                    accountLast4 = suggestion.accountLast4,
+                )
+            } catch (error: Exception) {
+                addingDetectedKeys.remove(suggestion.key)
+                throw error
+            }
+        }
+    }
+
+    fun dismissDetected(suggestion: DetectedSubscription) {
+        viewModelScope.launch {
+            userPreferencesRepository.dismissSubscriptionSuggestion(suggestion.key)
         }
     }
 
@@ -311,8 +387,38 @@ data class SubscriptionsUiState(
     val displayCurrency: String? = null,
     val isUnifiedMode: Boolean = false,
     val isLoading: Boolean = true,
+    val detected: List<DetectedSubscription> = emptyList(),
     val lastHiddenSubscription: SubscriptionEntity? = null,
     val lastEndedSubscription: SubscriptionEntity? = null,
     /** Snackbar text after a mark-as-paid action; cleared by [SubscriptionsViewModel.clearMarkPaidMessage]. */
     val markPaidMessage: UiText? = null,
 )
+
+private data class SubscriptionLedger(
+    val subscriptions: List<SubscriptionEntity>,
+    val transactions: List<TransactionEntity>,
+    val dismissed: Set<String>,
+)
+
+private data class CurrencyPrefs(
+    val isUnified: Boolean,
+    val displayCurrency: String,
+    val baseCurrency: String,
+)
+
+private fun TransactionEntity.toSubscriptionCharge(): SubscriptionCharge? {
+    if (isDeleted) return null
+    if (transactionType != TransactionType.EXPENSE && transactionType != TransactionType.CREDIT) return null
+    if (loanId != null) return null
+    if (merchantName.isBlank() || amount.signum() <= 0) return null
+    val digits = accountNumber?.filter { it.isDigit() }.orEmpty()
+    return SubscriptionCharge(
+        merchantName = merchantName,
+        amount = amount,
+        currency = currency.ifBlank { "LKR" },
+        date = dateTime.toLocalDate(),
+        category = category.takeIf { it.isNotBlank() && !it.equals("Others", ignoreCase = true) },
+        bankName = bankName,
+        accountLast4 = digits.takeLast(4).takeIf { it.length == 4 },
+    )
+}
