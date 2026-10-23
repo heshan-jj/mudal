@@ -21,6 +21,8 @@ test_results.txt
 
 # Kotlin/JVM specific
 *.class
+__pycache__/
+*.pyc
 *.log
 *.ctxt
 .mtj.tmp/
