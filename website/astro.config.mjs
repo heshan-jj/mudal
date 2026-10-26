@@ -1,11 +1,14 @@
 import { defineConfig } from "astro/config";
 
-// GitHub Pages project site: https://heshan-jj.github.io/mudal/
 export default defineConfig({
-  site: "https://heshan-jj.github.io",
-  base: "/mudal",
+  site: process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : undefined,
   trailingSlash: "ignore",
   build: {
-    inlineStylesheets: "auto",
+    inlineStylesheets: "always",
   },
 });
+
+
+
