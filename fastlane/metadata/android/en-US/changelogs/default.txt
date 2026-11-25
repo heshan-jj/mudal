@@ -1,9 +1,11 @@
-Version 2.24.3
+Version 2.25.0
 
 New Features:
-• update font usage and privacy policy
-• shorten the homepage
-• detect repeating charges as subscriptions
-• recognize Sri Lankan merchants and keep the Home tab reliable
-• update feature graphics and icons for improved visual consistency
+• add SMS-aware recurring reconciliation and own-account transfer pairing
+• add atomic plaintext-to-SQLCipher upgrade migrator
+• add FailingOpenHelperFactory and KeyAwareOpenHelperFactory
 
+Bug Fixes:
+• address code review findings for DB recovery and release scripts
+• remove in-memory fallback and restart cleanly on reset/restore
+• allow plaintext DB upgrade and clean sidecars on key reset
