@@ -1,8 +1,11 @@
 // Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
 package com.pennywiseai.tracker.data.repository
 
+import androidx.room.withTransaction
+import com.pennywiseai.tracker.data.database.PennyWiseDatabase
 import com.pennywiseai.tracker.data.database.entity.currentNameFor
 import com.pennywiseai.tracker.data.database.dao.SubscriptionDao
+import com.pennywiseai.tracker.data.database.dao.TransactionDao
 import com.pennywiseai.tracker.data.database.entity.SubscriptionEntity
 import com.pennywiseai.tracker.data.database.entity.SubscriptionState
 import com.pennywiseai.parser.core.MandateInfo
@@ -18,7 +21,9 @@ import android.util.Log
 @Singleton
 class SubscriptionRepository @Inject constructor(
     private val subscriptionDao: SubscriptionDao,
-    private val categoryDao: com.pennywiseai.tracker.data.database.dao.CategoryDao
+    private val categoryDao: com.pennywiseai.tracker.data.database.dao.CategoryDao,
+    private val transactionDao: TransactionDao,
+    private val database: PennyWiseDatabase
 ) {
     
     companion object {
@@ -30,6 +35,9 @@ class SubscriptionRepository @Inject constructor(
     
     fun getActiveSubscriptions(): Flow<List<SubscriptionEntity>> =
         subscriptionDao.getActiveSubscriptions()
+
+    suspend fun getActiveSubscriptionsList(): List<SubscriptionEntity> =
+        subscriptionDao.getActiveSubscriptionsList()
 
     fun getEndedSubscriptions(): Flow<List<SubscriptionEntity>> =
         subscriptionDao.getSubscriptionsByState(SubscriptionState.ENDED)
@@ -78,8 +86,10 @@ class SubscriptionRepository @Inject constructor(
     suspend fun reactivateSubscription(id: Long) =
         updateSubscriptionState(id, SubscriptionState.ACTIVE)
     
-    suspend fun deleteSubscription(id: Long) = 
+    suspend fun deleteSubscription(id: Long) = database.withTransaction {
+        transactionDao.clearSubscriptionLinks(id)
         subscriptionDao.deleteSubscriptionById(id)
+    }
     
         
     /**
@@ -143,6 +153,13 @@ class SubscriptionRepository @Inject constructor(
     /** See [SubscriptionDao.markPaid]. */
     suspend fun markPaid(subscriptionId: Long, paidAt: LocalDate, nextPaymentDate: LocalDate) =
         subscriptionDao.markPaid(subscriptionId, paidAt, nextPaymentDate)
+
+    suspend fun markPaidWithAmount(
+        subscriptionId: Long,
+        paidAt: LocalDate,
+        nextPaymentDate: LocalDate,
+        amount: BigDecimal
+    ) = subscriptionDao.markPaidWithAmount(subscriptionId, paidAt, nextPaymentDate, amount)
     
     
     private fun areAmountsEqual(amount1: BigDecimal, amount2: BigDecimal): Boolean {

@@ -149,21 +149,38 @@ class SubscriptionsViewModel @Inject constructor(
                 // Semantic: a sub is "paid this cycle" if today is still
                 // within one billing cycle of lastPaidAt.
                 val today = java.time.LocalDate.now()
-                val isPaidThisCycle: (com.pennywiseai.tracker.data.database.entity.SubscriptionEntity) -> Boolean = { sub ->
-                    sub.lastPaidAt?.let { lastPaid ->
+                val linkedLatestBySubId = snapshot.transactions
+                    .asSequence()
+                    .filter { !it.isDeleted && it.subscriptionId != null }
+                    .groupBy { it.subscriptionId!! }
+                    .mapValues { (_, list) -> list.maxOf { it.dateTime.toLocalDate() } }
+
+                val effectivePaidDates = subscriptions.mapNotNull { sub ->
+                    val effective = listOfNotNull(sub.lastPaidAt, linkedLatestBySubId[sub.id]).maxOrNull()
+                    effective?.let { sub.id to it }
+                }.toMap()
+
+                val isPaidThisCycle: (SubscriptionEntity) -> Boolean = { sub ->
+                    effectivePaidDates[sub.id]?.let { lastPaid ->
                         val nextLegitMark = subscriptionRepository.advance(lastPaid, sub.billingCycle)
-                        today.isBefore(nextLegitMark)
+                        val (beforeDays, _) = com.pennywiseai.tracker.domain.service.RecurringMatcher
+                            .windowOffsetsForBillingCycle(sub.billingCycle)
+                        val pastUnpaidDue = sub.nextPaymentDate != null &&
+                            sub.nextPaymentDate.isBefore(today) &&
+                            lastPaid.isBefore(sub.nextPaymentDate.minusDays(beforeDays))
+                        !today.isBefore(lastPaid) && today.isBefore(nextLegitMark) && !pastUnpaidDue
                     } ?: false
                 }
                 val (paid, unpaid) = subscriptions.partition(isPaidThisCycle)
                 val ordered = unpaid.sortedWith(
                     compareBy(nullsLast()) { it.nextPaymentDate },
-                ) + paid.sortedByDescending { it.lastPaidAt }
+                ) + paid.sortedByDescending { effectivePaidDates[it.id] }
                 val paidIds = paid.map { it.id }.toSet()
 
                 _uiState.value = _uiState.value.copy(
                     activeSubscriptions = ordered,
                     paidThisCycleIds = paidIds,
+                    effectivePaidDates = effectivePaidDates,
                     paidThisCycleCount = paid.size,
                     endedSubscriptions = endedSubscriptions,
                     totalMonthlyAmount = totalMonthlyAmount,
@@ -376,6 +393,7 @@ data class SubscriptionsUiState(
     val activeSubscriptions: List<SubscriptionEntity> = emptyList(),
     /** IDs of subs in [activeSubscriptions] whose current cycle is paid — used to drive the row badge. */
     val paidThisCycleIds: Set<Long> = emptySet(),
+    val effectivePaidDates: Map<Long, java.time.LocalDate> = emptyMap(),
     /** Count of subs in [activeSubscriptions] whose current cycle is paid. */
     val paidThisCycleCount: Int = 0,
     val endedSubscriptions: List<SubscriptionEntity> = emptyList(),

@@ -330,6 +330,25 @@ open class TransactionRepository @Inject constructor(
             !transactionDao.moveSharesToKeeper(duplicateId, keeperId)
         ) return false
         goalRepository.moveContributions(duplicateId, keeperId)
+        val dup = transactionDao.getTransactionById(duplicateId)
+        val keeper = transactionDao.getTransactionById(keeperId)
+        if (dup != null && keeper != null) {
+            val mergedSubId = keeper.subscriptionId ?: dup.subscriptionId
+            val mergedTplId = keeper.recurringTemplateId ?: dup.recurringTemplateId
+            val mergedRecurring = keeper.isRecurring || dup.isRecurring
+            if (mergedSubId != keeper.subscriptionId ||
+                mergedTplId != keeper.recurringTemplateId ||
+                mergedRecurring != keeper.isRecurring
+            ) {
+                transactionDao.updateTransaction(
+                    keeper.copy(
+                        subscriptionId = mergedSubId,
+                        recurringTemplateId = mergedTplId,
+                        isRecurring = mergedRecurring
+                    )
+                )
+            }
+        }
         deleteTransactionById(duplicateId)
         return true
     }
@@ -630,4 +649,32 @@ open class TransactionRepository @Inject constructor(
      */
     suspend fun deleteSplit(split: TransactionSplitEntity) =
         transactionSplitDao.deleteSplit(split)
+
+    suspend fun getTransactionsForSubscriptionInRange(
+        subscriptionId: Long,
+        start: LocalDateTime,
+        end: LocalDateTime
+    ): List<TransactionEntity> = transactionDao.getTransactionsForSubscriptionInRange(subscriptionId, start, end)
+
+    suspend fun getTransactionsForTemplateInRange(
+        templateId: Long,
+        start: LocalDateTime,
+        end: LocalDateTime
+    ): List<TransactionEntity> = transactionDao.getTransactionsForTemplateInRange(templateId, start, end)
+
+    fun getLinkedSubscriptionTransactions(): Flow<List<TransactionEntity>> =
+        transactionDao.getLinkedSubscriptionTransactions()
+
+    fun getLinkedTemplateTransactions(): Flow<List<TransactionEntity>> =
+        transactionDao.getLinkedTemplateTransactions()
+
+    suspend fun findSelfTransferCandidates(
+        amount: BigDecimal,
+        dateStart: LocalDateTime,
+        dateEnd: LocalDateTime,
+        excludeId: Long
+    ): List<TransactionEntity> = transactionDao.findSelfTransferCandidates(amount, dateStart, dateEnd, excludeId)
+
+    suspend fun getActiveSmsIncomeExpenseTransactions(): List<TransactionEntity> =
+        transactionDao.getActiveSmsIncomeExpenseTransactions()
 }

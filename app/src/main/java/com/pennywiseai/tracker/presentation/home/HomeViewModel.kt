@@ -15,7 +15,10 @@ import androidx.work.workDataOf
 import com.pennywiseai.tracker.data.database.entity.AccountBalanceEntity
 import com.pennywiseai.tracker.data.database.entity.BudgetImpactType
 import com.pennywiseai.tracker.data.database.entity.ProfileEntity
+import com.pennywiseai.tracker.data.database.entity.RecurringTransactionEntity
+import com.pennywiseai.tracker.data.database.entity.SubscriptionDirection
 import com.pennywiseai.tracker.data.database.entity.SubscriptionEntity
+import com.pennywiseai.tracker.data.database.entity.SubscriptionState
 import com.pennywiseai.tracker.data.database.entity.TransactionEntity
 import com.pennywiseai.tracker.data.manager.InAppUpdateManager
 import com.pennywiseai.tracker.data.manager.InAppReviewManager
@@ -38,6 +41,7 @@ import com.pennywiseai.tracker.data.repository.BudgetGroupSpending
 import com.pennywiseai.tracker.data.repository.BudgetGroupSpendingRaw
 import com.pennywiseai.tracker.data.repository.BudgetOverallSummary
 import com.pennywiseai.tracker.data.repository.LoanRepository
+import com.pennywiseai.tracker.data.repository.RecurringTransactionRepository
 import com.pennywiseai.tracker.data.repository.SubscriptionRepository
 import com.pennywiseai.tracker.data.repository.TransactionGroupRepository
 import com.pennywiseai.tracker.data.repository.TransactionRepository
@@ -84,6 +88,7 @@ class HomeViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val transactionGroupRepository: TransactionGroupRepository,
     private val subscriptionRepository: SubscriptionRepository,
+    private val recurringTransactionRepository: RecurringTransactionRepository,
     private val accountBalanceRepository: AccountBalanceRepository,
     private val budgetGroupRepository: BudgetGroupRepository,
     private val loanRepository: LoanRepository,
@@ -897,23 +902,29 @@ class HomeViewModel @Inject constructor(
         }
         
         viewModelScope.launch {
-            // Load all active subscriptions with conversion for unified mode
+            // Load active subscriptions + recurring templates with conversion for unified mode
             combine(
                 subscriptionRepository.getActiveSubscriptions(),
+                recurringTransactionRepository.getActive(),
                 userPreferencesRepository.unifiedCurrencyMode,
                 userPreferencesRepository.displayCurrency
-            ) { subscriptions, isUnified, displayCurrency ->
-                Triple(subscriptions, isUnified, displayCurrency)
-            }.collect { (subscriptions, isUnified, displayCurrency) ->
-                // Unified mode collapses to one converted figure. Native mode keeps
-                // currencies apart — summing ₹ + $ into one figure mislabels it — so
-                // we expose a per-currency map the card renders as "₹499 · $10".
+            ) { subscriptions, templates, isUnified, displayCurrency ->
+                Quad(subscriptions, templates, isUnified, displayCurrency)
+            }.collect { (subscriptions, templates, isUnified, displayCurrency) ->
+                val activeExpenseSubs = subscriptions.filter { it.direction == SubscriptionDirection.EXPENSE }
+                val activeExpenseTemplates = templates.filter { it.transactionType != TransactionType.INCOME }
+                val nextCharge = pickNextExpectedCharge(subscriptions, templates)
                 val totalAmount = if (isUnified) {
                     var total = java.math.BigDecimal.ZERO
-                    for (sub in subscriptions) {
+                    for (sub in activeExpenseSubs) {
                         total += currencyConversionService.convertAmountOrNull(
                             sub.amount, sub.currency, displayCurrency
-                        ) ?: continue // never-rated pair — skip, don't face-value (#670)
+                        ) ?: continue
+                    }
+                    for (tpl in activeExpenseTemplates) {
+                        total += currencyConversionService.convertAmountOrNull(
+                            tpl.amount, tpl.currency, displayCurrency
+                        ) ?: continue
                     }
                     total
                 } else {
@@ -922,10 +933,14 @@ class HomeViewModel @Inject constructor(
                 val totalByCurrency: Map<String, Money> = if (isUnified) {
                     emptyMap()
                 } else {
-                    subscriptions.sumByCurrency({ it.currency }, { it.amount })
+                    val combinedEntries = activeExpenseSubs.map { it.currency to it.amount } +
+                        activeExpenseTemplates.map { it.currency to it.amount }
+                    combinedEntries.sumByCurrency({ it.first }, { it.second })
                 }
                 _uiState.value = _uiState.value.copy(
                     upcomingSubscriptions = subscriptions,
+                    upcomingRecurringCount = templates.size,
+                    nextExpectedCharge = nextCharge,
                     upcomingSubscriptionsTotal = totalAmount,
                     upcomingSubscriptionsByCurrency = totalByCurrency
                 )
@@ -1719,6 +1734,8 @@ data class HomeUiState(
     val monthlyChangePercent: Int = 0,
     val recentItems: List<HomeRecentItem> = emptyList(),
     val upcomingSubscriptions: List<SubscriptionEntity> = emptyList(),
+    val upcomingRecurringCount: Int = 0,
+    val nextExpectedCharge: NextExpectedCharge? = null,
     /** Unified-mode total, converted to the display currency. */
     val upcomingSubscriptionsTotal: BigDecimal = BigDecimal.ZERO,
     /** Native-mode totals, kept per-currency so a ₹ + $ mix isn't summed. */
@@ -1759,3 +1776,58 @@ private data class Quad<A, B, C, D>(
     val c: C,
     val d: D
 )
+
+data class NextExpectedCharge(
+    val merchantName: String,
+    val amount: BigDecimal,
+    val currency: String,
+    val dueDate: java.time.LocalDate,
+    val isTemplate: Boolean
+)
+
+internal fun pickNextExpectedCharge(
+    subscriptions: List<SubscriptionEntity>,
+    templates: List<RecurringTransactionEntity>
+): NextExpectedCharge? {
+    val activeOutflowSubs = subscriptions
+        .filter {
+            it.state == SubscriptionState.ACTIVE &&
+                it.direction == SubscriptionDirection.EXPENSE &&
+                it.nextPaymentDate != null
+        }
+        .map {
+            NextExpectedCharge(
+                merchantName = it.merchantName,
+                amount = it.amount,
+                currency = it.currency,
+                dueDate = it.nextPaymentDate!!,
+                isTemplate = false
+            )
+        }
+    val activeOutflowTemplates = templates
+        .filter { it.isActive && it.transactionType != TransactionType.INCOME }
+        .map {
+            NextExpectedCharge(
+                merchantName = it.merchantName,
+                amount = it.amount,
+                currency = it.currency,
+                dueDate = it.nextDueDate,
+                isTemplate = true
+            )
+        }
+    val outflows = activeOutflowSubs + activeOutflowTemplates
+    if (outflows.isNotEmpty()) {
+        return outflows.minByOrNull { it.dueDate }
+    }
+    val fallbackSubs = subscriptions
+        .filter { it.state == SubscriptionState.ACTIVE && it.nextPaymentDate != null }
+        .map {
+            NextExpectedCharge(it.merchantName, it.amount, it.currency, it.nextPaymentDate!!, isTemplate = false)
+        }
+    val fallbackTemplates = templates
+        .filter { it.isActive }
+        .map {
+            NextExpectedCharge(it.merchantName, it.amount, it.currency, it.nextDueDate, isTemplate = true)
+        }
+    return (fallbackSubs + fallbackTemplates).minByOrNull { it.dueDate }
+}

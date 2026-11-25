@@ -3,6 +3,7 @@ package com.pennywiseai.tracker.presentation.recurring
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pennywiseai.tracker.data.database.entity.AccountBalanceEntity
 import com.pennywiseai.tracker.data.database.entity.CategoryEntity
 import com.pennywiseai.tracker.data.database.entity.RecurringFrequency
 import com.pennywiseai.tracker.data.database.entity.RecurringTransactionEntity
@@ -10,7 +11,10 @@ import com.pennywiseai.tracker.data.database.entity.TransactionType
 import com.pennywiseai.tracker.billing.EntitlementGate
 
 import com.pennywiseai.tracker.data.preferences.UserPreferencesRepository
+import com.pennywiseai.tracker.data.repository.AccountBalanceRepository
 import com.pennywiseai.tracker.data.repository.RecurringTransactionRepository
+import com.pennywiseai.tracker.data.repository.TransactionRepository
+import com.pennywiseai.tracker.domain.service.RecurringMatcher
 import com.pennywiseai.tracker.domain.usecase.GetCategoriesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +22,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -29,6 +32,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RecurringTransactionsViewModel @Inject constructor(
     private val repository: RecurringTransactionRepository,
+    accountBalanceRepository: AccountBalanceRepository,
+    transactionRepository: TransactionRepository,
     getCategoriesUseCase: GetCategoriesUseCase,
     userPreferencesRepository: UserPreferencesRepository,
     entitlementGate: EntitlementGate
@@ -37,6 +42,25 @@ class RecurringTransactionsViewModel @Inject constructor(
     val templates: StateFlow<List<RecurringTransactionEntity>> =
         repository.getAll()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val accounts: StateFlow<List<AccountBalanceEntity>> =
+        accountBalanceRepository.getAllLatestBalances()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val templateStatuses: StateFlow<Map<Long, RecurringTemplateStatus>> =
+        combine(
+            templates,
+            transactionRepository.getLinkedTemplateTransactions()
+        ) { allTemplates, linkedTxns ->
+            val latestByTemplate = linkedTxns
+                .filter { !it.isDeleted && it.recurringTemplateId != null }
+                .groupBy { it.recurringTemplateId!! }
+                .mapValues { (_, list) -> list.maxOf { it.dateTime.toLocalDate() } }
+            val today = LocalDate.now()
+            allTemplates.associate { tpl ->
+                tpl.id to computeRecurringTemplateStatus(tpl, latestByTemplate[tpl.id], today)
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
     val isProEntitled: StateFlow<Boolean> = entitlementGate.isProEntitled
 
@@ -74,6 +98,9 @@ class RecurringTransactionsViewModel @Inject constructor(
                         dayOfWeek = form.dayOfWeek,
                         nextDueDate = resolveNextDueDate(form),
                         isActive = form.isActive,
+                        bankName = form.bankName,
+                        accountLast4 = form.accountLast4,
+                        profileId = form.profileId,
                         note = form.note.trim().ifBlank { null }
                     )
                 )
@@ -98,6 +125,9 @@ class RecurringTransactionsViewModel @Inject constructor(
                         dayOfWeek = form.dayOfWeek,
                         nextDueDate = nextDue,
                         isActive = form.isActive,
+                        bankName = form.bankName,
+                        accountLast4 = form.accountLast4,
+                        profileId = form.profileId,
                         note = form.note.trim().ifBlank { null },
                         updatedAt = LocalDateTime.now()
                     )
@@ -155,6 +185,9 @@ data class RecurringFormState(
     val dayOfMonth: Int? = null,
     val dayOfWeek: Int? = null,
     val isActive: Boolean = true,
+    val bankName: String? = null,
+    val accountLast4: String? = null,
+    val profileId: Long = 1L,
     val note: String = ""
 ) {
     val isValid: Boolean
@@ -174,7 +207,44 @@ data class RecurringFormState(
             dayOfMonth = template.dayOfMonth,
             dayOfWeek = template.dayOfWeek,
             isActive = template.isActive,
+            bankName = template.bankName,
+            accountLast4 = template.accountLast4,
+            profileId = template.profileId,
             note = template.note.orEmpty()
         )
+    }
+}
+
+enum class RecurringCycleState {
+    PAUSED,
+    PAID,
+    OVERDUE,
+    SCHEDULED
+}
+
+data class RecurringTemplateStatus(
+    val state: RecurringCycleState,
+    val paidDate: LocalDate? = null
+)
+
+internal fun computeRecurringTemplateStatus(
+    template: RecurringTransactionEntity,
+    latestPaidDate: LocalDate?,
+    today: LocalDate = LocalDate.now()
+): RecurringTemplateStatus {
+    if (!template.isActive) {
+        return RecurringTemplateStatus(RecurringCycleState.PAUSED, latestPaidDate)
+    }
+    val (beforeDays, _) = RecurringMatcher.windowOffsetsForFrequency(template.frequency)
+    val withinPaidCycle = latestPaidDate != null &&
+        !today.isBefore(latestPaidDate) &&
+        today.isBefore(RecurringMatcher.cycleAdvance(latestPaidDate, template.frequency.name))
+    val pastUnpaidDue = template.nextDueDate.isBefore(today) &&
+        (latestPaidDate == null || latestPaidDate.isBefore(template.nextDueDate.minusDays(beforeDays)))
+    val paidThisCycle = withinPaidCycle && !pastUnpaidDue
+    return when {
+        paidThisCycle -> RecurringTemplateStatus(RecurringCycleState.PAID, latestPaidDate)
+        template.nextDueDate.isBefore(today) -> RecurringTemplateStatus(RecurringCycleState.OVERDUE, latestPaidDate)
+        else -> RecurringTemplateStatus(RecurringCycleState.SCHEDULED, latestPaidDate)
     }
 }

@@ -6,11 +6,15 @@ import com.pennywiseai.tracker.data.database.PennyWiseDatabase
 import com.pennywiseai.tracker.data.database.dao.RecurringTransactionDao
 import com.pennywiseai.tracker.data.database.entity.RecurringTransactionEntity
 import com.pennywiseai.tracker.data.database.entity.TransactionEntity
+import com.pennywiseai.tracker.data.preferences.BankAccountMergeStore
+import com.pennywiseai.tracker.domain.service.RecurringMatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.sync.withLock
 import java.math.BigDecimal
 import java.security.MessageDigest
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -42,6 +46,8 @@ class RecurringTransactionRepository @Inject constructor(
 
     fun getActive(): Flow<List<RecurringTransactionEntity>> = dao.getActive()
 
+    suspend fun getActiveList(): List<RecurringTransactionEntity> = dao.getActiveList()
+
     suspend fun getById(id: Long): RecurringTransactionEntity? = dao.getById(id)
 
     suspend fun insert(recurring: RecurringTransactionEntity): Long = dao.insert(recurring)
@@ -49,9 +55,21 @@ class RecurringTransactionRepository @Inject constructor(
     suspend fun update(recurring: RecurringTransactionEntity) =
         dao.update(recurring.copy(updatedAt = LocalDateTime.now()))
 
-    suspend fun delete(recurring: RecurringTransactionEntity) = dao.delete(recurring)
+    suspend fun updateNextDueDate(id: Long, nextDueDate: LocalDate) =
+        dao.updateNextDueDate(id, nextDueDate)
 
-    suspend fun deleteById(id: Long) = dao.deleteById(id)
+    suspend fun updateNextDueDateAndAmount(id: Long, nextDueDate: LocalDate, amount: BigDecimal) =
+        dao.updateNextDueDateAndAmount(id, nextDueDate, amount)
+
+    suspend fun delete(recurring: RecurringTransactionEntity) = database.withTransaction {
+        database.transactionDao().clearRecurringTemplateLinks(recurring.id)
+        dao.delete(recurring)
+    }
+
+    suspend fun deleteById(id: Long) = database.withTransaction {
+        database.transactionDao().clearRecurringTemplateLinks(id)
+        dao.deleteById(id)
+    }
 
     /**
      * Materialise every due active template into a real transaction and advance
@@ -70,31 +88,42 @@ class RecurringTransactionRepository @Inject constructor(
      * its schedule is fast-forwarded past today, rather than back-filling a
      * burst of historical transactions.
      */
-    suspend fun materializeDue(today: LocalDate = LocalDate.now()): Int {
-        val due = dao.getDue(today)
-        var created = 0
-        for (template in due) {
-            try {
-                database.withTransaction {
-                    val transaction = template.toTransaction()
-                    val rowId = accountBalanceRepository.insertTransactionWithBalance(
-                        transaction = transaction,
-                        bankName = template.bankName,
-                        accountLast4 = template.accountLast4
-                    )
-                    // Advance the schedule regardless of whether the insert was a
-                    // fresh row or a dedup no-op (-1): the intent is "this due
-                    // date has been handled, move on".
-                    dao.updateNextDueDate(template.id, nextDueDateAfter(template, today))
-                    if (rowId != -1L) created++
+    suspend fun materializeDue(today: LocalDate = LocalDate.now()): Int =
+        BankAccountMergeStore.mutationMutex.withLock {
+            val due = dao.getDue(today)
+            var created = 0
+            for (template in due) {
+                try {
+                    database.withTransaction {
+                        val (beforeDays, afterDays) = RecurringMatcher.windowOffsetsForFrequency(template.frequency)
+                        val existingLinked = database.transactionDao().getTransactionsForTemplateInRange(
+                            templateId = template.id,
+                            start = template.nextDueDate.minusDays(beforeDays).atStartOfDay(),
+                            end = template.nextDueDate.plusDays(afterDays).atTime(LocalTime.MAX)
+                        )
+                        if (existingLinked.isNotEmpty()) {
+                            dao.updateNextDueDate(template.id, nextDueDateAfter(template, today))
+                            return@withTransaction
+                        }
+                        val transaction = template.toTransaction()
+                        val rowId = accountBalanceRepository.insertTransactionWithBalance(
+                            transaction = transaction,
+                            bankName = template.bankName,
+                            accountLast4 = template.accountLast4
+                        )
+                        // Advance the schedule regardless of whether the insert was a
+                        // fresh row or a dedup no-op (-1): the intent is "this due
+                        // date has been handled, move on".
+                        dao.updateNextDueDate(template.id, nextDueDateAfter(template, today))
+                        if (rowId != -1L) created++
+                    }
+                } catch (e: Exception) {
+                    // One bad template must not abort the rest of the batch.
+                    Log.w(TAG, "Failed to materialize recurring template ${template.id}: ${e.message}", e)
                 }
-            } catch (e: Exception) {
-                // One bad template must not abort the rest of the batch.
-                Log.w(TAG, "Failed to materialize recurring template ${template.id}: ${e.message}", e)
             }
+            created
         }
-        return created
-    }
 
     /**
      * The first occurrence strictly after [today], stepping by the template's
@@ -135,6 +164,8 @@ class RecurringTransactionRepository @Inject constructor(
             accountNumber = accountLast4,
             balanceAfter = null,
             transactionHash = recurringTransactionHash(id, amount, merchantName, nextDueDate),
+            isRecurring = true,
+            recurringTemplateId = id,
             currency = currency,
             createdAt = now,
             updatedAt = now,

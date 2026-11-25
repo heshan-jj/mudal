@@ -18,6 +18,9 @@ interface SubscriptionDao {
     
     @Query("SELECT * FROM subscriptions WHERE state = 'ACTIVE' ORDER BY next_payment_date ASC")
     fun getActiveSubscriptions(): Flow<List<SubscriptionEntity>>
+
+    @Query("SELECT * FROM subscriptions WHERE state = 'ACTIVE' ORDER BY next_payment_date ASC")
+    suspend fun getActiveSubscriptionsList(): List<SubscriptionEntity>
     
     @Query("SELECT * FROM subscriptions WHERE next_payment_date <= :date AND state = 'ACTIVE' ORDER BY next_payment_date ASC")
     fun getUpcomingSubscriptions(date: LocalDate): Flow<List<SubscriptionEntity>>
@@ -94,6 +97,21 @@ interface SubscriptionDao {
         WHERE id = :id
     """)
     suspend fun markPaid(id: Long, paidAt: LocalDate, nextPaymentDate: LocalDate)
+
+    @Query("""
+        UPDATE subscriptions
+        SET last_paid_at = :paidAt,
+            next_payment_date = :nextPaymentDate,
+            amount = :amount,
+            updated_at = datetime('now')
+        WHERE id = :id
+    """)
+    suspend fun markPaidWithAmount(
+        id: Long,
+        paidAt: LocalDate,
+        nextPaymentDate: LocalDate,
+        amount: BigDecimal
+    )
 
     @Delete
     suspend fun deleteSubscription(subscription: SubscriptionEntity)

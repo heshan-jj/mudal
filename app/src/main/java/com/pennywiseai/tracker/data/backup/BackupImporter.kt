@@ -120,7 +120,7 @@ class BackupImporter @Inject constructor(
     /**
      * Replace all existing data with backup data
      */
-    private suspend fun replaceAllData(backup: PennyWiseBackup): ImportResult {
+    internal suspend fun replaceAllData(backup: PennyWiseBackup): ImportResult {
         var importedTransactions = 0
         var importedCategories = 0
         var skippedRows = 0
@@ -173,6 +173,38 @@ class BackupImporter @Inject constructor(
                     database.transactionGroupDao().insertGroup(group)
                 }
                 val profileIdMap = importProfilesAndBuildMap(backup.database.profiles)
+                val survivingProfileIds = database.profileDao().getAllProfiles()
+                    .map { it.id }.toSet()
+                fun resolveProfileId(oldId: Long?): Long? = when {
+                    oldId == null -> null
+                    profileIdMap.containsKey(oldId) -> profileIdMap[oldId]
+                    oldId in survivingProfileIds -> oldId
+                    else -> null
+                }
+
+                // Import subscriptions and recurring templates BEFORE transactions so
+                // TransactionEntity.subscriptionId and recurringTemplateId can be
+                // validated / remapped cleanly (never dangling if a parent row fails).
+                val restoredSubscriptionIds = HashMap<Long, Long>()
+                backup.database.subscriptions.insertEachCounting({ skippedRows++ }) { subscription ->
+                    val newId = database.subscriptionDao().insertSubscription(subscription)
+                    if (subscription.id != 0L && newId > 0L) {
+                        restoredSubscriptionIds[subscription.id] = newId
+                    }
+                }
+
+                val restoredTemplateIds = HashMap<Long, Long>()
+                backup.database.recurringTransactions.insertEachCounting({ skippedRows++ }) { recurring ->
+                    val newId = database.recurringTransactionDao().insert(
+                        recurring.copy(
+                            uid = stableUid(recurring),
+                            profileId = resolveProfileId(recurring.profileId) ?: 1L
+                        )
+                    )
+                    if (recurring.id != 0L && newId > 0L) {
+                        restoredTemplateIds[recurring.id] = newId
+                    }
+                }
 
                 // Older backups (pre-v1.1) didn't serialize loans / groups,
                 // and profiles were never in v1.0 either. The transactions
@@ -186,20 +218,14 @@ class BackupImporter @Inject constructor(
                 // refs that still point at a surviving local profile.
                 val backupLoanIds = backup.database.loans.map { it.id }.toSet()
                 val backupGroupIds = backup.database.transactionGroups.map { it.id }.toSet()
-                val survivingProfileIds = database.profileDao().getAllProfiles()
-                    .map { it.id }.toSet()
-                fun resolveProfileId(oldId: Long?): Long? = when {
-                    oldId == null -> null
-                    profileIdMap.containsKey(oldId) -> profileIdMap[oldId]
-                    oldId in survivingProfileIds -> oldId
-                    else -> null
-                }
                 fun cleanTransaction(tx: TransactionEntity): TransactionEntity = tx.copy(
                     loanId = tx.loanId?.takeIf { it in backupLoanIds },
                     // Rebuilt from the shares that restore (#346), below.
                     lentSharesTotal = null,
                     groupId = tx.groupId?.takeIf { it in backupGroupIds },
-                    profileId = resolveProfileId(tx.profileId)
+                    profileId = resolveProfileId(tx.profileId),
+                    subscriptionId = tx.subscriptionId?.let { restoredSubscriptionIds[it] },
+                    recurringTemplateId = tx.recurringTemplateId?.let { restoredTemplateIds[it] }
                 )
 
                 // Import all data
@@ -230,10 +256,6 @@ class BackupImporter @Inject constructor(
                     database.accountBalanceDao().insertBalance(
                         balance.copy(profileId = mappedProfileId)
                     )
-                }
-                
-                backup.database.subscriptions.insertEachCounting({ skippedRows++ }) { subscription ->
-                    database.subscriptionDao().insertSubscription(subscription)
                 }
 
                 backup.database.merchantMappings.insertEachCounting({ skippedRows++ }) { mapping ->
@@ -283,23 +305,6 @@ class BackupImporter @Inject constructor(
                 }
                 backup.database.transactionTagCrossRefs.insertEachCounting({ skippedRows++ }) { ref ->
                     database.tagDao().insertCrossRef(ref)
-                }
-
-                // Recurring / scheduled manual transaction templates (#706).
-                // Standalone table (no foreign keys); ids are preserved in
-                // REPLACE_ALL like every other cleared table, but the source
-                // profile_id is remapped so materialized transactions land under
-                // the right local profile. (Greptile)
-                backup.database.recurringTransactions.insertEachCounting({ skippedRows++ }) { recurring ->
-                    // Fall back to the default Personal profile (1) when the source
-                    // profile can't be mapped, rather than keeping a stale/invalid id;
-                    // give a fresh uid to any blank/legacy one.
-                    database.recurringTransactionDao().insert(
-                        recurring.copy(
-                            uid = stableUid(recurring),
-                            profileId = resolveProfileId(recurring.profileId) ?: 1L
-                        )
-                    )
                 }
 
                 // Goals (#914): ids preserved like every cleared table; goals go
@@ -356,7 +361,7 @@ class BackupImporter @Inject constructor(
     /**
      * Merge backup data with existing data
      */
-    private suspend fun mergeData(backup: PennyWiseBackup): ImportResult {
+    internal suspend fun mergeData(backup: PennyWiseBackup): ImportResult {
         var importedTransactions = 0
         var importedCategories = 0
         var skippedDuplicates = 0
@@ -457,6 +462,12 @@ class BackupImporter @Inject constructor(
                     else -> null
                 }
 
+                val oldToNewSubscriptionIdMap = importSubscriptionsWithMerge(backup.database.subscriptions) { skippedRows++ }
+                val oldToNewTemplateIdMap = importRecurringTransactionsWithMerge(
+                    backup.database.recurringTransactions,
+                    { resolveProfileId(it) }
+                ) { skippedRows++ }
+
                 // Import transactions (skip duplicates by hash)
                 // Build mapping from old transaction IDs to new IDs for split/application imports
                 val oldToNewTransactionIdMap = mutableMapOf<Long, Long>()
@@ -470,7 +481,9 @@ class BackupImporter @Inject constructor(
                             // Rebuilt from the shares that restore (#346).
                             lentSharesTotal = null,
                             groupId = transaction.groupId?.let { oldToNewGroupIdMap[it] },
-                            profileId = resolveProfileId(transaction.profileId)
+                            profileId = resolveProfileId(transaction.profileId),
+                            subscriptionId = transaction.subscriptionId?.let { oldToNewSubscriptionIdMap[it] },
+                            recurringTemplateId = transaction.recurringTemplateId?.let { oldToNewTemplateIdMap[it] }
                         )
                         val newId = database.transactionDao().insertTransaction(newTransaction)
                         // Track old ID -> new ID mapping directly from insert result
@@ -491,8 +504,6 @@ class BackupImporter @Inject constructor(
                 // Import other entities with duplicate checking
                 importCardsWithMerge(backup.database.cards) { skippedRows++ }
                 importAccountBalancesWithMerge(backup.database.accountBalances, { resolveProfileId(it) }) { skippedRows++ }
-                importSubscriptionsWithMerge(backup.database.subscriptions) { skippedRows++ }
-                importRecurringTransactionsWithMerge(backup.database.recurringTransactions, { resolveProfileId(it) }) { skippedRows++ }
                 importMerchantMappingsWithMerge(backup.database.merchantMappings) { skippedRows++ }
                 importMerchantAliasesWithMerge(backup.database.merchantAliases) { skippedRows++ }
                 importGoalsWithMerge(
@@ -669,19 +680,33 @@ class BackupImporter @Inject constructor(
     }
     
     /**
-     * Import subscriptions with duplicate checking
+     * Import subscriptions with duplicate checking and return backupId -> localId mapping.
      */
-    private suspend fun importSubscriptionsWithMerge(subscriptions: List<SubscriptionEntity>, onSkip: () -> Unit) {
+    internal suspend fun importSubscriptionsWithMerge(
+        subscriptions: List<SubscriptionEntity>,
+        onSkip: () -> Unit
+    ): Map<Long, Long> {
         val existingSubscriptions = database.subscriptionDao().getAllSubscriptions().first()
-        val existingKeys = existingSubscriptions.map { "${it.merchantName}_${it.amount}" }.toSet()
+        val keyToId = existingSubscriptions.associate {
+            "${it.merchantName}_${it.amount}" to it.id
+        }.toMutableMap()
+        val oldToNew = mutableMapOf<Long, Long>()
 
         subscriptions.insertEachCounting(onSkip) { subscription ->
             val key = "${subscription.merchantName}_${subscription.amount}"
-            if (!existingKeys.contains(key)) {
-                val newSubscription = subscription.copy(id = 0)
-                database.subscriptionDao().insertSubscription(newSubscription)
+            val existingId = keyToId[key]
+            val localId = if (existingId != null) {
+                existingId
+            } else {
+                val insertedId = database.subscriptionDao().insertSubscription(subscription.copy(id = 0))
+                if (insertedId > 0L) keyToId[key] = insertedId
+                insertedId
+            }
+            if (subscription.id != 0L && localId > 0L) {
+                oldToNew[subscription.id] = localId
             }
         }
+        return oldToNew
     }
     
     /**
@@ -716,23 +741,29 @@ class BackupImporter @Inject constructor(
         ).joinToString("|")
     }
 
-    private suspend fun importRecurringTransactionsWithMerge(
+    internal suspend fun importRecurringTransactionsWithMerge(
         recurring: List<RecurringTransactionEntity>,
         resolveProfileId: (Long?) -> Long?,
         onSkip: () -> Unit
-    ) {
+    ): Map<Long, Long> {
         // Dedup on the stable [RecurringTransactionEntity.uid], not on mutable
         // content: a repeated restore of the same backup can't duplicate a
         // template (same uid), while genuinely distinct templates always have
         // distinct uids and are always kept. A blank/legacy uid gets a fresh one
         // so it still inserts.
-        val seenUids = database.recurringTransactionDao().getAll().first()
-            .map { it.uid }.filter { it.isNotEmpty() }.toMutableSet()
+        val uidToId = database.recurringTransactionDao().getAll().first()
+            .filter { it.uid.isNotEmpty() }
+            .associate { it.uid to it.id }
+            .toMutableMap()
+        val oldToNew = mutableMapOf<Long, Long>()
 
         recurring.insertEachCounting(onSkip) { template ->
             val uid = stableUid(template)
-            if (seenUids.add(uid)) {
-                database.recurringTransactionDao().insert(
+            val existingId = uidToId[uid]
+            val localId = if (existingId != null) {
+                existingId
+            } else {
+                val insertedId = database.recurringTransactionDao().insert(
                     template.copy(
                         id = 0,
                         uid = uid,
@@ -741,8 +772,14 @@ class BackupImporter @Inject constructor(
                         profileId = resolveProfileId(template.profileId) ?: 1L
                     )
                 )
+                if (insertedId > 0L) uidToId[uid] = insertedId
+                insertedId
+            }
+            if (template.id != 0L && localId > 0L) {
+                oldToNew[template.id] = localId
             }
         }
+        return oldToNew
     }
 
     /**

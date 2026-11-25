@@ -3,6 +3,7 @@ package com.pennywiseai.tracker.data.database.dao
 import androidx.room.*
 import com.pennywiseai.tracker.data.database.entity.RecurringTransactionEntity
 import kotlinx.coroutines.flow.Flow
+import java.math.BigDecimal
 import java.time.LocalDate
 
 @Dao
@@ -13,6 +14,9 @@ interface RecurringTransactionDao {
 
     @Query("SELECT * FROM recurring_transactions WHERE is_active = 1 ORDER BY next_due_date ASC")
     fun getActive(): Flow<List<RecurringTransactionEntity>>
+
+    @Query("SELECT * FROM recurring_transactions WHERE is_active = 1 ORDER BY next_due_date ASC")
+    suspend fun getActiveList(): List<RecurringTransactionEntity>
 
     @Query("SELECT * FROM recurring_transactions WHERE id = :id")
     suspend fun getById(id: Long): RecurringTransactionEntity?
@@ -39,6 +43,9 @@ interface RecurringTransactionDao {
 
     @Query("UPDATE recurring_transactions SET next_due_date = :nextDueDate, updated_at = datetime('now') WHERE id = :id")
     suspend fun updateNextDueDate(id: Long, nextDueDate: LocalDate)
+
+    @Query("UPDATE recurring_transactions SET next_due_date = :nextDueDate, amount = :amount, updated_at = datetime('now') WHERE id = :id")
+    suspend fun updateNextDueDateAndAmount(id: Long, nextDueDate: LocalDate, amount: BigDecimal)
 
     @Query("DELETE FROM recurring_transactions")
     suspend fun deleteAll()

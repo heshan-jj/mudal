@@ -20,7 +20,6 @@ import com.pennywiseai.tracker.data.repository.AccountBalanceRepository
 import com.pennywiseai.tracker.data.repository.CardRepository
 import com.pennywiseai.tracker.data.preferences.IgnoredAccountsStore
 import com.pennywiseai.tracker.data.repository.MerchantMappingRepository
-import com.pennywiseai.tracker.data.repository.SubscriptionRepository
 import com.pennywiseai.tracker.data.repository.TagRepository
 import com.pennywiseai.tracker.data.repository.TransactionRepository
 import com.pennywiseai.tracker.domain.model.rule.tagChanges
@@ -47,12 +46,13 @@ class SmsTransactionProcessor @Inject constructor(
     private val accountBalanceRepository: AccountBalanceRepository,
     private val cardRepository: CardRepository,
     private val merchantMappingRepository: MerchantMappingRepository,
-    private val subscriptionRepository: SubscriptionRepository,
     private val ruleRepository: RuleRepository,
     private val ruleEngine: RuleEngine,
     private val tagRepository: TagRepository,
     private val ignoredAccountsStore: IgnoredAccountsStore,
-    private val database: PennyWiseDatabase
+    private val database: PennyWiseDatabase,
+    private val recurringReconciliationService: RecurringReconciliationService,
+    private val selfTransferAutoPairer: SelfTransferAutoPairer
 ) {
     private val bankAccountMerges = BankAccountMergeStore(appContext)
     companion object {
@@ -229,30 +229,46 @@ class SmsTransactionProcessor @Inject constructor(
                 Log.d(TAG, "Applied ${ruleApplications.size} rules to transaction")
             }
 
-            // Check if this transaction matches an active subscription
-            val matchedSubscription = subscriptionRepository.matchTransactionToSubscription(
-                entityWithRules.merchantName,
-                entityWithRules.amount
+            // Reconcile against active subscriptions and recurring templates before insert
+            val preparedRecurring = recurringReconciliationService.prepareForIncomingTransaction(
+                candidate = entityWithRules,
+                resolvedAccountLast4 = linkedAccountLast4
             )
-            val finalEntity = if (matchedSubscription != null) {
-                Log.d(TAG, "Matched subscription ${matchedSubscription.id}")
-                entityWithRules.copy(isRecurring = true)
-            } else {
-                entityWithRules
+            if (preparedRecurring is RecurringReconciliationService.PreparedMatch.Template &&
+                preparedRecurring.placeholderToReplace != null
+            ) {
+                val replacedId = recurringReconciliationService.replaceMaterializedPlaceholder(
+                    prepared = preparedRecurring,
+                    smsEntity = entityWithRules,
+                    resolvedAccountLast4 = linkedAccountLast4
+                )
+                if (replacedId != null) {
+                    val replacedEntity = recurringReconciliationService.enrichEntity(entityWithRules, preparedRecurring)
+                        .copy(id = replacedId)
+                    if (ruleApplications.isNotEmpty()) {
+                        ruleRepository.saveRuleApplications(
+                            ruleApplications.map { it.copy(transactionId = replacedId.toString()) }
+                        )
+                        val (add, remove) = ruleApplications.tagChanges()
+                        if (add.isNotEmpty() || remove.isNotEmpty()) tagRepository.applyTagChanges(replacedId, add, remove)
+                    }
+                    if (replacedEntity.balanceAfter != null) {
+                        processBalanceUpdate(parsedTransaction, replacedEntity, replacedId)
+                    }
+                    selfTransferAutoPairer.tryPairSavedTransaction(replacedEntity)
+                    com.pennywiseai.tracker.widget.WidgetRefresher.refreshTransactionWidgets(appContext)
+                    return ProcessingResult(true, transactionId = replacedId)
+                }
             }
 
-            val rowId = if (matchedSubscription != null) {
+            val finalEntity = recurringReconciliationService.enrichEntity(entityWithRules, preparedRecurring)
+
+            val rowId = if (preparedRecurring !is RecurringReconciliationService.PreparedMatch.None) {
                 // Atomicity: advance the billing cycle only if the charge row commits.
-                // Insert returning -1L (duplicate hash) or a throw must leave
-                // next_payment_date untouched. Callees are DAO passthroughs; no
-                // nested transactions.
                 database.withTransaction {
                     val id = transactionRepository.insertTransaction(finalEntity)
                     if (id != -1L) {
-                        subscriptionRepository.updateNextPaymentDateAfterCharge(
-                            matchedSubscription.id,
-                            finalEntity.dateTime.toLocalDate()
-                        )
+                        recurringReconciliationService.commitScheduleUpdate(preparedRecurring, finalEntity.copy(id = id))
                     }
                     id
                 }
@@ -276,8 +292,11 @@ class SmsTransactionProcessor @Inject constructor(
                     if (add.isNotEmpty() || remove.isNotEmpty()) tagRepository.applyTagChanges(rowId, add, remove)
                 }
 
-                // Process balance updates
+                // Process balance updates using the leg's original INCOME/EXPENSE type first
                 processBalanceUpdate(parsedTransaction, finalEntity, rowId)
+
+                // Pair tight-window own-account transfers AFTER balance capture
+                selfTransferAutoPairer.tryPairSavedTransaction(finalEntity.copy(id = rowId))
 
                 // Trigger widget refresh for the transaction-derived widgets
                 com.pennywiseai.tracker.widget.WidgetRefresher.refreshTransactionWidgets(appContext)

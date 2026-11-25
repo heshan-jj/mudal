@@ -197,6 +197,11 @@ fun MainScreen(
                                     launchSingleTop = true
                                 }
                             },
+                            onNavigateToRecurring = {
+                                rootNavController?.navigate(
+                                    com.pennywiseai.tracker.navigation.RecurringTransactions
+                                ) { launchSingleTop = true }
+                            },
                             onNavigateToBudgets = {
                                 rootNavController?.navigate(
                                     com.pennywiseai.tracker.navigation.BudgetGroups()

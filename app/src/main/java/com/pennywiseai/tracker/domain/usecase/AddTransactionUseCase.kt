@@ -105,11 +105,15 @@ class AddTransactionUseCase @Inject constructor(
                     accountLast4 = accountLast4,
                     category = category,
                     currency = currency,
+                    lastPaidAt = date.toLocalDate(),
                     createdAt = LocalDateTime.now(),
                     updatedAt = LocalDateTime.now()
                 )
 
-                subscriptionRepository.insertSubscription(subscription)
+                val subId = subscriptionRepository.insertSubscription(subscription)
+                database.transactionDao().getTransactionById(transactionId)?.let { inserted ->
+                    database.transactionDao().updateTransaction(inserted.copy(subscriptionId = subId))
+                }
             }
         }
     }

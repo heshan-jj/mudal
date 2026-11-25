@@ -69,6 +69,8 @@ class TransactionDetailViewModel @Inject constructor(
     private val ruleRepository: com.pennywiseai.tracker.domain.repository.RuleRepository,
     private val detectBalanceDiscrepancy: com.pennywiseai.tracker.domain.usecase.DetectBalanceDiscrepancyUseCase,
     private val goalRepository: com.pennywiseai.tracker.data.repository.GoalRepository,
+    private val subscriptionRepository: com.pennywiseai.tracker.data.repository.SubscriptionRepository,
+    private val recurringTransactionRepository: com.pennywiseai.tracker.data.repository.RecurringTransactionRepository,
     @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
 ) : ViewModel() {
     
@@ -77,6 +79,136 @@ class TransactionDetailViewModel @Inject constructor(
 
     private val _primaryCurrency = MutableStateFlow("LKR")
     val primaryCurrency: StateFlow<String> = _primaryCurrency.asStateFlow()
+
+    private val _recurringActionMessage = MutableStateFlow<UiText?>(null)
+    val recurringActionMessage: StateFlow<UiText?> = _recurringActionMessage.asStateFlow()
+
+    val linkedSubscriptionName: StateFlow<String?> = _transaction
+        .map { tx -> tx?.subscriptionId?.let { subscriptionRepository.getSubscriptionById(it)?.merchantName } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val linkedTemplateName: StateFlow<String?> = _transaction
+        .map { tx -> tx?.recurringTemplateId?.let { recurringTransactionRepository.getById(it)?.merchantName } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun clearRecurringActionMessage() {
+        _recurringActionMessage.value = null
+    }
+
+    private var creatingRecurring = false
+
+    fun createSubscriptionFromTransaction() {
+        viewModelScope.launch {
+            if (creatingRecurring) return@launch
+            val tx = _transaction.value ?: return@launch
+            if (tx.transactionType == TransactionType.TRANSFER ||
+                tx.isDeleted ||
+                tx.subscriptionId != null ||
+                tx.recurringTemplateId != null
+            ) return@launch
+            creatingRecurring = true
+            try {
+                val txDate = tx.dateTime.toLocalDate()
+                val today = java.time.LocalDate.now()
+                val dom = txDate.dayOfMonth
+                var ym = java.time.YearMonth.from(txDate).plusMonths(1)
+                var nextPayment = ym.atDay(dom.coerceIn(1, ym.lengthOfMonth()))
+                while (!nextPayment.isAfter(today)) {
+                    ym = ym.plusMonths(1)
+                    nextPayment = ym.atDay(dom.coerceIn(1, ym.lengthOfMonth()))
+                }
+                val direction = if (tx.transactionType == TransactionType.INCOME) {
+                    com.pennywiseai.tracker.data.database.entity.SubscriptionDirection.INCOME
+                } else {
+                    com.pennywiseai.tracker.data.database.entity.SubscriptionDirection.EXPENSE
+                }
+                val subId = subscriptionRepository.insertSubscription(
+                    com.pennywiseai.tracker.data.database.entity.SubscriptionEntity(
+                        merchantName = tx.merchantName,
+                        amount = tx.amount,
+                        nextPaymentDate = nextPayment,
+                        state = com.pennywiseai.tracker.data.database.entity.SubscriptionState.ACTIVE,
+                        bankName = tx.bankName ?: "Manual Entry",
+                        accountLast4 = tx.accountNumber,
+                        category = tx.category,
+                        currency = tx.currency,
+                        direction = direction,
+                        billingCycle = "Monthly",
+                        lastPaidAt = txDate,
+                        smsBody = tx.smsBody
+                    )
+                )
+                val updated = tx.copy(
+                    isRecurring = true,
+                    subscriptionId = subId,
+                    updatedAt = LocalDateTime.now()
+                )
+                transactionRepository.updateTransaction(updated)
+                _transaction.value = updated
+                _editableTransaction.update { it?.copy(isRecurring = true, subscriptionId = subId) }
+                _recurringActionMessage.value = UiText.Res(R.string.txn_detail_subscription_created, listOf(tx.merchantName))
+            } finally {
+                creatingRecurring = false
+            }
+        }
+    }
+
+    fun createTemplateFromTransaction() {
+        viewModelScope.launch {
+            if (creatingRecurring) return@launch
+            val tx = _transaction.value ?: return@launch
+            if (tx.transactionType == TransactionType.TRANSFER ||
+                tx.isDeleted ||
+                tx.subscriptionId != null ||
+                tx.recurringTemplateId != null
+            ) return@launch
+            creatingRecurring = true
+            try {
+                val txDate = tx.dateTime.toLocalDate()
+                val today = java.time.LocalDate.now()
+                val dom = txDate.dayOfMonth
+                var ym = java.time.YearMonth.from(txDate).plusMonths(1)
+                var nextDue = ym.atDay(dom.coerceIn(1, ym.lengthOfMonth()))
+                while (!nextDue.isAfter(today)) {
+                    ym = ym.plusMonths(1)
+                    nextDue = ym.atDay(dom.coerceIn(1, ym.lengthOfMonth()))
+                }
+                val tplType = if (tx.transactionType == TransactionType.INCOME) {
+                    TransactionType.INCOME
+                } else {
+                    TransactionType.EXPENSE
+                }
+                val tplId = recurringTransactionRepository.insert(
+                    com.pennywiseai.tracker.data.database.entity.RecurringTransactionEntity(
+                        merchantName = tx.merchantName,
+                        amount = tx.amount,
+                        currency = tx.currency,
+                        category = tx.category,
+                        transactionType = tplType,
+                        frequency = com.pennywiseai.tracker.data.database.entity.RecurringFrequency.MONTHLY,
+                        dayOfMonth = dom,
+                        nextDueDate = nextDue,
+                        isActive = true,
+                        accountLast4 = tx.accountNumber,
+                        bankName = tx.bankName,
+                        note = tx.description,
+                        profileId = tx.profileId ?: _accountProfileId.value ?: 1L
+                    )
+                )
+                val updated = tx.copy(
+                    isRecurring = true,
+                    recurringTemplateId = tplId,
+                    updatedAt = LocalDateTime.now()
+                )
+                transactionRepository.updateTransaction(updated)
+                _transaction.value = updated
+                _editableTransaction.update { it?.copy(isRecurring = true, recurringTemplateId = tplId) }
+                _recurringActionMessage.value = UiText.Res(R.string.txn_detail_template_created, listOf(tx.merchantName))
+            } finally {
+                creatingRecurring = false
+            }
+        }
+    }
 
     private val _convertedAmount = MutableStateFlow<BigDecimal?>(null)
     val convertedAmount: StateFlow<BigDecimal?> = _convertedAmount.asStateFlow()
@@ -943,7 +1075,9 @@ class TransactionDetailViewModel @Inject constructor(
                     loanId = if (currentPersisted != null) currentPersisted.loanId else toSave.loanId,
                     loanContribution = if (currentPersisted != null) currentPersisted.loanContribution else toSave.loanContribution,
                     // Owned by the split sheet (#346), same reasoning.
-                    lentSharesTotal = if (persisted != null) persisted.lentSharesTotal else toSave.lentSharesTotal
+                    lentSharesTotal = if (persisted != null) persisted.lentSharesTotal else toSave.lentSharesTotal,
+                    subscriptionId = if (currentPersisted != null) currentPersisted.subscriptionId else toSave.subscriptionId,
+                    recurringTemplateId = if (currentPersisted != null) currentPersisted.recurringTemplateId else toSave.recurringTemplateId
                 )
 
                 // Pin opening anchors from the PRE-update snapshot for the affected

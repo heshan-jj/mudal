@@ -58,7 +58,7 @@ class BackupExporter @Inject constructor(
     /**
      * Create backup data structure
      */
-    private suspend fun createBackup(privacy: ExportPrivacy, includeReceipts: Boolean): PennyWiseBackup {
+    internal suspend fun createBackup(privacy: ExportPrivacy, includeReceipts: Boolean): PennyWiseBackup {
         // Get all database data
         val transactions = database.transactionDao().getAllTransactions().first()
         val categories = database.categoryDao().getAllCategories().first()
@@ -121,13 +121,15 @@ class BackupExporter @Inject constructor(
             ExportPrivacy.FULL -> transactions
             ExportPrivacy.MASKED -> transactions.map { it.copy(
                 smsBody = "[REDACTED]",
-                accountNumber = it.accountNumber?.takeLast(4)?.let { "****$it" }
+                accountNumber = it.accountNumber?.takeLast(4)?.let { "****$it" },
+                recurringTemplateId = null
             )}
             ExportPrivacy.ANONYMOUS -> transactions.map { it.copy(
                 merchantName = "Merchant",
                 description = null,
                 smsBody = "[REDACTED]",
-                accountNumber = "****"
+                accountNumber = "****",
+                recurringTemplateId = null
             )}
         }
         

@@ -76,7 +76,6 @@ class OptimizedSmsReaderWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val transactionRepository: TransactionRepository,
-    private val subscriptionRepository: SubscriptionRepository,
     private val accountBalanceRepository: AccountBalanceRepository,
     private val cardRepository: CardRepository,
     private val llmRepository: LlmRepository,
@@ -88,7 +87,9 @@ class OptimizedSmsReaderWorker @AssistedInject constructor(
     private val ignoredAccountsStore: IgnoredAccountsStore,
     private val ruleEngine: RuleEngine,
     private val tagRepository: TagRepository,
-    private val generateIncomeAutopayUseCase: com.pennywiseai.tracker.domain.usecase.GenerateIncomeAutopayUseCase
+    private val generateIncomeAutopayUseCase: com.pennywiseai.tracker.domain.usecase.GenerateIncomeAutopayUseCase,
+    private val recurringReconciliationService: com.pennywiseai.tracker.data.manager.RecurringReconciliationService,
+    private val selfTransferAutoPairer: com.pennywiseai.tracker.data.manager.SelfTransferAutoPairer
 ) : CoroutineWorker(appContext, workerParams) {
     private val bankAccountMerges = BankAccountMergeStore(appContext)
 
@@ -727,15 +728,31 @@ class OptimizedSmsReaderWorker @AssistedInject constructor(
 
                 val (withRules, ruleApps) = ruleEngine.evaluateRules(mapped, sms.body, activeRules)
 
-                val matchedSub = subscriptionRepository.matchTransactionToSubscription(
-                    withRules.merchantName, withRules.amount
+                val preparedRecurring = recurringReconciliationService.prepareForIncomingTransaction(
+                    candidate = withRules,
+                    resolvedAccountLast4 = linkedAccountLast4
                 )
-                val finalEntity = if (matchedSub != null) {
-                    subscriptionRepository.updateNextPaymentDateAfterCharge(
-                        matchedSub.id, withRules.dateTime.toLocalDate()
+                if (preparedRecurring is com.pennywiseai.tracker.data.manager.RecurringReconciliationService.PreparedMatch.Template &&
+                    preparedRecurring.placeholderToReplace != null
+                ) {
+                    val replacedId = recurringReconciliationService.replaceMaterializedPlaceholder(
+                        prepared = preparedRecurring,
+                        smsEntity = withRules,
+                        resolvedAccountLast4 = linkedAccountLast4
                     )
-                    withRules.copy(isRecurring = true)
-                } else withRules
+                    if (replacedId != null) {
+                        val replacedEntity = recurringReconciliationService.enrichEntity(withRules, preparedRecurring)
+                        saveRuleApplications(replacedId, ruleApps)
+                        if (replacedEntity.balanceAfter != null) {
+                            pendingBalance = parsedInput.atEnqueuedAccount(parsed, replacedEntity)?.let {
+                                DeferredBalanceUpdate(it, replacedId)
+                            }
+                        }
+                        return@coroutineScope SaveOutcome.SAVED
+                    }
+                }
+
+                val finalEntity = recurringReconciliationService.enrichEntity(withRules, preparedRecurring)
 
                 val duplicate = transactionRepository.findPotentialDuplicates(finalEntity).firstOrNull()
                 if (duplicate != null) {
@@ -744,13 +761,22 @@ class OptimizedSmsReaderWorker @AssistedInject constructor(
                             id = duplicate.id,
                             transactionHash = duplicate.transactionHash,
                             isRecurring = duplicate.isRecurring || finalEntity.isRecurring,
+                            subscriptionId = duplicate.subscriptionId ?: finalEntity.subscriptionId,
+                            recurringTemplateId = duplicate.recurringTemplateId ?: finalEntity.recurringTemplateId,
                             createdAt = duplicate.createdAt,
                             // Loan and split-bill (#346) links belong to the row, not the SMS.
                             loanId = duplicate.loanId,
                             loanContribution = duplicate.loanContribution,
                             lentSharesTotal = duplicate.lentSharesTotal
                         )
-                        transactionRepository.updateTransaction(replacement)
+                        if (preparedRecurring !is com.pennywiseai.tracker.data.manager.RecurringReconciliationService.PreparedMatch.None) {
+                            database.withTransaction {
+                                transactionRepository.updateTransaction(replacement)
+                                recurringReconciliationService.commitScheduleUpdate(preparedRecurring, replacement)
+                            }
+                        } else {
+                            transactionRepository.updateTransaction(replacement)
+                        }
                         accountBalanceRepository.deleteBalancesForTransaction(duplicate.id)
                         replaceRuleApplications(duplicate.id, ruleApps)
                         pendingBalance = parsedInput.atEnqueuedAccount(parsed, replacement)?.let {
@@ -761,9 +787,18 @@ class OptimizedSmsReaderWorker @AssistedInject constructor(
                     return@coroutineScope SaveOutcome.SKIPPED_DUPLICATE
                 }
 
-                val rowId = transactionRepository.insertTransaction(finalEntity)
+                val rowId = if (preparedRecurring !is com.pennywiseai.tracker.data.manager.RecurringReconciliationService.PreparedMatch.None) {
+                    database.withTransaction {
+                        val id = transactionRepository.insertTransaction(finalEntity)
+                        if (id != -1L) {
+                            recurringReconciliationService.commitScheduleUpdate(preparedRecurring, finalEntity.copy(id = id))
+                        }
+                        id
+                    }
+                } else {
+                    transactionRepository.insertTransaction(finalEntity)
+                }
                 if (rowId == -1L) return@coroutineScope SaveOutcome.SKIPPED
-
                 saveRuleApplications(rowId, ruleApps)
                 pendingBalance = parsedInput.atEnqueuedAccount(parsed, finalEntity)?.let {
                     DeferredBalanceUpdate(it, rowId)
@@ -990,6 +1025,12 @@ class OptimizedSmsReaderWorker @AssistedInject constructor(
             val deletedDuplicates = cleanupExistingGPayDuplicates()
             if (deletedDuplicates > 0) {
                 Log.i(TAG, "Cleaned up $deletedDuplicates existing GPay duplicate transactions")
+            }
+            val pairedTransfers = BankAccountMergeStore.mutationMutex.withLock {
+                selfTransferAutoPairer.sweepExistingUnpairedTransfers()
+            }
+            if (pairedTransfers > 0) {
+                Log.i(TAG, "Auto-paired $pairedTransfers own-account transfer pairs")
             }
         } catch (e: Exception) {
             if (e is CancellationException) throw e

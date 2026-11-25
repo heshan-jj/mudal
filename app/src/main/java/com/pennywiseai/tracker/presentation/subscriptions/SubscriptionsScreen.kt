@@ -235,7 +235,10 @@ fun SubscriptionsScreen(
             // Active Subscriptions (staggered 50ms per item, starting at 50ms)
             if (uiState.activeSubscriptions.isNotEmpty()) {
                 item {
-                    SectionHeaderV2(title = stringResource(R.string.subscriptions_active_section))
+                    SectionHeaderV2(
+                        title = stringResource(R.string.subscriptions_active_section),
+                        subtitle = stringResource(R.string.subscriptions_sms_tracking_hint)
+                    )
                 }
                 itemsIndexed(
                     items = uiState.activeSubscriptions,
@@ -256,6 +259,7 @@ fun SubscriptionsScreen(
                             subscription = subscription,
                             accounts = accounts,
                             isPaidThisCycle = subscription.id in uiState.paidThisCycleIds,
+                            effectivePaidDate = uiState.effectivePaidDates[subscription.id],
                             convertedAmount = uiState.convertedAmounts[subscription.id],
                             displayCurrency = uiState.displayCurrency,
                             onTap = { markPaidTarget = subscription },
@@ -544,6 +548,7 @@ private fun SwipeableSubscriptionItem(
     subscription: SubscriptionEntity,
     accounts: List<AccountBalanceEntity> = emptyList(),
     isPaidThisCycle: Boolean = false,
+    effectivePaidDate: LocalDate? = null,
     convertedAmount: BigDecimal? = null,
     displayCurrency: String? = null,
     onTap: () -> Unit = {},
@@ -666,20 +671,25 @@ private fun SwipeableSubscriptionItem(
                                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                                     )
                                 } else {
-                                    var nextPaymentDate: LocalDate = subscriptionDate
-                                    while (nextPaymentDate.isBefore(today) || nextPaymentDate.isEqual(today)) {
-                                        nextPaymentDate = nextPaymentDate.plusMonths(1)
-                                    }
-                                    val daysUntilNext = ChronoUnit.DAYS.between(today, nextPaymentDate)
+                                    val daysUntilNext = ChronoUnit.DAYS.between(today, subscriptionDate)
+                                    val isOverdue = !isPaidThisCycle && daysUntilNext < 0L
 
                                     Icon(
                                         imageVector = Icons.Default.CalendarToday,
                                         contentDescription = null,
                                         modifier = Modifier.size(Dimensions.Icon.small),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        tint = if (isOverdue) {
+                                            MaterialTheme.colorScheme.error
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                        }
                                     )
                                     Text(
                                         text = when {
+                                            isOverdue -> stringResource(
+                                                R.string.subscriptions_overdue_date,
+                                                subscriptionDate.format(DateTimeFormatter.ofPattern("MMM d"))
+                                            )
                                             daysUntilNext == 0L -> stringResource(R.string.subscriptions_due_today)
                                             daysUntilNext == 1L -> stringResource(R.string.subscriptions_due_tomorrow)
                                             daysUntilNext in 2..7 -> pluralStringResource(
@@ -687,13 +697,13 @@ private fun SwipeableSubscriptionItem(
                                                 daysUntilNext.toInt(),
                                                 daysUntilNext.toInt()
                                             )
-                                            else -> nextPaymentDate.format(
+                                            else -> subscriptionDate.format(
                                                 DateTimeFormatter.ofPattern("MMM d")
                                             )
                                         },
                                         style = MaterialTheme.typography.bodySmall,
                                         color = when {
-                                            daysUntilNext <= 3 -> MaterialTheme.colorScheme.error
+                                            isOverdue || daysUntilNext in 0..3 -> MaterialTheme.colorScheme.error
                                             else -> MaterialTheme.colorScheme.onSurfaceVariant
                                         },
                                         maxLines = 1,
@@ -702,13 +712,10 @@ private fun SwipeableSubscriptionItem(
                                 }
                             }
 
-                            // "Paid Mar 15" badge — shown when this cycle has
-                            // already been marked. Computed in the VM
-                            // (today-anchored cycle check, single source of
-                            // truth shared with the partition sort). Sits
-                            // ABOVE the category since payment state is more
-                            // important than the category label.
-                            if (isPaidThisCycle) {
+                            // "Paid Mar 15" badge — driven by lastPaidAt or latest linked txn
+                            // (single source of truth shared with the partition sort, never null).
+                            val displayPaidDate = effectivePaidDate ?: subscription.lastPaidAt
+                            if (isPaidThisCycle && displayPaidDate != null) {
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -723,7 +730,7 @@ private fun SwipeableSubscriptionItem(
                                     Text(
                                         text = stringResource(
                                             R.string.subscriptions_paid_on,
-                                            "${subscription.lastPaidAt?.format(DateTimeFormatter.ofPattern("MMM d"))}"
+                                            displayPaidDate.format(DateTimeFormatter.ofPattern("MMM d"))
                                         ),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.primary,

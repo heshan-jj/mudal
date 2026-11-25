@@ -138,6 +138,7 @@ open class UserPreferencesRepository(
 
         // Feature discovery
         val HAS_USED_FULL_RESYNC = booleanPreferencesKey("has_used_full_resync")
+        val PHASE4_TRANSFER_SWEEP_DONE = booleanPreferencesKey("phase4_transfer_sweep_done")
 
         // Pro tier — UI-cached entitlement to avoid first-frame flicker
         // while the BillingClient connects.
@@ -1076,6 +1077,13 @@ open class UserPreferencesRepository(
             val current = prefs[PreferencesKeys.DISMISSED_SUBSCRIPTION_SUGGESTIONS] ?: emptySet()
             prefs[PreferencesKeys.DISMISSED_SUBSCRIPTION_SUGGESTIONS] = current + key
         }
+    }
+
+    suspend fun hasRunPhase4TransferSweep(): Boolean =
+        activeDataStore.data.first()[PreferencesKeys.PHASE4_TRANSFER_SWEEP_DONE] == true
+
+    suspend fun markPhase4TransferSweepDone() {
+        activeDataStore.edit { it[PreferencesKeys.PHASE4_TRANSFER_SWEEP_DONE] = true }
     }
 }
 

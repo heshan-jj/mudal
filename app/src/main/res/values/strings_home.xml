@@ -68,7 +68,20 @@
         <item quantity="one">%1$d active subscription</item>
         <item quantity="other">%1$d active subscriptions</item>
     </plurals>
+    <plurals name="home_active_recurring_schedules">
+        <item quantity="one">%1$d active recurring schedule</item>
+        <item quantity="other">%1$d active recurring schedules</item>
+    </plurals>
+    <string name="home_active_schedules_mixed">%1$d active subscriptions · %2$d recurring</string>
     <string name="home_subscriptions_monthly_total">Monthly total: %1$s</string>
+    <!-- %1$s = merchant name, %2$s = formatted amount, %3$s = due label -->
+    <string name="home_next_expected_charge">Next: %1$s · %2$s · %3$s</string>
+    <string name="home_next_due_today">Due today</string>
+    <string name="home_next_due_tomorrow">Due tomorrow</string>
+    <!-- %1$s = date -->
+    <string name="home_next_due_overdue">Overdue %1$s</string>
+    <!-- %1$s = date -->
+    <string name="home_next_due_date">%1$s</string>
     <plurals name="home_active_loans">
         <item quantity="one">%1$d active loan</item>
         <item quantity="other">%1$d active loans</item>

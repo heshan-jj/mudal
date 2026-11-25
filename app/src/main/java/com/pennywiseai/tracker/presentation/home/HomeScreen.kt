@@ -118,6 +118,8 @@ import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import androidx.compose.ui.text.style.TextOverflow
 
 /** Distance each card travels on the first-composition entrance animation. */
 private val ENTRANCE_SLIDE_DISTANCE = Spacing.lg
@@ -143,6 +145,7 @@ fun HomeScreen(
     onNavigateToTransactions: () -> Unit = {},
     onNavigateToTransactionsWithSearch: () -> Unit = {},
     onNavigateToSubscriptions: () -> Unit = {},
+    onNavigateToRecurring: () -> Unit = {},
     onNavigateToBudgets: () -> Unit = {},
     onNavigateToLoans: () -> Unit = {},
     onNavigateToTransactionGroups: () -> Unit = {},
@@ -900,8 +903,15 @@ fun HomeScreen(
                         }
                     }
                     HomeSection.SUBSCRIPTIONS -> {
-                        // 5. Upcoming Subscriptions Alert
-                        if (uiState.upcomingSubscriptions.isNotEmpty()) {
+                        // 5. Upcoming Subscriptions & Recurring Schedule Alert
+                        if (uiState.upcomingSubscriptions.isNotEmpty() || uiState.upcomingRecurringCount > 0) {
+                            val openScheduleScreen = {
+                                if (uiState.upcomingSubscriptions.isEmpty() || uiState.nextExpectedCharge?.isTemplate == true) {
+                                    onNavigateToRecurring()
+                                } else {
+                                    onNavigateToSubscriptions()
+                                }
+                            }
                             item(key = section.name) {
                                 val visible = remember { mutableStateOf(hasAnimated) }
                                 LaunchedEffect(Unit) {
@@ -921,7 +931,7 @@ fun HomeScreen(
                                             title = stringResource(R.string.home_section_subscriptions),
                                             modifier = Modifier.padding(horizontal = Dimensions.Padding.content),
                                             action = {
-                                                TextButton(onClick = onNavigateToSubscriptions) {
+                                                TextButton(onClick = openScheduleScreen) {
                                                     Text(stringResource(R.string.home_view_all))
                                                     Icon(
                                                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -934,11 +944,13 @@ fun HomeScreen(
                                         Box(modifier = Modifier.padding(horizontal = Dimensions.Padding.content)) {
                                             UpcomingSubscriptionsCard(
                                                 subscriptions = uiState.upcomingSubscriptions,
+                                                recurringCount = uiState.upcomingRecurringCount,
+                                                nextExpectedCharge = uiState.nextExpectedCharge,
                                                 totalAmount = uiState.upcomingSubscriptionsTotal,
                                                 totalByCurrency = uiState.upcomingSubscriptionsByCurrency,
                                                 isUnified = uiState.isUnifiedMode,
                                                 currency = uiState.selectedCurrency,
-                                                onClick = onNavigateToSubscriptions,
+                                                onClick = openScheduleScreen,
                                                 blurEffects = blurEffects,
                                                 hazeState = hazeStateBanner
                                             )
@@ -1443,6 +1455,8 @@ private fun BreakdownRow(
 @Composable
 private fun UpcomingSubscriptionsCard(
     subscriptions: List<SubscriptionEntity>,
+    recurringCount: Int = 0,
+    nextExpectedCharge: NextExpectedCharge? = null,
     totalAmount: BigDecimal,
     totalByCurrency: Map<String, com.pennywiseai.tracker.utils.Money> = emptyMap(),
     isUnified: Boolean = false,
@@ -1557,8 +1571,16 @@ private fun UpcomingSubscriptionsCard(
                     )
                 }
                 Column {
+                    val primaryHeading = when {
+                        subscriptions.isNotEmpty() && recurringCount > 0 ->
+                            stringResource(R.string.home_active_schedules_mixed, subscriptions.size, recurringCount)
+                        subscriptions.isNotEmpty() ->
+                            pluralStringResource(R.plurals.home_active_subscriptions, subscriptions.size, subscriptions.size)
+                        else ->
+                            pluralStringResource(R.plurals.home_active_recurring_schedules, recurringCount, recurringCount)
+                    }
                     Text(
-                        text = pluralStringResource(R.plurals.home_active_subscriptions, subscriptions.size, subscriptions.size),
+                        text = primaryHeading,
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -1580,6 +1602,34 @@ private fun UpcomingSubscriptionsCard(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = Dimensions.Alpha.subtitle)
                     )
+                    nextExpectedCharge?.let { next ->
+                        val today = remember { LocalDate.now() }
+                        val dateFormatter = remember { DateTimeFormatter.ofPattern("MMM d") }
+                        val dueLabel = when {
+                            next.dueDate.isBefore(today) -> stringResource(
+                                R.string.home_next_due_overdue,
+                                next.dueDate.format(dateFormatter)
+                            )
+                            next.dueDate == today -> stringResource(R.string.home_next_due_today)
+                            next.dueDate == today.plusDays(1) -> stringResource(R.string.home_next_due_tomorrow)
+                            else -> stringResource(
+                                R.string.home_next_due_date,
+                                next.dueDate.format(dateFormatter)
+                            )
+                        }
+                        Text(
+                            text = stringResource(
+                                R.string.home_next_expected_charge,
+                                next.merchantName,
+                                CurrencyFormatter.formatCurrency(next.amount, next.currency),
+                                dueLabel
+                            ),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
             Text(

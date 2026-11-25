@@ -11,7 +11,11 @@ import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "transactions",
-    indices = [Index(value = ["transaction_hash"], unique = true)]
+    indices = [
+        Index(value = ["transaction_hash"], unique = true),
+        Index(value = ["subscription_id"]),
+        Index(value = ["recurring_template_id"])
+    ]
 )
 @Serializable
 data class TransactionEntity(
@@ -128,7 +132,13 @@ data class TransactionEntity(
     val groupId: Long? = null,
 
     @ColumnInfo(name = "profile_id", defaultValue = "NULL")
-    val profileId: Long? = null
+    val profileId: Long? = null,
+
+    @ColumnInfo(name = "subscription_id", defaultValue = "NULL")
+    val subscriptionId: Long? = null,
+
+    @ColumnInfo(name = "recurring_template_id", defaultValue = "NULL")
+    val recurringTemplateId: Long? = null
 )
 
 @Serializable

@@ -228,7 +228,27 @@ interface TransactionDao {
      */
     @Query("""
         DELETE FROM transactions
-        WHERE loan_id IS NULL AND group_id IS NULL AND is_deleted = 0
+        WHERE loan_id IS NULL AND group_id IS NULL
+          AND (
+              is_deleted = 0
+              OR (
+                  transaction_hash LIKE 'MERGED_TRANSFER_%'
+                  AND EXISTS (
+                      SELECT 1 FROM transactions AS survivor
+                      WHERE survivor.transaction_type = 'TRANSFER'
+                        AND transactions.transaction_hash LIKE 'MERGED_TRANSFER_' || survivor.id || '_%'
+                        AND survivor.loan_id IS NULL
+                        AND survivor.group_id IS NULL
+                        AND survivor.is_deleted = 0
+                        AND survivor.id NOT IN (SELECT transaction_id FROM goal_contributions WHERE transaction_id IS NOT NULL)
+                        AND survivor.id NOT IN (SELECT transaction_id FROM loan_shares)
+                        AND survivor.sms_sender IS NOT NULL
+                        AND survivor.sms_sender NOT LIKE '% PDF'
+                        AND survivor.sms_sender NOT IN (:notificationAliases)
+                        AND survivor.date_time >= :from
+                  )
+              )
+          )
           AND id NOT IN (SELECT transaction_id FROM goal_contributions WHERE transaction_id IS NOT NULL)
           AND id NOT IN (SELECT transaction_id FROM loan_shares)
           AND sms_sender IS NOT NULL
@@ -625,4 +645,81 @@ interface TransactionDao {
         dateStart: LocalDateTime,
         dateEnd: LocalDateTime
     ): List<TransactionEntity>
+
+    @Query("UPDATE transactions SET subscription_id = NULL WHERE subscription_id = :subscriptionId")
+    suspend fun clearSubscriptionLinks(subscriptionId: Long)
+
+    @Query("UPDATE transactions SET recurring_template_id = NULL WHERE recurring_template_id = :templateId")
+    suspend fun clearRecurringTemplateLinks(templateId: Long)
+
+    @Query("""
+        SELECT * FROM transactions
+        WHERE is_deleted = 0
+          AND subscription_id = :subscriptionId
+          AND date_time BETWEEN :start AND :end
+        ORDER BY date_time DESC
+    """)
+    suspend fun getTransactionsForSubscriptionInRange(
+        subscriptionId: Long,
+        start: LocalDateTime,
+        end: LocalDateTime
+    ): List<TransactionEntity>
+
+    @Query("""
+        SELECT * FROM transactions
+        WHERE is_deleted = 0
+          AND recurring_template_id = :templateId
+          AND date_time BETWEEN :start AND :end
+        ORDER BY date_time DESC
+    """)
+    suspend fun getTransactionsForTemplateInRange(
+        templateId: Long,
+        start: LocalDateTime,
+        end: LocalDateTime
+    ): List<TransactionEntity>
+
+    @Query("""
+        SELECT * FROM transactions
+        WHERE is_deleted = 0 AND subscription_id IS NOT NULL
+        ORDER BY date_time DESC
+    """)
+    fun getLinkedSubscriptionTransactions(): Flow<List<TransactionEntity>>
+
+    @Query("""
+        SELECT * FROM transactions
+        WHERE is_deleted = 0 AND recurring_template_id IS NOT NULL
+        ORDER BY date_time DESC
+    """)
+    fun getLinkedTemplateTransactions(): Flow<List<TransactionEntity>>
+
+    @Query("""
+        SELECT * FROM transactions
+        WHERE is_deleted = 0
+          AND id != :excludeId
+          AND amount = :amount
+          AND transaction_type IN ('EXPENSE', 'INCOME')
+          AND loan_id IS NULL
+          AND lent_shares_total IS NULL
+          AND group_id IS NULL
+          AND date_time BETWEEN :dateStart AND :dateEnd
+        ORDER BY date_time ASC
+    """)
+    suspend fun findSelfTransferCandidates(
+        amount: BigDecimal,
+        dateStart: LocalDateTime,
+        dateEnd: LocalDateTime,
+        excludeId: Long
+    ): List<TransactionEntity>
+
+    @Query("""
+        SELECT * FROM transactions
+        WHERE is_deleted = 0
+          AND sms_body IS NOT NULL
+          AND transaction_type IN ('EXPENSE', 'INCOME')
+          AND loan_id IS NULL
+          AND lent_shares_total IS NULL
+          AND group_id IS NULL
+        ORDER BY date_time ASC
+    """)
+    suspend fun getActiveSmsIncomeExpenseTransactions(): List<TransactionEntity>
 }

@@ -116,6 +116,7 @@ class MarkSubscriptionPaidUseCase @Inject constructor(
             currency = sub.currency,
             transactionHash = hash,
             isRecurring = true,
+            subscriptionId = sub.id,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
         )
@@ -168,6 +169,15 @@ class MarkSubscriptionPaidUseCase @Inject constructor(
 
         val linkedTxn = transactionRepository.getTransactionById(transactionId)
         val paidAt = linkedTxn?.dateTime?.toLocalDate() ?: LocalDate.now()
+        if (linkedTxn != null && (linkedTxn.subscriptionId != sub.id || !linkedTxn.isRecurring)) {
+            transactionRepository.updateTransaction(
+                linkedTxn.copy(
+                    subscriptionId = sub.id,
+                    isRecurring = true,
+                    updatedAt = LocalDateTime.now()
+                )
+            )
+        }
 
         val nextDate = subscriptionRepository.advance(scheduled, sub.billingCycle)
         subscriptionRepository.markPaid(sub.id, paidAt, nextDate)

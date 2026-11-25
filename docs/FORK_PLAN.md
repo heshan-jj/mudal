@@ -33,7 +33,7 @@ for none.
 | 8 | Release (F-Droid + GitHub Releases) | **v2.24.3 published** — `v2.25.0` queued after Workstreams 2 & 3 |
 | 9 | Remove the UPI / contacts feature | **done** — no `READ_CONTACTS`, no UPI. See [`REMOVE_UPI_PLAN.md`](REMOVE_UPI_PLAN.md) |
 
-**Next phase:** complete Phase 4 (recurring transactions & subscriptions, SMS-aware) ahead of `v2.25.0`.
+**Next phase:** Phases 1–4 complete ahead of `v2.25.0`.
 
 Phase 9 was a scope-reduction change: the app no longer asks for
 `READ_CONTACTS` and has no UPI code left. It was planned in
@@ -203,7 +203,7 @@ Optional: offer the Sri Lankan parsers upstream as PRs to PennyWise (smaller for
 
 ---
 
-# Phase 4: Recurring transactions & subscriptions (SMS-aware) — MUST-HAVE for v1.0
+# Phase 4: Recurring transactions & subscriptions (SMS-aware) — COMPLETE for v2.25.0
 
 **Do not build this from scratch.** Both features already exist upstream and are ungated after Phase 1:
 - **Subscriptions** — `SubscriptionsScreen` (`MainScreen.kt`), `SubscriptionEntity`/`SubscriptionDao`/`SubscriptionRepository`, `MarkSubscriptionPaidUseCase`, `SubscriptionTabContent`. The SMS path already matches a parsed charge to a subscription (`SmsTransactionProcessor` → `matchTransactionToSubscription`).

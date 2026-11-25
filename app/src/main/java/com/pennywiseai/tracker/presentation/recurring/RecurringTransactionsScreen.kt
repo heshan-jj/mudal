@@ -11,7 +11,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -28,6 +30,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pennywiseai.tracker.data.database.entity.AccountBalanceEntity
 import com.pennywiseai.tracker.data.database.entity.RecurringFrequency
 import com.pennywiseai.tracker.data.database.entity.RecurringTransactionEntity
 import com.pennywiseai.tracker.data.database.entity.TransactionType
@@ -47,6 +50,8 @@ fun RecurringTransactionsScreen(
     viewModel: RecurringTransactionsViewModel = hiltViewModel()
 ) {
     val templates by viewModel.templates.collectAsStateWithLifecycle()
+    val accounts by viewModel.accounts.collectAsStateWithLifecycle()
+    val templateStatuses by viewModel.templateStatuses.collectAsStateWithLifecycle()
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val baseCurrency by viewModel.baseCurrency.collectAsStateWithLifecycle()
     val canAddMore by viewModel.canAddMore.collectAsStateWithLifecycle()
@@ -106,6 +111,7 @@ fun RecurringTransactionsScreen(
                 items(active, key = { it.id }) { template ->
                     RecurringItem(
                         template = template,
+                        status = templateStatuses[template.id],
                         onEdit = { editing = RecurringFormState.from(template) },
                         onToggleActive = { viewModel.setActive(template, it) },
                         onDelete = { viewModel.delete(template) }
@@ -117,6 +123,7 @@ fun RecurringTransactionsScreen(
                 items(paused, key = { it.id }) { template ->
                     RecurringItem(
                         template = template,
+                        status = templateStatuses[template.id],
                         onEdit = { editing = RecurringFormState.from(template) },
                         onToggleActive = { viewModel.setActive(template, it) },
                         onDelete = { viewModel.delete(template) }
@@ -130,6 +137,7 @@ fun RecurringTransactionsScreen(
         RecurringEditorDialog(
             form = form,
             categoryNames = categories.map { it.name },
+            accounts = accounts,
             onDismiss = { editing = null },
             onSave = { viewModel.save(it); editing = null }
         )
@@ -148,12 +156,15 @@ private fun RecurringFrequency.label(): String = stringResource(
 @Composable
 private fun RecurringItem(
     template: RecurringTransactionEntity,
+    status: RecurringTemplateStatus? = null,
     onEdit: () -> Unit,
     onToggleActive: (Boolean) -> Unit,
     onDelete: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    val today = remember { java.time.LocalDate.now() }
+    val dateFormatter = remember { DateTimeFormatter.ofPattern("MMM d") }
 
     PennyWiseCardV2(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onEdit)
@@ -173,11 +184,33 @@ private fun RecurringItem(
                     text = stringResource(
                         R.string.recurring_item_schedule,
                         template.frequency.label(),
-                        template.nextDueDate.format(DateTimeFormatter.ofPattern("MMM d"))
+                        template.nextDueDate.format(dateFormatter)
                     ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                val statusText = when (status?.state) {
+                    RecurringCycleState.PAUSED -> stringResource(R.string.recurring_status_paused) to MaterialTheme.colorScheme.onSurfaceVariant
+                    RecurringCycleState.PAID -> status.paidDate?.let {
+                        stringResource(R.string.recurring_status_paid, it.format(dateFormatter)) to MaterialTheme.colorScheme.primary
+                    }
+                    RecurringCycleState.OVERDUE ->
+                        stringResource(R.string.recurring_status_overdue, template.nextDueDate.format(dateFormatter)) to MaterialTheme.colorScheme.error
+                    RecurringCycleState.SCHEDULED, null ->
+                        if (template.isActive && template.nextDueDate == today) {
+                            stringResource(R.string.recurring_status_due_today) to MaterialTheme.colorScheme.error
+                        } else if (template.isActive) {
+                            stringResource(R.string.recurring_status_scheduled) to MaterialTheme.colorScheme.onSurfaceVariant
+                        } else null
+                }
+                statusText?.let { (label, color) ->
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
+                        color = color
+                    )
+                }
                 template.category.takeIf { it.isNotBlank() }?.let {
                     Text(
                         text = it,
@@ -254,6 +287,7 @@ private fun RecurringItem(
 private fun RecurringEditorDialog(
     form: RecurringFormState,
     categoryNames: List<String>,
+    accounts: List<AccountBalanceEntity> = emptyList(),
     onDismiss: () -> Unit,
     onSave: (RecurringFormState) -> Unit
 ) {
@@ -261,6 +295,7 @@ private fun RecurringEditorDialog(
     var freqExpanded by remember { mutableStateOf(false) }
     var categoryExpanded by remember { mutableStateOf(false) }
     var dowExpanded by remember { mutableStateOf(false) }
+    var accountExpanded by remember { mutableStateOf(false) }
 
     val locale = LocalConfiguration.current.locales[0]
     val dayOfWeekNames = remember(locale) {
@@ -272,7 +307,9 @@ private fun RecurringEditorDialog(
         title = { Text(if (form.id == 0L) stringResource(R.string.recurring_editor_new) else stringResource(R.string.recurring_editor_edit)) },
         text = {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(Spacing.sm)
             ) {
                 OutlinedTextField(
@@ -424,6 +461,58 @@ private fun RecurringEditorDialog(
                         }
                     }
                     RecurringFrequency.DAILY -> { /* no day selector */ }
+                }
+
+                if (accounts.isNotEmpty()) {
+                    val bankName = state.bankName
+                    val accountLast4 = state.accountLast4
+                    val selectedAccount = accounts.firstOrNull {
+                        it.bankName == bankName && it.accountLast4 == accountLast4
+                    }
+                    val accountLabel: String = selectedAccount?.displayLabel
+                        ?: if (bankName != null && !accountLast4.isNullOrBlank()) {
+                            "$bankName ••$accountLast4"
+                        } else {
+                            bankName ?: stringResource(R.string.recurring_account_cash)
+                        }
+                    ExposedDropdownMenuBox(
+                        expanded = accountExpanded,
+                        onExpandedChange = { accountExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = accountLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.recurring_field_account)) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(accountExpanded) },
+                            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = accountExpanded,
+                            onDismissRequest = { accountExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.recurring_account_cash)) },
+                                onClick = {
+                                    state = state.copy(bankName = null, accountLast4 = null, profileId = 1L)
+                                    accountExpanded = false
+                                }
+                            )
+                            accounts.forEach { acct ->
+                                DropdownMenuItem(
+                                    text = { Text(acct.displayLabel) },
+                                    onClick = {
+                                        state = state.copy(
+                                            bankName = acct.bankName,
+                                            accountLast4 = acct.accountLast4,
+                                            profileId = acct.profileId
+                                        )
+                                        accountExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
 
                 OutlinedTextField(

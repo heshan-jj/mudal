@@ -137,6 +137,13 @@
         <item quantity="other">Update %1$d existing transactions</item>
     </plurals>
     <string name="txn_detail_recurring_checkbox">Recurring Transaction</string>
+    <string name="txn_detail_track_subscription">Track as Subscription</string>
+    <string name="txn_detail_make_recurring_template">Make Recurring Template</string>
+    <string name="txn_detail_recurring_choice_hint">Subscriptions match incoming bank SMS bills; recurring templates auto-add scheduled manual spend when no SMS arrives.</string>
+    <string name="txn_detail_linked_subscription">Linked subscription: %1$s</string>
+    <string name="txn_detail_linked_template">Linked template: %1$s</string>
+    <string name="txn_detail_subscription_created">Added \"%1$s\" to Subscriptions</string>
+    <string name="txn_detail_template_created">Added \"%1$s\" to Recurring</string>
     <string name="txn_detail_bank_read_only">Bank: %1$s (read-only)</string>
     <string name="txn_detail_budget_impact">Budget impact</string>
     <string name="txn_detail_budget_impact_none">None</string>
@@ -343,9 +350,18 @@
     <string name="recurring_back">Back</string>
     <string name="recurring_add">Add recurring transaction</string>
     <string name="recurring_empty_title">No recurring transactions</string>
-    <string name="recurring_empty_hint">Schedule cash or manual spend to be added automatically — rent, an allowance, a weekly cleaner.</string>
+    <string name="recurring_empty_hint">Schedule cash or manual spend to be added automatically when no bank SMS arrives — rent, an allowance, a weekly cleaner.</string>
     <string name="recurring_section_active">Active</string>
     <string name="recurring_section_paused">Paused</string>
+    <string name="recurring_status_paused">Paused</string>
+    <!-- %1$s = date -->
+    <string name="recurring_status_paid">Paid %1$s</string>
+    <!-- %1$s = due date -->
+    <string name="recurring_status_overdue">Overdue · %1$s</string>
+    <string name="recurring_status_due_today">Due today</string>
+    <string name="recurring_status_scheduled">Scheduled</string>
+    <string name="recurring_field_account">Funding account (optional)</string>
+    <string name="recurring_account_cash">Manual / Cash</string>
     <string name="recurring_frequency_daily">Daily</string>
     <string name="recurring_frequency_weekly">Weekly</string>
     <string name="recurring_frequency_monthly">Monthly</string>

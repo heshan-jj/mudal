@@ -77,7 +77,7 @@ import com.pennywiseai.tracker.data.database.entity.UnrecognizedSmsEntity
  * that needs to record the version it was exported against. Bump this in lock-
  * step with any schema change.
  */
-const val SCHEMA_VERSION = 67
+const val SCHEMA_VERSION = 68
 
 /**
  * The Mudal Room database.
@@ -148,7 +148,10 @@ const val SCHEMA_VERSION = 67
         AutoMigration(from = 65, to = 66),
         // 66→67 adds the loan_shares table and transactions.lent_shares_total
         // for split bills (#346) — purely additive.
-        AutoMigration(from = 66, to = 67)
+        AutoMigration(from = 66, to = 67),
+        // 67→68 adds nullable subscription_id and recurring_template_id links + indices
+        // on transactions (Phase 4 SMS-aware recurring reconciliation).
+        AutoMigration(from = 67, to = 68)
     ]
 )
 @TypeConverters(Converters::class)

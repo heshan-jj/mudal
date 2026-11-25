@@ -280,12 +280,15 @@
     <string name="subscriptions_no_date">No date set</string>
     <string name="subscriptions_due_today">Due today</string>
     <string name="subscriptions_due_tomorrow">Due tomorrow</string>
+    <!-- %1$s = formatted due date -->
+    <string name="subscriptions_overdue_date">Overdue · %1$s</string>
     <plurals name="subscriptions_due_in_days">
         <item quantity="one">Due in %1$d day</item>
         <item quantity="other">Due in %1$d days</item>
     </plurals>
     <!-- %1$s = date -->
     <string name="subscriptions_paid_on">Paid %1$s</string>
+    <string name="subscriptions_sms_tracking_hint">Recurring bills reconciled from bank SMS</string>
     <string name="subscriptions_more_options">More options</string>
     <string name="subscriptions_menu_mark_paid">Mark as paid</string>
     <string name="subscriptions_menu_view_source">View source</string>

@@ -216,6 +216,15 @@ fun TransactionDetailScreen(
             }
         }
     }
+
+    val recurringActionMsg by viewModel.recurringActionMessage.collectAsStateWithLifecycle()
+    val recurringActionText = recurringActionMsg?.asString()
+    LaunchedEffect(recurringActionText) {
+        recurringActionText?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearRecurringActionMessage()
+        }
+    }
     
     // Reload on every resume so external changes — e.g. the linked loan being
     // deleted from the Loan screen — are reflected when returning here (#444).
@@ -945,14 +954,60 @@ private fun TransactionReceipt(
                 )
             }
 
-            // Recurring
-            if (transaction.isRecurring) {
+            // Recurring link or create Subscription / Template actions
+            val linkedSubscriptionName by viewModel.linkedSubscriptionName.collectAsStateWithLifecycle()
+            val linkedTemplateName by viewModel.linkedTemplateName.collectAsStateWithLifecycle()
+            if (transaction.isRecurring || transaction.subscriptionId != null || transaction.recurringTemplateId != null) {
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                val statusText = when {
+                    linkedSubscriptionName != null -> stringResource(R.string.txn_detail_linked_subscription, linkedSubscriptionName!!)
+                    linkedTemplateName != null -> stringResource(R.string.txn_detail_linked_template, linkedTemplateName!!)
+                    else -> stringResource(R.string.txn_detail_status_recurring)
+                }
                 DetailInfoRow(
                     icon = Icons.Default.Repeat,
                     label = stringResource(R.string.txn_detail_label_status),
-                    value = stringResource(R.string.txn_detail_status_recurring)
+                    value = statusText
                 )
+            }
+            if (transaction.transactionType != TransactionType.TRANSFER &&
+                !transaction.isDeleted &&
+                transaction.subscriptionId == null &&
+                transaction.recurringTemplateId == null
+            ) {
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
+                    ) {
+                        OutlinedButton(
+                            onClick = { viewModel.createSubscriptionFromTransaction() },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txn_detail_track_subscription),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        OutlinedButton(
+                            onClick = { viewModel.createTemplateFromTransaction() },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.txn_detail_make_recurring_template),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                    Text(
+                        text = stringResource(R.string.txn_detail_recurring_choice_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
 
             // Classification

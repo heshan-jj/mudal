@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 private const val LEGACY_SCHEDULED_FOLDER_BACKUP_WORK_NAME = "scheduled_folder_backup"
@@ -89,6 +90,9 @@ class PennyWiseApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var databaseKeyManager: com.pennywiseai.tracker.data.database.DatabaseKeyManager
 
+    @Inject
+    lateinit var selfTransferAutoPairer: com.pennywiseai.tracker.data.manager.SelfTransferAutoPairer
+
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var activityReferences = 0
     private var isInForeground = false
@@ -136,6 +140,20 @@ class PennyWiseApplication : Application(), Configuration.Provider {
         // off still creates anything that came due while it was down.
         com.pennywiseai.tracker.worker.RecurringTransactionWorker.enqueuePeriodic(this)
         com.pennywiseai.tracker.worker.RecurringTransactionWorker.enqueueOneShotCatchUp(this)
+        applicationScope.launch(Dispatchers.IO) {
+            try {
+                if (!userPreferencesRepository.hasRunPhase4TransferSweep()) {
+                    com.pennywiseai.tracker.data.preferences.BankAccountMergeStore.mutationMutex.withLock {
+                        selfTransferAutoPairer.sweepExistingUnpairedTransfers()
+                    }
+                    userPreferencesRepository.markPhase4TransferSweepDone()
+                }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                android.util.Log.w("PennyWiseApplication", "Skipping Phase 4 transfer sweep", e)
+            }
+        }
         applicationScope.launch {
             try {
                 webhookSyncScheduler.observeSchedule()

@@ -58,6 +58,7 @@ class GenerateIncomeAutopayUseCase @Inject constructor(
                         currency = sub.currency,
                         transactionHash = hash,
                         isRecurring = true,
+                        subscriptionId = sub.id,
                         createdAt = LocalDateTime.now(),
                         updatedAt = LocalDateTime.now()
                     )
