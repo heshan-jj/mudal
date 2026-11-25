@@ -41,9 +41,15 @@ find_jdk21() {
     c="$(/usr/libexec/java_home -v 21 2>/dev/null || true)"
     [[ -n "$c" ]] && candidates+=("$c")
   fi
-  # 3. Android Studio's bundled JBR (used only if it is actually 21).
+  # 3. Android Studio's bundled JBR (macOS and Windows Git Bash / MSYS).
   candidates+=("/Applications/Android Studio.app/Contents/jbr/Contents/Home")
-  # 4. Common SDKMAN install.
+  candidates+=("/c/Program Files/Android/Android Studio/jbr")
+  # 4. Gradle toolchain cache (e.g. Eclipse Adoptium 21 provisioned by Gradle).
+  local gradle_jdk
+  for gradle_jdk in "$HOME/.gradle/jdks"/eclipse_adoptium-21*; do
+    [[ -d "$gradle_jdk" ]] && candidates+=("$gradle_jdk")
+  done
+  # 5. Common SDKMAN install.
   candidates+=("${SDKMAN_DIR:-$HOME/.sdkman}/candidates/java/current")
 
   for c in "${candidates[@]}"; do

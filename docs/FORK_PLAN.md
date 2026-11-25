@@ -24,19 +24,16 @@ for none.
 |---|---|---|
 | 0 | Fork + baseline verification | done — `phase-0-done` |
 | 1 | Identity, de-commercialise, privacy cleanup | done — `phase-1-done` (`8c26effa`) |
-| 2 | Database encryption (SQLCipher) | **in progress** — see outstanding items below |
+| 2 | Database encryption (SQLCipher) | **done** — plaintext upgrade, key-loss gate, clean reset/restore restart |
 | 3 | Parsers: Sampath + Commercial Bank | done — parsers implemented, audited against real samples, tests green |
 | 4 | Recurring transactions & subscriptions (SMS-aware) | **must-have for v1.0** |
 | 5 | Sinhala localisation | optional, post-v1.0 |
 | 6 | Budget rollover + alerts | optional, post-v1.0 |
 | 7 | Offline build variant | optional, post-v1.0 |
-| 8 | Release (F-Droid + GitHub Releases) | **v2.24.1 published** — https://github.com/heshan-jj/mudal/releases/tag/v2.24.1 |
+| 8 | Release (F-Droid + GitHub Releases) | **v2.24.3 published** — `v2.25.0` queued after Workstreams 2 & 3 |
 | 9 | Remove the UPI / contacts feature | **done** — no `READ_CONTACTS`, no UPI. See [`REMOVE_UPI_PLAN.md`](REMOVE_UPI_PLAN.md) |
 
-**Next phase: none queued.** The v1.0 scope (Phases 1–4) is complete except for
-Phase 2's outstanding items (the plaintext→encrypted upgrade path, the
-in-memory fallback, close-before-delete) and Phase 4 (recurring transactions &
-subscriptions, SMS-aware). Phase 8 has published v2.24.1.
+**Next phase:** encrypt scheduled folder backups (Phase 1/2 leftover) and complete Phase 4 (recurring transactions & subscriptions, SMS-aware) ahead of `v2.25.0`.
 
 Phase 9 was a scope-reduction change: the app no longer asks for
 `READ_CONTACTS` and has no UPI code left. It was planned in
@@ -163,14 +160,14 @@ users; it does not protect the owner's device.
 
 ### Outstanding items (finish these before reporting Phase 2 done)
 
-- [ ] Plaintext→encrypted upgrade path + test (item 3) — **the owner's device hits this on first launch**
-- [ ] Remove the in-memory fallback; fail loudly into the error screen (item 4)
-- [ ] Close-before-delete in `resetDatabaseAndKey()`; rebuild the instance after (item 5)
+- [x] Plaintext→encrypted upgrade path + test (item 3) — `PlaintextDatabaseMigrator` + `SqlCipherEncryptionTest`
+- [x] Remove the in-memory fallback; fail loudly into the error screen (item 4) — `FailingOpenHelperFactory` + `KeyAwareOpenHelperFactory`
+- [x] Close-before-delete in `resetDatabaseAndKey()`; rebuild the instance after (item 5) — staged restore + process restart in `MainActivity`
 - [x] `allowBackup=false` — already set in `AndroidManifest.xml`; `data_extraction_rules.xml` / `backup_rules.xml` are inert while it is (item 6)
-- [ ] Decide and document the backup-encryption story (item 7)
-- [ ] Delete the now-dead `PennyWiseDatabase.getInstance()` path — it builds a second Room instance with a separate key manager, so key-loss detected there never reaches the UI
-- [ ] `System.loadLibrary("sqlcipher")` must not be swallowed by a bare `catch (Throwable)` — log and rethrow, so "library missing" is not reported as "file is not a database"
-- [ ] `./init.sh app` green with quoted output (the gate, not ad-hoc gradle runs)
+- [ ] Decide and document the backup-encryption story (item 7) — scheduled folder backup encryption queued next (Workstream 2)
+- [x] Delete the now-dead `PennyWiseDatabase.getInstance()` path — removed from `PennyWiseDatabase` & `DatabaseKeyManager`
+- [x] `System.loadLibrary("sqlcipher")` must not be swallowed by a bare `catch (Throwable)` — logs and rethrows in `DatabaseModule`
+- [x] `./init.sh app` green with quoted output (the gate, not ad-hoc gradle runs)
 
 Acceptance: encrypted DB proven, the owner's existing data survived the upgrade, all existing DB tests pass, restore from backup works, `./init.sh app` green with quoted output.
 
