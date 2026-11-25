@@ -123,6 +123,67 @@ class DatabaseKeyManagerTest {
         assertFalse(manager.hasKeyError())
     }
 
+    @Test
+    fun `plaintext db file with missing key generates passphrase instead of key loss error`() {
+        val tempDir = java.nio.file.Files.createTempDirectory("db_key_plain").toFile()
+        try {
+            val tempDb = File(tempDir, PennyWiseDatabase.DATABASE_NAME)
+            val header = "SQLite format 3\u0000".toByteArray(Charsets.US_ASCII)
+            tempDb.writeBytes(header + ByteArray(64))
+            every { context.getDatabasePath(PennyWiseDatabase.DATABASE_NAME) } returns tempDb
+
+            val manager = DatabaseKeyManager(context, fakeKeyStoreHelper)
+            val key = manager.getOrCreatePassphrase()
+
+            assertEquals(32, key.size)
+            assertFalse(manager.hasKeyError())
+            assertTrue(prefStorage.containsKey("encrypted_db_key"))
+        } finally {
+            tempDir.deleteRecursively()
+        }
+    }
+
+    @Test
+    fun `encrypted db file with missing key still triggers key loss error`() {
+        val tempDir = java.nio.file.Files.createTempDirectory("db_key_enc").toFile()
+        try {
+            val tempDb = File(tempDir, PennyWiseDatabase.DATABASE_NAME)
+            tempDb.writeBytes(ByteArray(64) { 0x42 })
+            every { context.getDatabasePath(PennyWiseDatabase.DATABASE_NAME) } returns tempDb
+
+            val manager = DatabaseKeyManager(context, fakeKeyStoreHelper)
+
+            assertThrows(DatabaseKeyException::class.java) {
+                manager.getOrCreatePassphrase()
+            }
+            assertTrue(manager.hasKeyError())
+        } finally {
+            tempDir.deleteRecursively()
+        }
+    }
+
+    @Test
+    fun `resetDatabaseAndKey deletes wal shm journal tmp and bak sidecar files`() {
+        val tempDir = java.nio.file.Files.createTempDirectory("db_key_reset").toFile()
+        try {
+            val tempDb = File(tempDir, PennyWiseDatabase.DATABASE_NAME).apply { writeBytes(byteArrayOf(1, 2, 3)) }
+            val sidecars = listOf("-wal", "-shm", "-journal", ".tmp", ".bak").map { suffix ->
+                File("${tempDb.path}$suffix").apply { writeBytes(byteArrayOf(4, 5, 6)) }
+            }
+            every { context.getDatabasePath(PennyWiseDatabase.DATABASE_NAME) } returns tempDb
+
+            val manager = DatabaseKeyManager(context, fakeKeyStoreHelper)
+            manager.resetDatabaseAndKey()
+
+            assertFalse("Main DB file should be deleted", tempDb.exists())
+            sidecars.forEach { file ->
+                assertFalse("Sidecar ${file.name} should be deleted", file.exists())
+            }
+        } finally {
+            tempDir.deleteRecursively()
+        }
+    }
+
     private class FakeKeyStoreHelper : KeyStoreHelper {
         private val masterKey = ByteArray(32) { 0x5A.toByte() }
         var shouldFailDecrypt = false

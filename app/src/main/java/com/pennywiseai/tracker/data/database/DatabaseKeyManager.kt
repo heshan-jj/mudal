@@ -2,13 +2,15 @@
 package com.pennywiseai.tracker.data.database
 
 import android.content.Context
-import java.util.Base64
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.File
+import java.io.FileInputStream
 import java.security.SecureRandom
+import java.util.Base64
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,14 +32,41 @@ class DatabaseKeyManager @Inject constructor(
         private const val KEY_CIPHERTEXT = "encrypted_db_key"
         private const val KEY_IV = "db_key_iv"
         private const val KEY_LEN_BYTES = 32
+        private val SQLITE_HEADER = "SQLite format 3\u0000".toByteArray(Charsets.US_ASCII)
+        private val SIDECAR_SUFFIXES = listOf("-wal", "-shm", "-journal", ".tmp", ".bak")
 
         @Volatile
         private var instance: DatabaseKeyManager? = null
 
+        @Deprecated("Removed in Task 4 alongside PennyWiseDatabase.getInstance()")
         fun getInstance(context: Context): DatabaseKeyManager {
             return instance ?: synchronized(this) {
                 instance ?: DatabaseKeyManager(context.applicationContext).also { instance = it }
             }
+        }
+
+        fun isPlaintextSqlite(dbFile: File): Boolean {
+            if (!dbFile.exists() || !dbFile.isFile || dbFile.length() < SQLITE_HEADER.size) {
+                return false
+            }
+            return try {
+                val buffer = ByteArray(SQLITE_HEADER.size)
+                val read = FileInputStream(dbFile).use { it.read(buffer) }
+                read == SQLITE_HEADER.size && buffer.contentEquals(SQLITE_HEADER)
+            } catch (_: Exception) {
+                false
+            }
+        }
+
+        fun deleteDatabaseFiles(dbFile: File): Boolean {
+            var allDeleted = !dbFile.exists() || dbFile.delete()
+            for (suffix in SIDECAR_SUFFIXES) {
+                val sidecar = File("${dbFile.path}$suffix")
+                if (sidecar.exists() && !sidecar.delete()) {
+                    allDeleted = false
+                }
+            }
+            return allDeleted
         }
     }
 
@@ -51,7 +80,7 @@ class DatabaseKeyManager @Inject constructor(
 
     /**
      * Retrieves the database encryption passphrase, or generates and wraps a new one on first run.
-     * Throws [DatabaseKeyException] if key loss is detected (e.g., DB exists but key is lost).
+     * Throws [DatabaseKeyException] if key loss is detected (e.g., encrypted DB exists but key is lost).
      */
     @Synchronized
     fun getOrCreatePassphrase(): ByteArray {
@@ -63,14 +92,14 @@ class DatabaseKeyManager @Inject constructor(
 
         val passphrase = try {
             if (encryptedKeyBase64 == null || ivBase64 == null) {
-                if (dbFile.exists()) {
-                    // Database exists on disk, but encryption key is gone -> KEY LOSS
+                if (dbFile.exists() && !isPlaintextSqlite(dbFile)) {
+                    // Encrypted database exists on disk, but encryption key is gone -> KEY LOSS
                     val msg = "Database exists on device but encryption key is missing from storage."
                     Log.e(TAG, msg)
                     _keyStatus.value = DatabaseKeyStatus.Error(msg)
                     throw DatabaseKeyException(msg)
                 } else {
-                    // First run: generate new random 256-bit passphrase and store wrapped in Android Keystore
+                    // First run or legacy plaintext database awaiting upgrade
                     generateAndStoreNewPassphrase()
                 }
             } else {
@@ -110,12 +139,13 @@ class DatabaseKeyManager @Inject constructor(
     }
 
     /**
-     * Resets the database and encryption key: deletes old database files and stored wrapped key,
-     * generates a fresh key, and marks status as Ready.
+     * Resets the database and encryption key: deletes old database files (including WAL/SHM sidecars)
+     * and stored wrapped key, generates a fresh key, and marks status as Ready.
      */
     @Synchronized
     fun resetDatabaseAndKey(): ByteArray {
         context.deleteDatabase(PennyWiseDatabase.DATABASE_NAME)
+        deleteDatabaseFiles(context.getDatabasePath(PennyWiseDatabase.DATABASE_NAME))
         prefs.edit().clear().commit()
         try {
             keyStoreHelper.removeMasterKey()
