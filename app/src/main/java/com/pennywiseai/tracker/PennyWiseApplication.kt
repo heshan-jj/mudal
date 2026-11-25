@@ -98,14 +98,24 @@ class PennyWiseApplication : Application(), Configuration.Provider {
         // off still creates anything that came due while it was down.
         com.pennywiseai.tracker.worker.RecurringTransactionWorker.enqueuePeriodic(this)
         com.pennywiseai.tracker.worker.RecurringTransactionWorker.enqueueOneShotCatchUp(this)
-        applicationScope.launch { webhookSyncScheduler.observeSchedule() }
+        applicationScope.launch {
+            try {
+                webhookSyncScheduler.observeSchedule()
+            } catch (e: com.pennywiseai.tracker.data.database.DatabaseKeyException) {
+                android.util.Log.w("PennyWiseApplication", "Skipping webhook schedule observer due to DB key error", e)
+            }
+        }
 
         // Goal widgets (#914): one hook for every goal write (screens, Add to goal,
         // restore, a linked transaction edited or deleted) instead of one per call site.
         // ponytail: re-queries goals on any transactions-table write; cheap at goal-list sizes.
         applicationScope.launch {
-            goalRepository.observeGoals().distinctUntilChanged().drop(1).collect {
-                com.pennywiseai.tracker.widget.GoalWidgetUpdateWorker.enqueueOneShot(this@PennyWiseApplication)
+            try {
+                goalRepository.observeGoals().distinctUntilChanged().drop(1).collect {
+                    com.pennywiseai.tracker.widget.GoalWidgetUpdateWorker.enqueueOneShot(this@PennyWiseApplication)
+                }
+            } catch (e: com.pennywiseai.tracker.data.database.DatabaseKeyException) {
+                android.util.Log.w("PennyWiseApplication", "Skipping goal observer due to DB key error", e)
             }
         }
 
@@ -122,22 +132,26 @@ class PennyWiseApplication : Application(), Configuration.Provider {
         // Mirror user category styles (color + emoji, #760) into CategoryMapping so
         // icon call sites outside ViewModels can render custom categories.
         applicationScope.launch {
-            categoryRepository.getAllCategories().collectLatest { categories ->
-                com.pennywiseai.tracker.data.mapper.BuiltinCategoryNames.update(categories)
-                val seedColors = com.pennywiseai.shared.data.bootstrap.DefaultCategoryData.ALL.associate { it.name to it.colorHex }
-                val styles = categories.associate {
-                    val key = it.builtinKey
-                    it.name to CategoryMapping.UserStyle(
-                        colorHex = it.color,
-                        emoji = it.icon,
-                        builtinKey = key?.takeIf { k -> k != it.name },
-                        // A built-in still on its seeded colour uses the palette; one the
-                        // user recoloured (now possible, #823) uses theirs.
-                        customColor = key == null || !it.color.equals(seedColors[key], ignoreCase = true)
-                    )
+            try {
+                categoryRepository.getAllCategories().collectLatest { categories ->
+                    com.pennywiseai.tracker.data.mapper.BuiltinCategoryNames.update(categories)
+                    val seedColors = com.pennywiseai.shared.data.bootstrap.DefaultCategoryData.ALL.associate { it.name to it.colorHex }
+                    val styles = categories.associate {
+                        val key = it.builtinKey
+                        it.name to CategoryMapping.UserStyle(
+                            colorHex = it.color,
+                            emoji = it.icon,
+                            builtinKey = key?.takeIf { k -> k != it.name },
+                            // A built-in still on its seeded colour uses the palette; one the
+                            // user recoloured (now possible, #823) uses theirs.
+                            customColor = key == null || !it.color.equals(seedColors[key], ignoreCase = true)
+                        )
+                    }
+                    CategoryMapping.userStyles.keys.retainAll(styles.keys)
+                    CategoryMapping.userStyles.putAll(styles)
                 }
-                CategoryMapping.userStyles.keys.retainAll(styles.keys)
-                CategoryMapping.userStyles.putAll(styles)
+            } catch (e: com.pennywiseai.tracker.data.database.DatabaseKeyException) {
+                android.util.Log.w("PennyWiseApplication", "Skipping category observer due to DB key error", e)
             }
         }
     }

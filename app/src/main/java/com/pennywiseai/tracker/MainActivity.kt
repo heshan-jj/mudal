@@ -1,4 +1,4 @@
-// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-10-21 - see NOTICE.
+// Mudal fork: modified from PennyWise AI (AGPL-3.0-only) on 2026-11-25 - see NOTICE.
 package com.pennywiseai.tracker
 
 import android.content.Intent
@@ -6,24 +6,53 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
-import com.pennywiseai.tracker.receiver.SmsBroadcastReceiver
-import dagger.hilt.android.AndroidEntryPoint
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.pennywiseai.tracker.data.backup.ImportResult
+import com.pennywiseai.tracker.data.backup.ImportStrategy
+import com.pennywiseai.tracker.data.database.DatabaseKeyStatus
+import com.pennywiseai.tracker.data.database.PennyWiseDatabase
+import com.pennywiseai.tracker.receiver.SmsBroadcastReceiver
+import com.pennywiseai.tracker.ui.theme.PennyWiseTheme
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
+
+    @javax.inject.Inject
+    lateinit var database: PennyWiseDatabase
 
     @javax.inject.Inject
     lateinit var databaseKeyManager: com.pennywiseai.tracker.data.database.DatabaseKeyManager
@@ -54,6 +83,7 @@ class MainActivity : FragmentActivity() {
         fun addDeepLink(): Uri = "$DEEP_LINK_SCHEME://$DEEP_LINK_HOST_ADD".toUri()
 
         private const val MAX_SHARED_TEXT = 1000
+        private const val STAGED_RESTORE_FILENAME = "pending_restore.json"
     }
 
     // Transaction ID to edit when launched from notification
@@ -71,6 +101,35 @@ class MainActivity : FragmentActivity() {
     // Text shared to Mudal from another app; opens Add Transaction pre-filled.
     var sharedText by mutableStateOf<String?>(null)
         private set
+
+    private fun stagedRestoreFile(): File = File(cacheDir, STAGED_RESTORE_FILENAME)
+
+    private fun stagedRestoreTempFile(): File = File(cacheDir, "$STAGED_RESTORE_FILENAME.tmp")
+
+    private fun stageBackupUri(uri: Uri) {
+        val tempFile = stagedRestoreTempFile()
+        val finalFile = stagedRestoreFile()
+        tempFile.delete()
+        finalFile.delete()
+        val copied = contentResolver.openInputStream(uri)?.use { input ->
+            tempFile.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        } ?: throw IllegalStateException("Could not open selected backup file")
+        check(copied > 0L) { "Selected backup file is empty" }
+        check(tempFile.renameTo(finalFile)) { "Could not stage backup file for restore" }
+    }
+
+    private fun resetAndRestartProcess() {
+        runCatching { database.close() }
+        databaseKeyManager.resetDatabaseAndKey()
+        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
+            ?: Intent(this, MainActivity::class.java)
+        val restartIntent = Intent.makeRestartActivityTask(launchIntent.component)
+        startActivity(restartIntent)
+        finishAffinity()
+        Runtime.getRuntime().exit(0)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Install splash screen before super.onCreate()
@@ -107,26 +166,105 @@ class MainActivity : FragmentActivity() {
 
         setContent {
             val keyStatus by databaseKeyManager.keyStatus.collectAsStateWithLifecycle()
-            if (keyStatus is com.pennywiseai.tracker.data.database.DatabaseKeyStatus.Error) {
-                com.pennywiseai.tracker.ui.screens.database.DatabaseErrorScreen(
-                    errorMessage = (keyStatus as com.pennywiseai.tracker.data.database.DatabaseKeyStatus.Error).message,
-                    onRestoreBackup = { uri ->
-                        lifecycleScope.launch {
-                            try {
-                                databaseKeyManager.resetDatabaseAndKey()
-                                backupImporter.importBackup(uri, com.pennywiseai.tracker.data.backup.ImportStrategy.REPLACE_ALL)
-                                recreate()
-                            } catch (e: Exception) {
-                                android.util.Log.e("MainActivity", "Failed to restore backup", e)
+            var isRecoveryWorking by remember { mutableStateOf(false) }
+            var recoveryError by remember { mutableStateOf<String?>(null) }
+            var isApplyingStagedRestore by remember { mutableStateOf(stagedRestoreFile().exists()) }
+            var stagedRestoreError by remember { mutableStateOf<String?>(null) }
+
+            if (keyStatus is DatabaseKeyStatus.Error) {
+                PennyWiseTheme {
+                    com.pennywiseai.tracker.ui.screens.database.DatabaseErrorScreen(
+                        errorMessage = (keyStatus as DatabaseKeyStatus.Error).message,
+                        actionError = recoveryError,
+                        isWorking = isRecoveryWorking,
+                        onRestoreBackup = { uri ->
+                            if (isRecoveryWorking) return@DatabaseErrorScreen
+                            isRecoveryWorking = true
+                            recoveryError = null
+                            lifecycleScope.launch {
+                                try {
+                                    withContext(Dispatchers.IO) {
+                                        stageBackupUri(uri)
+                                    }
+                                    resetAndRestartProcess()
+                                } catch (e: Exception) {
+                                    android.util.Log.e("MainActivity", "Failed to stage backup for restore", e)
+                                    stagedRestoreTempFile().delete()
+                                    stagedRestoreFile().delete()
+                                    recoveryError = getString(
+                                        R.string.db_error_restore_failed,
+                                        e.message ?: "unknown error"
+                                    )
+                                    isRecoveryWorking = false
+                                }
+                            }
+                        },
+                        onResetDatabase = {
+                            if (isRecoveryWorking) return@DatabaseErrorScreen
+                            isRecoveryWorking = true
+                            recoveryError = null
+                            resetAndRestartProcess()
+                        }
+                    )
+                }
+            } else if (isApplyingStagedRestore) {
+                LaunchedEffect(Unit) {
+                    val staged = stagedRestoreFile()
+                    try {
+                        val result = withContext(Dispatchers.IO) {
+                            backupImporter.importBackup(
+                                Uri.fromFile(staged),
+                                ImportStrategy.REPLACE_ALL
+                            )
+                        }
+                        if (result is ImportResult.Error) {
+                            stagedRestoreError = getString(
+                                R.string.db_error_restore_failed,
+                                result.message
+                            )
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("MainActivity", "Failed to import staged backup", e)
+                        stagedRestoreError = getString(
+                            R.string.db_error_restore_failed,
+                            e.message ?: "unknown error"
+                        )
+                    } finally {
+                        staged.delete()
+                        isApplyingStagedRestore = false
+                    }
+                }
+                PennyWiseTheme {
+                    Scaffold { paddingValues ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = stringResource(R.string.db_error_restoring),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
+                    }
+                }
+            } else {
+                stagedRestoreError?.let { errorMsg ->
+                    AlertDialog(
+                        onDismissRequest = { stagedRestoreError = null },
+                        title = { Text(text = stringResource(R.string.db_error_title)) },
+                        text = { Text(text = errorMsg) },
+                        confirmButton = {
+                            TextButton(onClick = { stagedRestoreError = null }) {
+                                Text(text = stringResource(android.R.string.ok))
                             }
                         }
-                    },
-                    onResetDatabase = {
-                        databaseKeyManager.resetDatabaseAndKey()
-                        recreate()
-                    }
-                )
-            } else {
+                    )
+                }
                 PennyWiseApp(
                     editTransactionId = editTransactionId,
                     openAddTransaction = openAddTransaction,

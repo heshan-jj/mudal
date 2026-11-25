@@ -35,16 +35,6 @@ class DatabaseKeyManager @Inject constructor(
         private val SQLITE_HEADER = "SQLite format 3\u0000".toByteArray(Charsets.US_ASCII)
         private val SIDECAR_SUFFIXES = listOf("-wal", "-shm", "-journal", ".tmp", ".bak")
 
-        @Volatile
-        private var instance: DatabaseKeyManager? = null
-
-        @Deprecated("Removed in Task 4 alongside PennyWiseDatabase.getInstance()")
-        fun getInstance(context: Context): DatabaseKeyManager {
-            return instance ?: synchronized(this) {
-                instance ?: DatabaseKeyManager(context.applicationContext).also { instance = it }
-            }
-        }
-
         fun isPlaintextSqlite(dbFile: File): Boolean {
             if (!dbFile.exists() || !dbFile.isFile || dbFile.length() < SQLITE_HEADER.size) {
                 return false

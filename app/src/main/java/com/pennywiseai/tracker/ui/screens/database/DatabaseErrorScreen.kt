@@ -25,7 +25,9 @@ import com.pennywiseai.tracker.R
 fun DatabaseErrorScreen(
     errorMessage: String,
     onRestoreBackup: (Uri) -> Unit,
-    onResetDatabase: () -> Unit
+    onResetDatabase: () -> Unit,
+    actionError: String? = null,
+    isWorking: Boolean = false
 ) {
     var showResetConfirmDialog by remember { mutableStateOf(false) }
 
@@ -71,14 +73,17 @@ fun DatabaseErrorScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            if (errorMessage.isNotBlank()) {
+            if (errorMessage.isNotBlank() || !actionError.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Surface(
                     color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f),
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Text(
-                        text = errorMessage,
+                        text = listOfNotNull(
+                            errorMessage.takeIf { it.isNotBlank() },
+                            actionError?.takeIf { it.isNotBlank() }
+                        ).joinToString("\n\n"),
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onErrorContainer,
@@ -91,6 +96,7 @@ fun DatabaseErrorScreen(
 
             Button(
                 onClick = { filePickerLauncher.launch(arrayOf("application/json", "*/*")) },
+                enabled = !isWorking,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -98,7 +104,15 @@ fun DatabaseErrorScreen(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Icon(Icons.Default.Restore, contentDescription = null)
+                if (isWorking) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Icon(Icons.Default.Restore, contentDescription = null)
+                }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.db_error_restore_backup),
@@ -110,6 +124,7 @@ fun DatabaseErrorScreen(
 
             OutlinedButton(
                 onClick = { showResetConfirmDialog = true },
+                enabled = !isWorking,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),

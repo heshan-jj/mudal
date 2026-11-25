@@ -86,6 +86,8 @@
     <string name="db_error_reset_confirm_message">This will permanently delete the current encrypted database file on this device and initialize a fresh, empty database. Any unbacked data will be lost.</string>
     <string name="db_error_reset_confirm_action">Reset</string>
     <string name="db_error_cancel">Cancel</string>
+    <string name="db_error_restoring">Restoring backup…</string>
+    <string name="db_error_restore_failed">Could not restore backup: %1$s</string>
 
     <!-- Data Management -->
     <string name="settings_data_section">Data Management</string>

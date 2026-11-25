@@ -70,37 +70,38 @@ object DatabaseModule {
         try {
             System.loadLibrary("sqlcipher")
         } catch (t: Throwable) {
-            android.util.Log.e("DatabaseModule", "Could not load sqlcipher native library: ${t.message}")
+            android.util.Log.e("DatabaseModule", "Could not load sqlcipher native library: ${t.message}", t)
+            throw t
         }
 
-        val database = try {
+        val dbFile = context.getDatabasePath(PennyWiseDatabase.DATABASE_NAME)
+        val openHelperFactory = try {
             val passphrase = databaseKeyManager.getOrCreatePassphrase()
-            val openHelperFactory = net.zetetic.database.sqlcipher.SupportOpenHelperFactory(passphrase)
-            Room.databaseBuilder(
-                context,
-                PennyWiseDatabase::class.java,
-                PennyWiseDatabase.DATABASE_NAME
+            com.pennywiseai.tracker.data.database.PlaintextDatabaseMigrator
+                .migrateIfNeeded(dbFile, passphrase)
+                .getOrThrow()
+            com.pennywiseai.tracker.data.database.KeyAwareOpenHelperFactory(
+                delegate = net.zetetic.database.sqlcipher.SupportOpenHelperFactory(passphrase),
+                databaseKeyManager = databaseKeyManager
             )
-                .openHelperFactory(openHelperFactory)
-                .addMigrations(*PennyWiseDatabase.ALL_MIGRATIONS)
-                .addCallback(DatabaseCallback())
-                .build()
         } catch (e: Exception) {
-            android.util.Log.e("DatabaseModule", "Failed to open encrypted database, using in-memory fallback to prevent crash loop", e)
-            Room.inMemoryDatabaseBuilder(
-                context,
-                PennyWiseDatabase::class.java
-            )
-                .addMigrations(*PennyWiseDatabase.ALL_MIGRATIONS)
-                .build()
+            val message = e.message ?: "Failed to initialize encrypted database"
+            android.util.Log.e("DatabaseModule", "Encrypted database initialization failed: $message", e)
+            databaseKeyManager.markError(message, e)
+            com.pennywiseai.tracker.data.database.FailingOpenHelperFactory(message, e)
         }
 
-        // Set the singleton instance so BroadcastReceivers can access it
-        PennyWiseDatabase.setInstance(database)
-
-        return database
+        return Room.databaseBuilder(
+            context,
+            PennyWiseDatabase::class.java,
+            PennyWiseDatabase.DATABASE_NAME
+        )
+            .openHelperFactory(openHelperFactory)
+            .addMigrations(*PennyWiseDatabase.ALL_MIGRATIONS)
+            .addCallback(DatabaseCallback())
+            .build()
     }
-    
+
     /**
      * Provides the TransactionDao from the database.
      * 
