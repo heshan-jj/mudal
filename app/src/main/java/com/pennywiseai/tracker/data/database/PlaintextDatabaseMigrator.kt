@@ -25,12 +25,20 @@ object PlaintextDatabaseMigrator {
      * leaving the original [dbFile] intact on error.
      */
     fun migrateIfNeeded(dbFile: File, passphrase: ByteArray): Result<Boolean> {
+        val tmpFile = File("${dbFile.path}.tmp")
+        val bakFile = File("${dbFile.path}.bak")
+
+        // Recover if an earlier swap crashed between renameTo(bakFile) and renameTo(dbFile)
+        if (!dbFile.exists() && bakFile.exists()) {
+            if (!bakFile.renameTo(dbFile)) {
+                return Result.failure(IllegalStateException("Failed to recover original database from .bak"))
+            }
+        }
+
         if (!DatabaseKeyManager.isPlaintextSqlite(dbFile)) {
             return Result.success(false)
         }
 
-        val tmpFile = File("${dbFile.path}.tmp")
-        val bakFile = File("${dbFile.path}.bak")
         deleteIfExists(tmpFile)
         deleteIfExists(bakFile)
 

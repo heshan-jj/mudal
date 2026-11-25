@@ -87,4 +87,34 @@ class DatabaseOpenHelpersTest {
         assertSame(mockDb, helper.readableDatabase)
         assertFalse(manager.hasKeyError())
     }
+
+    @Test
+    fun `verifyDatabaseReadable returns false and keeps key error when openHelper fails`() {
+        val manager = createKeyManager()
+        val delegateHelper = mockk<SupportSQLiteOpenHelper>(relaxed = true)
+        every { delegateHelper.writableDatabase } throws RuntimeException("wrong key")
+        val helper = KeyAwareOpenHelperFactory({ delegateHelper }, manager).create(testConfiguration())
+
+        val ok = verifyDatabaseReadable(helper, manager)
+
+        assertFalse(ok)
+        assertTrue(manager.hasKeyError())
+    }
+
+    @Test
+    fun `verifyDatabaseReadable returns true when openHelper succeeds`() {
+        val manager = createKeyManager()
+        val mockDb = mockk<SupportSQLiteDatabase>(relaxed = true)
+        val cursor = mockk<android.database.Cursor>(relaxed = true)
+        every { cursor.moveToFirst() } returns true
+        every { mockDb.query("SELECT 1") } returns cursor
+        val delegateHelper = mockk<SupportSQLiteOpenHelper>(relaxed = true)
+        every { delegateHelper.writableDatabase } returns mockDb
+        val helper = KeyAwareOpenHelperFactory({ delegateHelper }, manager).create(testConfiguration())
+
+        val ok = verifyDatabaseReadable(helper, manager)
+
+        assertTrue(ok)
+        assertFalse(manager.hasKeyError())
+    }
 }

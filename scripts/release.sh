@@ -204,7 +204,7 @@ echo -e "${GREEN}✅ Fastlane changelog created: $CHANGELOG_FILE${NC}"
 
 # 6. Commit and tag
 git add app/build.gradle.kts "$CHANGELOG_FILE" "$CHANGELOG_DIR/default.txt"
-git commit -m "chore(release): bump version to $NEXT_VERSION [skip ci]"
+git commit -m "chore(release): bump version to $NEXT_VERSION"
 git tag -a "v$NEXT_VERSION" -m "Release v$NEXT_VERSION"
 CHANGES_MADE=false
 echo -e "${GREEN}✅ Commit and tag created${NC}"

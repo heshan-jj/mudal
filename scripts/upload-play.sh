@@ -41,7 +41,7 @@ for arg in "$@"; do
   esac
 done
 
-PACKAGE="com.pennywiseai.tracker"
+PACKAGE="com.mudal.tracker"
 JSON_KEY="${PLAY_JSON_KEY:-secrets/play-store-key.json}"
 TRACK="${PLAY_TRACK:-production}"
 STATUS="${PLAY_STATUS:-draft}"
@@ -71,8 +71,8 @@ fi
 case "$MODE" in
   release)
     VERSION=$(grep 'versionName = ' app/build.gradle.kts | sed 's/.*"\(.*\)".*/\1/')
-    AAB="app/build/outputs/bundle/standardRelease/PennyWise-v${VERSION}.aab"
-    [ -f "$AAB" ] || AAB=$(ls app/build/outputs/bundle/standardRelease/*.aab 2>/dev/null | head -1)
+    AAB="app/build/outputs/bundle/release/Mudal-v${VERSION}.aab"
+    [ -f "$AAB" ] || AAB=$(ls app/build/outputs/bundle/release/*.aab 2>/dev/null | head -1)
     if [ -z "$AAB" ] || [ ! -f "$AAB" ]; then
       echo -e "${RED}❌ No .aab found. Build it first (release.sh -> 'Build Play Store Bundle').${NC}"; exit 1
     fi

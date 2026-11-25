@@ -36,17 +36,19 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.pennywiseai.tracker.data.backup.BackupRestoreStaging
 import com.pennywiseai.tracker.data.backup.ImportResult
 import com.pennywiseai.tracker.data.backup.ImportStrategy
 import com.pennywiseai.tracker.data.database.DatabaseKeyStatus
 import com.pennywiseai.tracker.data.database.PennyWiseDatabase
+import com.pennywiseai.tracker.data.database.verifyDatabaseReadable
 import com.pennywiseai.tracker.receiver.SmsBroadcastReceiver
 import com.pennywiseai.tracker.ui.theme.PennyWiseTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
@@ -83,7 +85,6 @@ class MainActivity : FragmentActivity() {
         fun addDeepLink(): Uri = "$DEEP_LINK_SCHEME://$DEEP_LINK_HOST_ADD".toUri()
 
         private const val MAX_SHARED_TEXT = 1000
-        private const val STAGED_RESTORE_FILENAME = "pending_restore.json"
     }
 
     // Transaction ID to edit when launched from notification
@@ -102,27 +103,9 @@ class MainActivity : FragmentActivity() {
     var sharedText by mutableStateOf<String?>(null)
         private set
 
-    private fun stagedRestoreFile(): File = File(cacheDir, STAGED_RESTORE_FILENAME)
+    private var isDbProbeComplete by mutableStateOf(false)
 
-    private fun stagedRestoreTempFile(): File = File(cacheDir, "$STAGED_RESTORE_FILENAME.tmp")
-
-    private fun stageBackupUri(uri: Uri) {
-        val tempFile = stagedRestoreTempFile()
-        val finalFile = stagedRestoreFile()
-        tempFile.delete()
-        finalFile.delete()
-        val copied = contentResolver.openInputStream(uri)?.use { input ->
-            tempFile.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        } ?: throw IllegalStateException("Could not open selected backup file")
-        check(copied > 0L) { "Selected backup file is empty" }
-        check(tempFile.renameTo(finalFile)) { "Could not stage backup file for restore" }
-    }
-
-    private fun resetAndRestartProcess() {
-        runCatching { database.close() }
-        databaseKeyManager.resetDatabaseAndKey()
+    private fun restartAppProcess() {
         val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
             ?: Intent(this, MainActivity::class.java)
         val restartIntent = Intent.makeRestartActivityTask(launchIntent.component)
@@ -132,11 +115,22 @@ class MainActivity : FragmentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Install splash screen before super.onCreate()
-        installSplashScreen()
+        // Keep the splash screen up until SQLCipher open/readiness has settled,
+        // so MainViewModel/HomeViewModel never mount against a corrupt encrypted DB.
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { !isDbProbeComplete }
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        lifecycleScope.launch {
+            if (!databaseKeyManager.hasKeyError()) {
+                withContext(Dispatchers.IO) {
+                    verifyDatabaseReadable(database.openHelper, databaseKeyManager)
+                }
+            }
+            isDbProbeComplete = true
+        }
 
         // Handle intent if activity is launched from notification
         handleEditIntent(intent)
@@ -165,10 +159,16 @@ class MainActivity : FragmentActivity() {
         }
 
         setContent {
+            if (!isDbProbeComplete) {
+                return@setContent
+            }
+
             val keyStatus by databaseKeyManager.keyStatus.collectAsStateWithLifecycle()
             var isRecoveryWorking by remember { mutableStateOf(false) }
             var recoveryError by remember { mutableStateOf<String?>(null) }
-            var isApplyingStagedRestore by remember { mutableStateOf(stagedRestoreFile().exists()) }
+            var isApplyingStagedRestore by remember {
+                mutableStateOf(BackupRestoreStaging.stagedFile(cacheDir).exists())
+            }
             var stagedRestoreError by remember { mutableStateOf<String?>(null) }
 
             if (keyStatus is DatabaseKeyStatus.Error) {
@@ -182,15 +182,37 @@ class MainActivity : FragmentActivity() {
                             isRecoveryWorking = true
                             recoveryError = null
                             lifecycleScope.launch {
-                                try {
+                                val stagedOk = try {
                                     withContext(Dispatchers.IO) {
-                                        stageBackupUri(uri)
+                                        val input = contentResolver.openInputStream(uri)
+                                            ?: throw IllegalStateException("Could not open selected backup file")
+                                        BackupRestoreStaging.stageBackup(input, cacheDir)
                                     }
-                                    resetAndRestartProcess()
+                                    true
+                                } catch (e: CancellationException) {
+                                    throw e
                                 } catch (e: Exception) {
                                     android.util.Log.e("MainActivity", "Failed to stage backup for restore", e)
-                                    stagedRestoreTempFile().delete()
-                                    stagedRestoreFile().delete()
+                                    BackupRestoreStaging.clearStagedRestore(cacheDir)
+                                    recoveryError = getString(
+                                        R.string.db_error_restore_failed,
+                                        e.message ?: "unknown error"
+                                    )
+                                    isRecoveryWorking = false
+                                    false
+                                }
+                                if (!stagedOk) return@launch
+
+                                try {
+                                    withContext(Dispatchers.IO) {
+                                        runCatching { database.close() }
+                                        databaseKeyManager.resetDatabaseAndKey()
+                                    }
+                                    restartAppProcess()
+                                } catch (e: CancellationException) {
+                                    throw e
+                                } catch (e: Exception) {
+                                    android.util.Log.e("MainActivity", "Failed to reset database before restore", e)
                                     recoveryError = getString(
                                         R.string.db_error_restore_failed,
                                         e.message ?: "unknown error"
@@ -203,13 +225,29 @@ class MainActivity : FragmentActivity() {
                             if (isRecoveryWorking) return@DatabaseErrorScreen
                             isRecoveryWorking = true
                             recoveryError = null
-                            resetAndRestartProcess()
+                            lifecycleScope.launch {
+                                try {
+                                    withContext(Dispatchers.IO) {
+                                        BackupRestoreStaging.clearStagedRestore(cacheDir)
+                                        runCatching { database.close() }
+                                        databaseKeyManager.resetDatabaseAndKey()
+                                    }
+                                    restartAppProcess()
+                                } catch (e: CancellationException) {
+                                    throw e
+                                } catch (e: Exception) {
+                                    android.util.Log.e("MainActivity", "Failed to reset database", e)
+                                    recoveryError = e.message ?: "Failed to reset database"
+                                    isRecoveryWorking = false
+                                }
+                            }
                         }
                     )
                 }
             } else if (isApplyingStagedRestore) {
                 LaunchedEffect(Unit) {
-                    val staged = stagedRestoreFile()
+                    val staged = BackupRestoreStaging.stagedFile(cacheDir)
+                    var finishedImport = false
                     try {
                         val result = withContext(Dispatchers.IO) {
                             backupImporter.importBackup(
@@ -217,21 +255,28 @@ class MainActivity : FragmentActivity() {
                                 ImportStrategy.REPLACE_ALL
                             )
                         }
+                        finishedImport = true
                         if (result is ImportResult.Error) {
                             stagedRestoreError = getString(
                                 R.string.db_error_restore_failed,
                                 result.message
                             )
                         }
+                    } catch (e: CancellationException) {
+                        // Preserve pending_restore.json across Activity recreation (e.g. rotation)
+                        throw e
                     } catch (e: Exception) {
+                        finishedImport = true
                         android.util.Log.e("MainActivity", "Failed to import staged backup", e)
                         stagedRestoreError = getString(
                             R.string.db_error_restore_failed,
                             e.message ?: "unknown error"
                         )
                     } finally {
-                        staged.delete()
-                        isApplyingStagedRestore = false
+                        if (finishedImport) {
+                            staged.delete()
+                            isApplyingStagedRestore = false
+                        }
                     }
                 }
                 PennyWiseTheme {

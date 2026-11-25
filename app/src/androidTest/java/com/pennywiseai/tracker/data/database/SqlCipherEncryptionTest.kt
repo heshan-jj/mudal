@@ -240,4 +240,76 @@ class SqlCipherEncryptionTest {
             DatabaseKeyManager.deleteDatabaseFiles(dbFile)
         }
     }
+
+    @Test
+    fun testPlaintextWalWithUncheckpointedSidecarsAndBakRecovery() {
+        runBlocking {
+            val dbFile = context.getDatabasePath(testDbName)
+            val walFile = java.io.File("${dbFile.path}-wal")
+            val shmFile = java.io.File("${dbFile.path}-shm")
+            val bakFile = java.io.File("${dbFile.path}.bak")
+
+            // 1. Build a plaintext WAL database and capture main + -wal + -shm BEFORE checkpointing
+            val plainDb = Room.databaseBuilder(context, PennyWiseDatabase::class.java, testDbName)
+                .setJournalMode(androidx.room.RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
+                .addMigrations(*PennyWiseDatabase.ALL_MIGRATIONS)
+                .build()
+            plainDb.transactionDao().insertTransaction(
+                TransactionEntity(
+                    amount = BigDecimal("100.00"),
+                    merchantName = "Base Row",
+                    category = "Food",
+                    transactionType = TransactionType.EXPENSE,
+                    dateTime = LocalDateTime.now(),
+                    transactionHash = "hash_wal_base"
+                )
+            )
+            // Force a checkpoint of base row, then disable auto-checkpoint so the next row stays ONLY in -wal
+            plainDb.openHelper.writableDatabase.query("PRAGMA wal_checkpoint(TRUNCATE)").use { it.moveToFirst() }
+            plainDb.openHelper.writableDatabase.query("PRAGMA wal_autocheckpoint = 0").use { it.moveToFirst() }
+            plainDb.transactionDao().insertTransaction(
+                TransactionEntity(
+                    amount = BigDecimal("250.00"),
+                    merchantName = "Uncheckpointed WAL Row",
+                    category = "Food",
+                    transactionType = TransactionType.EXPENSE,
+                    dateTime = LocalDateTime.now(),
+                    transactionHash = "hash_wal_only"
+                )
+            )
+            assertTrue("WAL sidecar must exist with uncheckpointed data", walFile.exists() && walFile.length() > 0)
+
+            // Snapshot the uncheckpointed main + wal + shm bytes before closing Room
+            val mainSnap = dbFile.readBytes()
+            val walSnap = walFile.readBytes()
+            val shmSnap = if (shmFile.exists()) shmFile.readBytes() else ByteArray(0)
+            plainDb.close()
+
+            // Restore the uncheckpointed snapshot and simulate a crash after renameTo(.bak)
+            dbFile.delete()
+            bakFile.writeBytes(mainSnap)
+            walFile.writeBytes(walSnap)
+            if (shmSnap.isNotEmpty()) shmFile.writeBytes(shmSnap)
+
+            val result = PlaintextDatabaseMigrator.migrateIfNeeded(dbFile, correctPassphrase)
+            assertTrue("Migration with WAL + .bak recovery must succeed: ${result.exceptionOrNull()}", result.isSuccess)
+            assertTrue(result.getOrThrow())
+            assertFalse(bakFile.exists())
+            assertFalse(walFile.exists())
+            assertFalse(shmFile.exists())
+
+            val encryptedDb = Room.databaseBuilder(context, PennyWiseDatabase::class.java, testDbName)
+                .openHelperFactory(SupportOpenHelperFactory(correctPassphrase))
+                .addMigrations(*PennyWiseDatabase.ALL_MIGRATIONS)
+                .build()
+            val txs = encryptedDb.transactionDao().getAllTransactions().first()
+            assertTrue(
+                "Uncheckpointed WAL row must survive migration",
+                txs.any { it.merchantName == "Uncheckpointed WAL Row" }
+            )
+            encryptedDb.close()
+
+            DatabaseKeyManager.deleteDatabaseFiles(dbFile)
+        }
+    }
 }

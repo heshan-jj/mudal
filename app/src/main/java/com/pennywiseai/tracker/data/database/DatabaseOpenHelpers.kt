@@ -80,3 +80,29 @@ class KeyAwareOpenHelperFactory(
         }
     }
 }
+
+/**
+ * Triggers SQLCipher open once off the main thread before UI ViewModels mount.
+ * Returns `true` if the database opened and answered `SELECT 1`, or `false` if
+ * [databaseKeyManager] is (or became) in error state.
+ */
+fun verifyDatabaseReadable(
+    openHelper: SupportSQLiteOpenHelper,
+    databaseKeyManager: DatabaseKeyManager
+): Boolean {
+    if (databaseKeyManager.hasKeyError()) return false
+    return try {
+        openHelper.writableDatabase.query("SELECT 1").use { it.moveToFirst() }
+        !databaseKeyManager.hasKeyError()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        if (!databaseKeyManager.hasKeyError()) {
+            databaseKeyManager.markError(
+                e.message ?: "Failed to open encrypted database",
+                e
+            )
+        }
+        false
+    }
+}
