@@ -181,4 +181,63 @@ class SqlCipherEncryptionTest {
             context.deleteDatabase(testDbName)
         }
     }
+
+    @Test
+    fun testPlaintextDatabaseUpgradesToEncrypted() {
+        runBlocking {
+            val dbFile = context.getDatabasePath(testDbName)
+
+            val plainDb = Room.databaseBuilder(context, PennyWiseDatabase::class.java, testDbName)
+                .addMigrations(*PennyWiseDatabase.ALL_MIGRATIONS)
+                .build()
+            val tx = TransactionEntity(
+                amount = BigDecimal("750.00"),
+                merchantName = "Plaintext Bakery",
+                category = "Food",
+                transactionType = TransactionType.EXPENSE,
+                accountNumber = "1122",
+                dateTime = LocalDateTime.now(),
+                transactionHash = "hash_plaintext_upgrade_test",
+                smsBody = "LKR 750.00 spent at Plaintext Bakery",
+                currency = "LKR"
+            )
+            val insertedId = plainDb.transactionDao().insertTransaction(tx)
+            assertTrue(insertedId > 0)
+            plainDb.close()
+
+            assertTrue(
+                "Legacy DB must start as plaintext SQLite",
+                DatabaseKeyManager.isPlaintextSqlite(dbFile)
+            )
+
+            val firstResult = PlaintextDatabaseMigrator.migrateIfNeeded(dbFile, correctPassphrase)
+            assertTrue("Migration must succeed: ${firstResult.exceptionOrNull()}", firstResult.isSuccess)
+            assertTrue("Migration must report conversion occurred", firstResult.getOrThrow())
+            assertFalse(
+                "Migrated DB must no longer have plaintext header",
+                DatabaseKeyManager.isPlaintextSqlite(dbFile)
+            )
+
+            val encryptedDb = Room.databaseBuilder(context, PennyWiseDatabase::class.java, testDbName)
+                .openHelperFactory(SupportOpenHelperFactory(correctPassphrase))
+                .addMigrations(*PennyWiseDatabase.ALL_MIGRATIONS)
+                .build()
+            val loaded = encryptedDb.transactionDao().getTransactionById(insertedId)
+            assertNotNull(loaded)
+            assertEquals("Plaintext Bakery", loaded?.merchantName)
+            assertEquals(BigDecimal("750.00"), loaded?.amount)
+            val version = encryptedDb.openHelper.readableDatabase.query("PRAGMA user_version").use { c ->
+                assertTrue(c.moveToFirst())
+                c.getInt(0)
+            }
+            assertEquals(SCHEMA_VERSION, version)
+            encryptedDb.close()
+
+            val secondResult = PlaintextDatabaseMigrator.migrateIfNeeded(dbFile, correctPassphrase)
+            assertTrue(secondResult.isSuccess)
+            assertFalse("Second run must be an idempotent no-op", secondResult.getOrThrow())
+
+            DatabaseKeyManager.deleteDatabaseFiles(dbFile)
+        }
+    }
 }
