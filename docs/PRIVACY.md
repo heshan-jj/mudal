@@ -45,4 +45,6 @@ Mudal only makes network calls for user-requested, explicit functionality:
 
 ## Local Data Storage
 
-Accounts, transactions, categories, budgets and backups stay on the device. The Room database is encrypted with SQLCipher. The passphrase is a random 256-bit key wrapped by the Android Keystore; uninstalling the app deletes that key with the database.
+Accounts, transactions, categories, and budgets stay on the device. The Room database is encrypted with SQLCipher using a random 256-bit key wrapped by the Android Keystore; uninstalling the app deletes that key with the database.
+
+Backups are created **only on explicit user action** via **Export Data** (there is no unattended background or scheduled folder backup). Exported backup files are plaintext JSON (with optional embedded receipt photos) stored or shared wherever the user chooses.

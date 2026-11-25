@@ -122,7 +122,7 @@ app/
 │   │   └── mapper/
 │   ├── di/                      # Hilt modules (DatabaseModule, etc.)
 │   ├── receiver/                # SMS / notification entry points
-│   ├── worker/                  # WorkManager jobs (SMS scan retry, scheduled backups)
+│   ├── worker/                  # WorkManager jobs (SMS scan, recurring, widgets, webhooks)
 │   ├── widget/                  # Home-screen widgets
 │   ├── billing/                 # Play Billing + FreeTierLimits
 │   ├── backup/ core/ initializer/ utils/

@@ -27,12 +27,9 @@ import com.pennywiseai.tracker.data.preferences.UserPreferencesRepository
 import com.pennywiseai.tracker.data.manager.SmsScanParamsCalculator
 import com.pennywiseai.tracker.data.backup.BackupExporter
 import com.pennywiseai.tracker.data.backup.BackupImporter
-import com.pennywiseai.tracker.data.backup.ExportBytesResult
 import com.pennywiseai.tracker.data.backup.ExportResult
 import com.pennywiseai.tracker.data.backup.ImportResult
 import com.pennywiseai.tracker.data.backup.ImportStrategy
-import com.pennywiseai.tracker.backup.folder.FolderBackupWriter
-import com.pennywiseai.tracker.backup.folder.ScheduledFolderBackupScheduler
 import com.pennywiseai.tracker.data.repository.AccountBalanceRepository
 import com.pennywiseai.tracker.data.repository.TransactionRepository
 import com.pennywiseai.tracker.domain.usecase.DeleteAllTransactionsUseCase
@@ -64,8 +61,6 @@ class SettingsViewModel @Inject constructor(
     private val backupExporter: BackupExporter,
     private val backupImporter: BackupImporter,
     private val importCsvUseCase: com.pennywiseai.tracker.data.csv.ImportCsvUseCase,
-    private val folderBackupWriter: FolderBackupWriter,
-    private val scheduledFolderBackupScheduler: ScheduledFolderBackupScheduler,
     entitlementGate: EntitlementGate,
 ) : ViewModel() {
 
@@ -118,25 +113,12 @@ class SettingsViewModel @Inject constructor(
         _deleteAllTransactionsResult.value = null
     }
 
-    val scheduledFolderBackupEnabled = userPreferencesRepository.scheduledFolderBackupEnabled
-    val scheduledFolderBackupLastTimestamp = userPreferencesRepository.scheduledFolderBackupLastTimestamp
     val exportIncludeReceipts = userPreferencesRepository.exportIncludeReceipts
-    val folderBackupIncludeReceipts = userPreferencesRepository.folderBackupIncludeReceipts
 
     fun setExportIncludeReceipts(include: Boolean) {
         viewModelScope.launch { userPreferencesRepository.setExportIncludeReceipts(include) }
     }
 
-    fun setFolderBackupIncludeReceipts(include: Boolean) {
-        viewModelScope.launch { userPreferencesRepository.setFolderBackupIncludeReceipts(include) }
-    }
-
-    private val _requestFolderPicker = MutableStateFlow(false)
-    val requestFolderPicker: StateFlow<Boolean> = _requestFolderPicker.asStateFlow()
-
-    private var currentFolderPickerAction: FolderPickerAction = FolderPickerAction.ENABLE
-
-    
     // Developer mode state
     val isDeveloperModeEnabled = userPreferencesRepository.isDeveloperModeEnabled
     
@@ -512,118 +494,6 @@ class SettingsViewModel @Inject constructor(
     fun clearImportExportMessage() {
         _importExportMessage.value = null
     }
-
-    fun setScheduledFolderBackupEnabled(enabled: Boolean) {
-        viewModelScope.launch {
-            if (enabled) {
-                val treeUri = userPreferencesRepository.getScheduledFolderBackupTreeUri()
-                if (treeUri.isNullOrBlank()) {
-                    currentFolderPickerAction = FolderPickerAction.ENABLE
-                    _requestFolderPicker.value = true
-                    return@launch
-                }
-                enableScheduledFolderBackup(treeUri)
-            } else {
-                userPreferencesRepository.setScheduledFolderBackupEnabled(false)
-                scheduledFolderBackupScheduler.cancel()
-                _importExportMessage.value = UiText.Res(R.string.settings_folder_backup_disabled)
-            }
-        }
-    }
-
-    fun requestChangeBackupFolder() {
-        currentFolderPickerAction = FolderPickerAction.CHANGE
-        _requestFolderPicker.value = true
-    }
-
-    fun onFolderPickerLaunched() {
-        _requestFolderPicker.value = false
-    }
-
-    fun onBackupFolderSelected(uri: Uri) {
-        viewModelScope.launch {
-            try {
-                val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                context.contentResolver.takePersistableUriPermission(uri, flags)
-
-                val treeUri = uri.toString()
-                userPreferencesRepository.setScheduledFolderBackupTreeUri(treeUri)
-
-                when (currentFolderPickerAction) {
-                    FolderPickerAction.ENABLE -> enableScheduledFolderBackup(treeUri)
-                    FolderPickerAction.CHANGE -> {
-                        if (userPreferencesRepository.isScheduledFolderBackupEnabled()) {
-                            scheduledFolderBackupScheduler.schedule()
-                        }
-                        backupToFolderNow(showSuccessMessage = true)
-                    }
-                }
-            } catch (e: Exception) {
-                _importExportMessage.value = UiText.Res(R.string.settings_folder_access_failed, listOf("${e.message}"))
-                Log.e("SettingsViewModel", "Failed to persist backup folder", e)
-            }
-        }
-    }
-
-    fun backupToFolderNow(showSuccessMessage: Boolean = true) {
-        viewModelScope.launch {
-            performFolderBackup(showSuccessMessage)
-        }
-    }
-
-    private suspend fun performFolderBackup(showSuccessMessage: Boolean): Boolean {
-        val treeUri = userPreferencesRepository.getScheduledFolderBackupTreeUri()
-        if (treeUri.isNullOrBlank()) {
-            _importExportMessage.value = UiText.Res(R.string.settings_folder_select_first)
-            return false
-        }
-
-        if (!folderBackupWriter.canWriteToFolder(treeUri)) {
-            _importExportMessage.value = UiText.Res(R.string.settings_folder_not_writable)
-            return false
-        }
-
-        val includeReceipts = userPreferencesRepository.folderBackupIncludeReceipts.first()
-        return when (val exportResult = backupExporter.exportBackupBytes(includeReceipts = includeReceipts)) {
-            is ExportBytesResult.Success -> {
-                when (val writeResult = folderBackupWriter.writeBackup(treeUri, exportResult.bytes)) {
-                    is FolderBackupWriter.Result.Success -> {
-                        userPreferencesRepository.setScheduledFolderBackupLastTimestamp(
-                            System.currentTimeMillis()
-                        )
-                        if (showSuccessMessage) {
-                            _importExportMessage.value = UiText.Res(R.string.settings_folder_backup_saved)
-                        }
-                        true
-                    }
-                    is FolderBackupWriter.Result.Failure -> {
-                        _importExportMessage.value = UiText.Plain(writeResult.message)
-                        false
-                    }
-                }
-            }
-            is ExportBytesResult.Error -> {
-                _importExportMessage.value = UiText.Plain(exportResult.message)
-                false
-            }
-        }
-    }
-
-    private suspend fun enableScheduledFolderBackup(treeUri: String) {
-        if (!folderBackupWriter.canWriteToFolder(treeUri)) {
-            _importExportMessage.value = UiText.Res(R.string.settings_folder_not_writable)
-            return
-        }
-
-        userPreferencesRepository.setScheduledFolderBackupEnabled(true)
-        scheduledFolderBackupScheduler.schedule()
-        // Only claim success if the immediate backup actually wrote. On failure,
-        // performFolderBackup has already surfaced the reason — don't clobber it.
-        if (performFolderBackup(showSuccessMessage = false)) {
-            _importExportMessage.value = UiText.Res(R.string.settings_folder_backup_enabled)
-        }
-    }
     
     fun updateBaseCurrency(currency: String) {
         viewModelScope.launch {
@@ -660,11 +530,4 @@ class SettingsViewModel @Inject constructor(
             userPreferencesRepository.applyMainAccountCurrency(currency)
         }
     }
-}
-
-
-
-private enum class FolderPickerAction {
-    ENABLE,
-    CHANGE
 }

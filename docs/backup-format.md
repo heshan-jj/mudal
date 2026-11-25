@@ -17,7 +17,7 @@ versions, and the rules you must follow when you change anything it touches.
 |------|------|
 | `data/backup/BackupModels.kt` | The wrapper schema (`PennyWiseBackup`, `DatabaseSnapshot`, `PreferencesSnapshot`, …). All `@Serializable`, all fields defaulted. |
 | `data/backup/BackupSerializers.kt` | The `backupJson` instance + custom serializers for `BigDecimal` / `LocalDate` / `LocalDateTime`. The one source of truth for serialization behavior. |
-| `data/backup/BackupExporter.kt` | Reads the DB → builds `PennyWiseBackup` → `backupJson.encodeToString`. |
+| `data/backup/BackupExporter.kt` | Reads the DB → builds `PennyWiseBackup` → `backupJson.encodeToStream`. |
 | `data/backup/BackupImporter.kt` | `backupJson.decodeFromString` → inserts into the DB (MERGE or REPLACE_ALL), remapping foreign keys and skipping bad rows. |
 | `data/backup/BackupReceipts.kt` | Receipt photos: collect (export), path-safety check + restore (import). |
 | `data/database/entity/*.kt` | The Room entities are serialized **directly** (each is `@Serializable`). |
@@ -81,10 +81,9 @@ one file format and every v1.x app can read it (older apps ignore the key):
 - `path` is the transaction's `receiptPath` (relative to `filesDir`);
   `data_base64` is the file's bytes, standard Base64. Both defaulted to `""`.
 - **Export** includes photos only when the caller opts in and only for `FULL`
-  exports. Settings has one toggle per path: *Include receipt photos* for
-  manual export (pref `export_include_receipts`, default **on**) and for
-  Automatic Folder Backup (pref `folder_backup_include_receipts`, default
-  **off**: it runs daily). Missing/unreadable files are skipped and logged.
+  exports. Settings has a toggle *Include receipt photos* for manual export
+  (pref `export_include_receipts`, default **on**). Missing/unreadable files
+  are skipped and logged.
 - **Import** treats `path` as untrusted: only `receipts/<name>` that resolves
   (canonically) directly inside `filesDir/receipts` is written. Absolute paths,
   `..`, nested dirs and backslashes are rejected. A receipt is written only if a

@@ -211,15 +211,8 @@ open class UserPreferencesRepository(
         // While true, the main-account-derived currency must not override their choice.
         val BASE_CURRENCY_USER_SET = booleanPreferencesKey("base_currency_user_set")
 
-        // Scheduled folder backup (SAF tree URI; shared by standard and F-Droid).
-        val SCHEDULED_FOLDER_BACKUP_ENABLED = booleanPreferencesKey("scheduled_folder_backup_enabled")
-        val SCHEDULED_FOLDER_BACKUP_TREE_URI = stringPreferencesKey("scheduled_folder_backup_tree_uri")
-        val SCHEDULED_FOLDER_BACKUP_LAST_TIMESTAMP = longPreferencesKey("scheduled_folder_backup_last_timestamp")
-
-        // Embed receipt photos in backups (#839). Manual export defaults ON;
-        // the daily folder backup defaults OFF (photos make every copy large).
+        // Embed receipt photos in backups (#839). Manual export defaults ON.
         val EXPORT_INCLUDE_RECEIPTS = booleanPreferencesKey("export_include_receipts")
-        val FOLDER_BACKUP_INCLUDE_RECEIPTS = booleanPreferencesKey("folder_backup_include_receipts")
 
         // Merchants the user rejected on the subscriptions screen ("not a subscription").
         val DISMISSED_SUBSCRIPTION_SUGGESTIONS = stringSetPreferencesKey("dismissed_subscription_suggestions")
@@ -1045,59 +1038,34 @@ open class UserPreferencesRepository(
         }
     }
 
-    val scheduledFolderBackupEnabled: Flow<Boolean> = context.dataStore.data
-        .map { preferences ->
-            preferences[PreferencesKeys.SCHEDULED_FOLDER_BACKUP_ENABLED] ?: false
+    /**
+     * Removes DataStore keys left behind by the removed Scheduled Folder Backup feature
+     * and returns the previously configured SAF tree URI (if any) so the caller can
+     * release its persistable URI permission.
+     */
+    suspend fun clearLegacyScheduledFolderBackup(): String? {
+        val enabledKey = booleanPreferencesKey("scheduled_folder_backup_enabled")
+        val treeUriKey = stringPreferencesKey("scheduled_folder_backup_tree_uri")
+        val lastTimestampKey = longPreferencesKey("scheduled_folder_backup_last_timestamp")
+        val includeReceiptsKey = booleanPreferencesKey("folder_backup_include_receipts")
+        val legacyKeys = listOf(enabledKey, treeUriKey, lastTimestampKey, includeReceiptsKey)
+
+        val current = activeDataStore.data.first()
+        val legacyTreeUri = current[treeUriKey]
+        if (legacyKeys.none { current.contains(it) }) {
+            return null
         }
-
-    val scheduledFolderBackupTreeUri: Flow<String?> = context.dataStore.data
-        .map { preferences ->
-            preferences[PreferencesKeys.SCHEDULED_FOLDER_BACKUP_TREE_URI]
+        activeDataStore.edit { preferences ->
+            legacyKeys.forEach { preferences.remove(it) }
         }
-
-    val scheduledFolderBackupLastTimestamp: Flow<Long?> = context.dataStore.data
-        .map { preferences ->
-            preferences[PreferencesKeys.SCHEDULED_FOLDER_BACKUP_LAST_TIMESTAMP]
-        }
-
-    suspend fun isScheduledFolderBackupEnabled(): Boolean {
-        return scheduledFolderBackupEnabled.first()
-    }
-
-    suspend fun getScheduledFolderBackupTreeUri(): String? {
-        return scheduledFolderBackupTreeUri.first()
-    }
-
-    suspend fun setScheduledFolderBackupEnabled(enabled: Boolean) {
-        context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.SCHEDULED_FOLDER_BACKUP_ENABLED] = enabled
-        }
-    }
-
-    suspend fun setScheduledFolderBackupTreeUri(treeUri: String) {
-        context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.SCHEDULED_FOLDER_BACKUP_TREE_URI] = treeUri
-        }
-    }
-
-    suspend fun setScheduledFolderBackupLastTimestamp(timestamp: Long) {
-        context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.SCHEDULED_FOLDER_BACKUP_LAST_TIMESTAMP] = timestamp
-        }
+        return legacyTreeUri
     }
 
     val exportIncludeReceipts: Flow<Boolean> = context.dataStore.data
         .map { it[PreferencesKeys.EXPORT_INCLUDE_RECEIPTS] ?: true }
 
-    val folderBackupIncludeReceipts: Flow<Boolean> = context.dataStore.data
-        .map { it[PreferencesKeys.FOLDER_BACKUP_INCLUDE_RECEIPTS] ?: false }
-
     suspend fun setExportIncludeReceipts(include: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.EXPORT_INCLUDE_RECEIPTS] = include }
-    }
-
-    suspend fun setFolderBackupIncludeReceipts(include: Boolean) {
-        context.dataStore.edit { it[PreferencesKeys.FOLDER_BACKUP_INCLUDE_RECEIPTS] = include }
     }
 
     val dismissedSubscriptionSuggestions: Flow<Set<String>> = context.dataStore.data

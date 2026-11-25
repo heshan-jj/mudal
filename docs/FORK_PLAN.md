@@ -33,7 +33,7 @@ for none.
 | 8 | Release (F-Droid + GitHub Releases) | **v2.24.3 published** — `v2.25.0` queued after Workstreams 2 & 3 |
 | 9 | Remove the UPI / contacts feature | **done** — no `READ_CONTACTS`, no UPI. See [`REMOVE_UPI_PLAN.md`](REMOVE_UPI_PLAN.md) |
 
-**Next phase:** encrypt scheduled folder backups (Phase 1/2 leftover) and complete Phase 4 (recurring transactions & subscriptions, SMS-aware) ahead of `v2.25.0`.
+**Next phase:** complete Phase 4 (recurring transactions & subscriptions, SMS-aware) ahead of `v2.25.0`.
 
 Phase 9 was a scope-reduction change: the app no longer asks for
 `READ_CONTACTS` and has no UPI code left. It was planned in
@@ -128,7 +128,7 @@ Acceptance: app installs side by side with the original under the new applicatio
 ### Phase 1 leftovers (still open)
 
 - [x] **Model host** — resolved on 2026-10-22: the on-device model and its upstream R2 download were removed outright. The optional AI assistant uses the user's own Gemini API key, so there is no longer any dependency on upstream-hosted files.
-- [ ] **Backup encryption.** Manual export writes plaintext JSON, and the scheduled folder backup writes it unattended. Rule 11 says no plaintext transaction file may reach shared storage without an explicit user action — the scheduled backup needs encrypting with the device key, or switching off.
+- [x] **Backup encryption.** Scheduled folder backup removed so no plaintext transaction file is written to shared storage unattended; backups happen only on explicit manual Export Data (plaintext JSON, documented in `docs/PRIVACY.md`).
 
 ---
 
@@ -152,7 +152,7 @@ users; it does not protect the owner's device.
 4. **Key loss: never a crash loop, never a silent empty app.** Show the error screen and offer restore-from-backup or reset. **Do not fall back to an in-memory database** — it turns every failure into an app that looks empty and silently discards parsed SMS, widgets and backups.
 5. **Reset/restore must close the database before deleting it.** Deleting the file while Room still holds it open sends later writes to an unlinked inode. Close → delete → rebuild the instance (or restart the process) → only then import a backup.
 6. **Backup rules are explicit.** Set `allowBackup=false`, or write explicit `data_extraction_rules.xml` exclusions for `databases/` and the wrapped-key preferences. A Keystore key never leaves the device, so a synced encrypted database cannot be decrypted after restore — backing it up is pointless and lands the user on the error screen.
-7. **Backup threat model: decide and document.** Minimum bar — no plaintext transaction file is written to shared storage without an explicit user action; manual export stays plaintext JSON (documented in `PRIVACY.md`); scheduled folder backup must be encrypted with the device key or disabled. Passphrase-encrypted export is a post-v1.0 item.
+7. **Backup threat model: decide and document.** Minimum bar — no plaintext transaction file is written to shared storage without an explicit user action; scheduled folder backup has been removed; manual export stays plaintext JSON (documented in `docs/PRIVACY.md`). Passphrase-encrypted export is a post-v1.0 item.
 8. Make sure the KMP `shared`/`parser` modules are unaffected. Check WorkManager workers and widgets open the DB through the same encrypted path.
 9. Re-run migration tests against the encrypted setup. Add tests: wrong key fails cleanly; backup JSON export/restore round-trip still works; plaintext→encrypted conversion works.
 10. Offer FLAG_SECURE (hide in recents) as a setting.
@@ -164,7 +164,7 @@ users; it does not protect the owner's device.
 - [x] Remove the in-memory fallback; fail loudly into the error screen (item 4) — `FailingOpenHelperFactory` + `KeyAwareOpenHelperFactory`
 - [x] Close-before-delete in `resetDatabaseAndKey()`; rebuild the instance after (item 5) — staged restore + process restart in `MainActivity`
 - [x] `allowBackup=false` — already set in `AndroidManifest.xml`; `data_extraction_rules.xml` / `backup_rules.xml` are inert while it is (item 6)
-- [ ] Decide and document the backup-encryption story (item 7) — scheduled folder backup encryption queued next (Workstream 2)
+- [x] Decide and document the backup-encryption story (item 7) — unattended scheduled folder backup removed; manual export only (documented in `docs/PRIVACY.md`)
 - [x] Delete the now-dead `PennyWiseDatabase.getInstance()` path — removed from `PennyWiseDatabase` & `DatabaseKeyManager`
 - [x] `System.loadLibrary("sqlcipher")` must not be swallowed by a bare `catch (Throwable)` — logs and rethrows in `DatabaseModule`
 - [x] `./init.sh app` green with quoted output (the gate, not ad-hoc gradle runs)
@@ -286,7 +286,7 @@ audit, `PRIVACY.md`, and the absence of analytics. Revisit only if a Play Store
 listing or a privacy-focused buyer makes it worth the release-matrix cost.
 
 1. Add an `offline` build variant whose merged release manifest has no `INTERNET` permission: exchange-rate fetch, model download and webhooks disabled (model import via file picker instead). Add a CI step that fails if that variant's merged manifest contains INTERNET.
-2. Decide on cloud backup: skip Google Drive (needs OAuth app verification). Optionally port Cashiro's WebDAV provider (AGPL-compatible, attribute it) into the connected variant only. Local scheduled backup stays the default.
+2. Decide on cloud backup: skip Google Drive (needs OAuth app verification). Optionally port Cashiro's WebDAV provider (AGPL-compatible, attribute it) into the connected variant only. Manual plaintext JSON export stays the default.
 
 ---
 

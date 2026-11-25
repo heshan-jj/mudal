@@ -31,6 +31,6 @@ Ask "what did I spend on food last month?" and get a real answer. Mudal talks to
 • Open source (AGPL-3.0) — read the code yourself
 
 ★ Completely free
-Every feature is unlocked: unlimited rules, PDF statement imports, CSV export, duplicate-account merge and scheduled daily backups. No paywall, no in-app purchases, no Pro tier.
+Every feature is unlocked: unlimited rules, PDF statement imports, CSV export, duplicate-account merge and manual data backups. No paywall, no in-app purchases, no Pro tier.
 
 A money manager, budget planner and spending tracker in one — for people who hate typing in expenses.

@@ -82,16 +82,6 @@
     <string name="settings_transaction_groups_subtitle">Организовать транзакции по теме</string>
     <string name="settings_export_data_title">Экспорт данных</string>
     <string name="settings_export_data_subtitle">Резервировать все данные в файл</string>
-    <string name="settings_folder_backup_title">Автоматическое резервное копирование папок</string>
-    <string name="settings_folder_backup_subtitle_enabled">Ежедневное резервное копирование в 2:00 в выбранную папку</string>
-    <string name="settings_folder_backup_subtitle_pro">Pro · Сохранять резервную копию каждый день в 2:00 утра</string>
-    <string name="settings_folder_backup_subtitle_disabled">Сохранять резервную копию в папку каждый день в 2:00 утра</string>
-    <string name="settings_backup_now_title">Резервное копирование сейчас</string>
-    <!-- %1$s = date and time of the last backup -->
-    <string name="settings_backup_now_last_backup">Последняя резервная копия: %1$s</string>
-    <string name="settings_backup_now_subtitle">Запустить резервную копию в папку сейчас</string>
-    <string name="settings_change_backup_folder_title">Изменить папку резервного копирования</string>
-    <string name="settings_change_backup_folder_subtitle">Выберите другую папку для автоматического резервного копирования</string>
     <string name="settings_import_data_title">Импорт данных</string>
     <string name="settings_import_data_subtitle">Восстановить данные из резервной копии</string>
     <string name="settings_import_csv_title">Импорт транзакций (CSV)</string>
@@ -161,12 +151,6 @@
     <string name="settings_import_error">Ошибка импорта: %1$s</string>
     <string name="settings_importing_transactions">Импорт транзакций...</string>
     <string name="settings_import_csv_success">Импортированные %1$d транзакции, пропущены дубликаты %2$d</string>
-    <string name="settings_folder_backup_disabled">Автоматическое резервное копирование папок отключено</string>
-    <string name="settings_folder_access_failed">Не удалось получить доступ к выбранной папке: %1$s</string>
-    <string name="settings_folder_select_first">Сначала выберите папку с резервной копией</string>
-    <string name="settings_folder_not_writable">Запись в выбранную папку резервной копии невозможна</string>
-    <string name="settings_folder_backup_saved">Резервное копирование сохранено в папку</string>
-    <string name="settings_folder_backup_enabled">Автоматическое резервное копирование папок включено. Резервные копии выполняются ежедневно в 2:00 утра.</string>
     <!-- Data Management → Save backup dialog -->
     <string name="settings_save_backup_title">Сохранить резервную копию</string>
     <string name="settings_save_backup_created">Резервная копия успешно создана!</string>

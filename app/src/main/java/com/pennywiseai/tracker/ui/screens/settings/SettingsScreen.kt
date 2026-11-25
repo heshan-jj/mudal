@@ -136,11 +136,7 @@ fun SettingsScreen(
     val accounts by settingsViewModel.accounts.collectAsStateWithLifecycle()
     val mainAccountKey by settingsViewModel.mainAccountKey.collectAsStateWithLifecycle()
     val isProEntitled by settingsViewModel.isProEntitled.collectAsStateWithLifecycle()
-    val scheduledFolderBackupEnabled by settingsViewModel.scheduledFolderBackupEnabled.collectAsStateWithLifecycle(initialValue = false)
-    val scheduledFolderBackupLastTimestamp by settingsViewModel.scheduledFolderBackupLastTimestamp.collectAsStateWithLifecycle(initialValue = null)
     val exportIncludeReceipts by settingsViewModel.exportIncludeReceipts.collectAsStateWithLifecycle(initialValue = true)
-    val folderBackupIncludeReceipts by settingsViewModel.folderBackupIncludeReceipts.collectAsStateWithLifecycle(initialValue = false)
-    val requestFolderPicker by settingsViewModel.requestFolderPicker.collectAsStateWithLifecycle()
     var showSmsScanDialog by remember { mutableStateOf(false) }
     var showSmsScanDatePicker by remember { mutableStateOf(false) }
     var showExportOptionsDialog by remember { mutableStateOf(false) }
@@ -188,20 +184,6 @@ fun SettingsScreen(
             }
         }
     )
-
-    val backupFolderLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocumentTree(),
-        onResult = { uri ->
-            uri?.let { settingsViewModel.onBackupFolderSelected(it) }
-        }
-    )
-
-    LaunchedEffect(requestFolderPicker) {
-        if (requestFolderPicker) {
-            backupFolderLauncher.launch(null)
-            settingsViewModel.onFolderPickerLaunched()
-        }
-    }
 
     // Scroll behaviors for collapsible TopAppBar
     val scrollBehaviorSmall = TopAppBarDefaults.pinnedScrollBehavior()
@@ -549,57 +531,6 @@ fun SettingsScreen(
                     onCheckedChange = { settingsViewModel.setExportIncludeReceipts(it) },
                     position = ListItemPosition.Middle
                 )
-                SettingsSwitchRow(
-                    icon = Icons.Default.Backup,
-                    iconBgColor = purple_light,
-                    iconTint = purple_dark,
-                    title = stringResource(R.string.settings_folder_backup_title),
-                    subtitle = if (scheduledFolderBackupEnabled) {
-                        stringResource(R.string.settings_folder_backup_subtitle_enabled)
-                    } else {
-                        stringResource(R.string.settings_folder_backup_subtitle_disabled)
-                    },
-                    checked = scheduledFolderBackupEnabled,
-                    onCheckedChange = { enabled ->
-                        settingsViewModel.setScheduledFolderBackupEnabled(enabled)
-                    },
-                    position = ListItemPosition.Middle
-                )
-                if (scheduledFolderBackupEnabled) {
-                    SettingsNavItem(
-                        icon = Icons.Default.SaveAlt,
-                        iconBgColor = green_light,
-                        iconTint = green_dark,
-                        title = stringResource(R.string.settings_backup_now_title),
-                        subtitle = scheduledFolderBackupLastTimestamp?.let { timestamp ->
-                            val formatted = java.time.Instant.ofEpochMilli(timestamp)
-                                .atZone(java.time.ZoneId.systemDefault())
-                                .format(java.time.format.DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a"))
-                            stringResource(R.string.settings_backup_now_last_backup, formatted)
-                        } ?: stringResource(R.string.settings_backup_now_subtitle),
-                        onClick = { settingsViewModel.backupToFolderNow() },
-                        position = ListItemPosition.Middle
-                    )
-                    SettingsSwitchRow(
-                        icon = Icons.Default.Receipt,
-                        iconBgColor = purple_light,
-                        iconTint = purple_dark,
-                        title = stringResource(R.string.settings_folder_backup_include_receipts_title),
-                        subtitle = stringResource(R.string.settings_folder_backup_include_receipts_subtitle),
-                        checked = folderBackupIncludeReceipts,
-                        onCheckedChange = { settingsViewModel.setFolderBackupIncludeReceipts(it) },
-                        position = ListItemPosition.Middle
-                    )
-                    SettingsNavItem(
-                        icon = Icons.Default.FolderOpen,
-                        iconBgColor = amber_light,
-                        iconTint = amber_dark,
-                        title = stringResource(R.string.settings_change_backup_folder_title),
-                        subtitle = stringResource(R.string.settings_change_backup_folder_subtitle),
-                        onClick = { settingsViewModel.requestChangeBackupFolder() },
-                        position = ListItemPosition.Middle
-                    )
-                }
                 SettingsNavItem(
                     icon = Icons.Default.Download,
                     iconBgColor = cyan_light,

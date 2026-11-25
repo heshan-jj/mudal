@@ -80,16 +80,6 @@
     <string name="settings_transaction_groups_subtitle">Organize transações sob um tópico</string>
     <string name="settings_export_data_title">Exportar dados</string>
     <string name="settings_export_data_subtitle">Fazer backup de todos os dados em um arquivo</string>
-    <string name="settings_folder_backup_title">Backup automático da pasta</string>
-    <string name="settings_folder_backup_subtitle_enabled">Backup diário às 2:00 AM para a pasta escolhida</string>
-    <string name="settings_folder_backup_subtitle_pro">Pro · Salve um backup em uma pasta todos os dias às 2:00 AM</string>
-    <string name="settings_folder_backup_subtitle_disabled">Salve um backup em uma pasta todos os dias às 2:00 AM</string>
-    <string name="settings_backup_now_title">Fazer backup agora</string>
-    <!-- %1$s = date and time of the last backup -->
-    <string name="settings_backup_now_last_backup">Último backup: %1$s</string>
-    <string name="settings_backup_now_subtitle">Execute um backup na sua pasta agora</string>
-    <string name="settings_change_backup_folder_title">Alterar pasta de Backup</string>
-    <string name="settings_change_backup_folder_subtitle">Escolha uma pasta diferente para backups automáticos</string>
     <string name="settings_import_data_title">Importar dados</string>
     <string name="settings_import_data_subtitle">Restaurar dados do backup</string>
     <string name="settings_import_csv_title">Importar transações (CSV)</string>
@@ -157,12 +147,6 @@
     <string name="settings_import_error">Erro de importação: %1$s</string>
     <string name="settings_importing_transactions">Importando transações...</string>
     <string name="settings_import_csv_success_with_failed_rows">Transações %1$d importadas, duplicadas com %2$d saltadas, registros %3$d não puderam ser analisados</string>
-    <string name="settings_folder_backup_disabled">Backup automático de pastas desativado</string>
-    <string name="settings_folder_access_failed">Não foi possível acessar a pasta selecionada: %1$s</string>
-    <string name="settings_folder_select_first">Selecione uma pasta de backup primeiro</string>
-    <string name="settings_folder_not_writable">Não é possível gravar a pasta de backup selecionada</string>
-    <string name="settings_folder_backup_saved">Backup salvo na pasta</string>
-    <string name="settings_folder_backup_enabled">Backup automático de pastas ativado. Backups executam diariamente às 2:00 AM.</string>
     <!-- Data Management → Save backup dialog -->
     <string name="settings_save_backup_title">Salvar Backup</string>
     <string name="settings_save_backup_created">Backup criado com sucesso!</string>

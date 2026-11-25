@@ -75,16 +75,6 @@
     <string name="settings_transaction_groups_subtitle">Organiser les transactions sous un thème</string>
     <string name="settings_export_data_title">Exporter les données</string>
     <string name="settings_export_data_subtitle">Sauvegarder toutes les données dans un fichier</string>
-    <string name="settings_folder_backup_title">Sauvegarde automatique du dossier</string>
-    <string name="settings_folder_backup_subtitle_enabled">Sauvegarde quotidienne à 2h00 du matin dans le dossier de votre choix</string>
-    <string name="settings_folder_backup_subtitle_pro">Pro · Sauvegardez une sauvegarde dans un dossier tous les jours à 2:00 AM</string>
-    <string name="settings_folder_backup_subtitle_disabled">Enregistrez une sauvegarde dans un dossier tous les jours à 2:00 AM</string>
-    <string name="settings_backup_now_title">Sauvegarder maintenant</string>
-    <!-- %1$s = date and time of the last backup -->
-    <string name="settings_backup_now_last_backup">Dernière sauvegarde : %1$s</string>
-    <string name="settings_backup_now_subtitle">Exécutez une sauvegarde vers votre dossier maintenant</string>
-    <string name="settings_change_backup_folder_title">Modifier le dossier de sauvegarde</string>
-    <string name="settings_change_backup_folder_subtitle">Choisir un dossier différent pour les sauvegardes automatiques</string>
     <string name="settings_import_data_title">Importer des données</string>
     <string name="settings_import_data_subtitle">Restaurer les données depuis la sauvegarde</string>
     <string name="settings_import_csv_title">Importer des transactions (CSV)</string>
@@ -149,12 +139,6 @@
     <string name="settings_importing_transactions">Importation des transactions...</string>
     <string name="settings_import_csv_success">Transactions %1$d importées, %2$d doublons ignorés</string>
     <string name="settings_import_csv_success_with_failed_rows">Transactions %1$d importées, doublons %2$d ignorés, %3$d lignes n\'ont pas pu être analysées</string>
-    <string name="settings_folder_backup_disabled">Sauvegarde automatique du dossier désactivée</string>
-    <string name="settings_folder_access_failed">Impossible d\'accéder au dossier sélectionné : %1$s</string>
-    <string name="settings_folder_select_first">Sélectionnez d\'abord un dossier de sauvegarde</string>
-    <string name="settings_folder_not_writable">Impossible d\'écrire dans le dossier de sauvegarde sélectionné</string>
-    <string name="settings_folder_backup_saved">Sauvegarde enregistrée dans le dossier</string>
-    <string name="settings_folder_backup_enabled">Sauvegarde automatique du dossier activée. Les sauvegardes s\'exécutent tous les jours à 2:00 AM.</string>
     <!-- Data Management → Save backup dialog -->
     <string name="settings_save_backup_title">Enregistrer la sauvegarde</string>
     <string name="settings_save_backup_created">Sauvegarde créée avec succès !</string>

@@ -88,16 +88,6 @@
     <string name="settings_transaction_groups_subtitle">Spravovat transakce v rámci tématu</string>
     <string name="settings_export_data_title">Exportovat data</string>
     <string name="settings_export_data_subtitle">Zálohovat všechna data do souboru</string>
-    <string name="settings_folder_backup_title">Automatická záloha složky</string>
-    <string name="settings_folder_backup_subtitle_enabled">Denní záloha ve 2:00 do vybrané složky</string>
-    <string name="settings_folder_backup_subtitle_pro">Pro · Uložit zálohu do složky každý den ve 2:00</string>
-    <string name="settings_folder_backup_subtitle_disabled">Uložit zálohu do složky každý den ve 2:00 hodin</string>
-    <string name="settings_backup_now_title">Zálohovat nyní</string>
-    <!-- %1$s = date and time of the last backup -->
-    <string name="settings_backup_now_last_backup">Poslední záloha: %1$s</string>
-    <string name="settings_backup_now_subtitle">Spustit zálohu do složky</string>
-    <string name="settings_change_backup_folder_title">Změnit záložní složku</string>
-    <string name="settings_change_backup_folder_subtitle">Vyberte jinou složku pro automatické zálohování</string>
     <string name="settings_import_data_title">Importovat data</string>
     <string name="settings_import_data_subtitle">Obnovit data ze zálohy</string>
     <string name="settings_import_csv_title">Importovat transakce (CSV)</string>
@@ -188,12 +178,6 @@
     <string name="settings_import_failed">Import se nezdařil: %1$s</string>
     <string name="settings_import_error">Chyba importu: %1$s</string>
     <string name="settings_importing_transactions">Importuji transakce...</string>
-    <string name="settings_folder_backup_disabled">Automatické zálohování složky zakázáno</string>
-    <string name="settings_folder_access_failed">Nelze získat přístup k vybrané složce: %1$s</string>
-    <string name="settings_folder_select_first">Nejprve vyberte záložní složku</string>
-    <string name="settings_folder_not_writable">Nelze zapisovat do vybrané složky zálohy</string>
-    <string name="settings_folder_backup_saved">Záloha uložena do složky</string>
-    <string name="settings_folder_backup_enabled">Automatické zálohování složky povoleno. Zálohy běží denně na 2:00 hodin.</string>
     <!-- Data Management → Save backup dialog -->
     <string name="settings_save_backup_title">Uložit zálohu</string>
     <string name="settings_save_backup_created">Záloha byla úspěšně vytvořena!</string>

@@ -23,6 +23,45 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val LEGACY_SCHEDULED_FOLDER_BACKUP_WORK_NAME = "scheduled_folder_backup"
+
+internal suspend fun cleanupLegacyScheduledFolderBackup(
+    workManagerProvider: () -> androidx.work.WorkManager,
+    userPreferencesRepository: UserPreferencesRepository,
+    contentResolver: android.content.ContentResolver
+) {
+    try {
+        workManagerProvider().cancelUniqueWork(LEGACY_SCHEDULED_FOLDER_BACKUP_WORK_NAME)
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        android.util.Log.w("PennyWiseApplication", "Failed cancelling legacy folder backup work", e)
+    }
+
+    val legacyTreeUri = try {
+        userPreferencesRepository.clearLegacyScheduledFolderBackup()
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        android.util.Log.w("PennyWiseApplication", "Failed clearing legacy folder backup preferences", e)
+        null
+    }
+
+    if (!legacyTreeUri.isNullOrBlank()) {
+        try {
+            contentResolver.releasePersistableUriPermission(
+                android.net.Uri.parse(legacyTreeUri),
+                android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                    android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            android.util.Log.w("PennyWiseApplication", "Failed releasing legacy folder backup URI permission", e)
+        }
+    }
+}
+
 @HiltAndroidApp
 class PennyWiseApplication : Application(), Configuration.Provider {
 
@@ -40,9 +79,6 @@ class PennyWiseApplication : Application(), Configuration.Provider {
 
     @Inject
     lateinit var categoryRepository: com.pennywiseai.tracker.data.repository.CategoryRepository
-
-    @Inject
-    lateinit var scheduledFolderBackupScheduler: com.pennywiseai.tracker.backup.folder.ScheduledFolderBackupScheduler
 
     @Inject
     lateinit var webhookSyncScheduler: WebhookSyncScheduler
@@ -80,17 +116,19 @@ class PennyWiseApplication : Application(), Configuration.Provider {
         registerActivityLifecycleCallbacks(AppLockLifecycleObserver())
         lastLocales = resources.configuration.locales
 
+        // Upgrade cleanup: run even if DB has a key error, since WorkManager/DataStore/SAF do not
+        // touch PennyWiseDatabase and old scheduled worker requests must still be cancelled.
+        applicationScope.launch(Dispatchers.IO) {
+            cleanupLegacyScheduledFolderBackup(
+                workManagerProvider = { androidx.work.WorkManager.getInstance(this@PennyWiseApplication) },
+                userPreferencesRepository = userPreferencesRepository,
+                contentResolver = contentResolver
+            )
+        }
+
         if (databaseKeyManager.hasKeyError()) {
             android.util.Log.w("PennyWiseApplication", "Database key error detected on startup; pausing background database jobs")
             return
-        }
-
-        // Re-arm the daily folder backup on process start when the user has it enabled,
-        // so scheduled work survives reboots / app updates that clear WorkManager state.
-        applicationScope.launch {
-            if (userPreferencesRepository.isScheduledFolderBackupEnabled()) {
-                scheduledFolderBackupScheduler.schedule()
-            }
         }
 
         // Materialise recurring / scheduled manual (cash) transactions (#706):

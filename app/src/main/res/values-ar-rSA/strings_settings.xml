@@ -92,16 +92,6 @@
     <string name="settings_transaction_groups_subtitle">تنظيم المعاملات تحت موضوع</string>
     <string name="settings_export_data_title">تصدير البيانات</string>
     <string name="settings_export_data_subtitle">النسخ الاحتياطي لجميع البيانات إلى ملف</string>
-    <string name="settings_folder_backup_title">النسخ الاحتياطي التلقائي للمجلد</string>
-    <string name="settings_folder_backup_subtitle_enabled">النسخ الاحتياطي اليومي عند 2:00 صباحا للمجلد الذي اخترته</string>
-    <string name="settings_folder_backup_subtitle_pro">Pro · حفظ نسخة احتياطية في مجلد كل يوم في الثانية صباحا</string>
-    <string name="settings_folder_backup_subtitle_disabled">حفظ نسخة احتياطية إلى مجلد كل يوم في الثانية صباحا</string>
-    <string name="settings_backup_now_title">النسخ الاحتياطي الآن</string>
-    <!-- %1$s = date and time of the last backup -->
-    <string name="settings_backup_now_last_backup">النسخة الاحتياطية الأخيرة: %1$s</string>
-    <string name="settings_backup_now_subtitle">تشغيل نسخة احتياطية للمجلد الخاص بك الآن</string>
-    <string name="settings_change_backup_folder_title">تغيير مجلد النسخ الاحتياطي</string>
-    <string name="settings_change_backup_folder_subtitle">اختيار مجلد مختلف للنسخ الاحتياطية التلقائية</string>
     <string name="settings_import_data_title">استيراد البيانات</string>
     <string name="settings_import_data_subtitle">استعادة البيانات من النسخة الاحتياطية</string>
     <string name="settings_import_csv_title">استيراد المعاملات (CSV)</string>
@@ -210,12 +200,6 @@
     <string name="settings_importing_transactions">استيراد المعاملات...</string>
     <string name="settings_import_csv_success">المعاملات المستوردة %1$d ، تخطي %2$d التكرارات</string>
     <string name="settings_import_csv_success_with_failed_rows">المعاملات المستوردة %1$d ، تخطي %2$d التكرار، %3$d الصفوف لا يمكن تحليلها</string>
-    <string name="settings_folder_backup_disabled">تم تعطيل النسخ الاحتياطي للمجلد التلقائي</string>
-    <string name="settings_folder_access_failed">تعذر الوصول إلى المجلد المحدد: %1$s</string>
-    <string name="settings_folder_select_first">حدد مجلد النسخ الاحتياطي أولاً</string>
-    <string name="settings_folder_not_writable">لا يمكن الكتابة إلى مجلد النسخ الاحتياطي المحدد</string>
-    <string name="settings_folder_backup_saved">تم حفظ النسخ الاحتياطي إلى المجلد</string>
-    <string name="settings_folder_backup_enabled">تم تمكين النسخ الاحتياطي التلقائي للمجلد. تعمل النسخ الاحتياطي يوميا في الساعة 2:00 صباحا.</string>
     <!-- Data Management → Save backup dialog -->
     <string name="settings_save_backup_title">حفظ النسخ الاحتياطي</string>
     <string name="settings_save_backup_created">تم إنشاء النسخ الاحتياطي بنجاح!</string>

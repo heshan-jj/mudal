@@ -49,7 +49,7 @@ Bank SMS are parsed on the device and never uploaded. The database is encrypted 
 
 ![Every feature. Free. For good.](branding/feature-graphics/feature-free.png)
 
-No ads, no subscription and no Pro tier. Unlimited rules, CSV export, PDF statement import, scheduled backups and every other feature are available to everyone, and the source is public under the AGPL-3.0.
+No ads, no subscription and no Pro tier. Unlimited rules, CSV export, PDF statement import, local JSON backups and every other feature are available to everyone, and the source is public under the AGPL-3.0.
 
 ### Look and feel
 
