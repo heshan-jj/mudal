@@ -372,6 +372,17 @@ fun TransactionsScreen(
                     scrollBehaviorLarge = scrollBehaviorLarge,
                     title = stringResource(R.string.txn_list_title),
                     hasBackButton = showBackButton,
+                    actionContent = {
+                        if (uiState.transactions.isNotEmpty()) {
+                            IconButton(onClick = { showExportDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.FileDownload,
+                                    contentDescription = stringResource(R.string.txn_list_export_csv),
+                                    modifier = Modifier.size(Dimensions.Icon.medium)
+                                )
+                            }
+                        }
+                    },
                     navigationContent = {
                         IconButton(onClick = onNavigateBack) {
                             Icon(
@@ -384,39 +395,6 @@ fun TransactionsScreen(
                 )
             }
         },
-        floatingActionButton = {
-            Column(
-                modifier = Modifier.padding(bottom = bottomBarClearance),
-                verticalArrangement = Arrangement.spacedBy(Spacing.sm)
-            ) {
-                // Export FAB (only show if transactions exist)
-                if (uiState.transactions.isNotEmpty()) {
-                    SmallFloatingActionButton(
-                        onClick = { showExportDialog = true },
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.FileDownload,
-                            contentDescription = stringResource(R.string.txn_list_export_csv),
-                            modifier = Modifier.size(Dimensions.Icon.medium)
-                        )
-                    }
-                }
-                
-                // Add Transaction FAB (consistent with Home screen)
-                SmallFloatingActionButton(
-                    onClick = onAddTransactionClick,
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.txn_list_add_transaction)
-                    )
-                }
-            }
-        }
     ) { paddingValues ->
         Column(
             modifier = Modifier

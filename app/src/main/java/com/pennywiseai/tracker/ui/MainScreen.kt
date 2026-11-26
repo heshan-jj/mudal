@@ -667,6 +667,11 @@ fun MainScreen(
                     hiddenTabs = hiddenTabs,
                     blurEffects = themeState.blurEffectsEnabled,
                     hazeState = hazeState,
+                    onAddClick = {
+                        rootNavController?.navigate(
+                            com.pennywiseai.tracker.navigation.AddTransaction()
+                        ) { launchSingleTop = true }
+                    },
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
             }
