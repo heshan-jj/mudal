@@ -269,7 +269,18 @@ object SharedCategoryMapping {
         "the coffee lab",
         "top cafeteria",
         "bosporus sharjah",
-        "uber eats"
+        "uber eats",
+        "caravan fresh",
+        "taco bell",
+        "baskin robbins",
+        "kottu",
+        "biriyani",
+        "caterers",
+        "pastry",
+        "sweets",
+        "bakers",
+        "bake house",
+        "juice bar"
     )
 
     private val GROCERY = setOf(
@@ -347,7 +358,11 @@ object SharedCategoryMapping {
         "majid al futtaim hypm",
         "keells",
         "glomark",
-        "spar"
+        "spar",
+        "supermarket",
+        "mini mart",
+        "food city",
+        "super centre"
     )
 
     private val TRANSPORT = setOf(
@@ -388,7 +403,11 @@ object SharedCategoryMapping {
         "pttst.c",
         "smart auto",
         "interchange",
-        "pickme"
+        "pickme",
+        "filling station",
+        "service station",
+        "fuel station",
+        "lioc"
     )
 
     private val SHOPPING = setOf(
@@ -533,7 +552,20 @@ object SharedCategoryMapping {
         "the empire tower",
         "aliexpress",
         "nolimit",
-        "lady j"
+        "lady j",
+        "temu",
+        "shein",
+        "ebay",
+        "claude",
+        "anthropic",
+        "github",
+        "vercel",
+        "cloudflare",
+        "digitalocean",
+        "bookshop",
+        "hardware",
+        "kelly felder",
+        "thilakawardhana"
     )
 
     private val UTILITIES = setOf(
@@ -587,7 +619,12 @@ object SharedCategoryMapping {
         "sfcinemacity",
         "platinumlist.net",
         "scope entertainment",
-        "scope cinemas"
+        "scope cinemas",
+        "steam",
+        "playstation",
+        "xbox",
+        "nintendo",
+        "icloud"
     )
 
     private val HEALTHCARE = setOf(
@@ -614,7 +651,8 @@ object SharedCategoryMapping {
         "union chemists",
         // Kept in step with SHOPPING_EXCLUDE — a merchant we pull out of
         // Shopping for being clinical has to land somewhere (#678).
-        "chemist", "chemists", "diagnostic", "diagnostics"
+        "chemist", "chemists", "diagnostic", "diagnostics",
+        "dental", "optical", "opticals", "lanka hospitals", "channeling"
     )
 
     private val INVESTMENT = setOf(

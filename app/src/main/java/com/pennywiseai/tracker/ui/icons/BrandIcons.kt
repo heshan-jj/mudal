@@ -687,13 +687,36 @@ object BrandIcons {
         merchantName.contains("discover", ignoreCase = true) -> "#FF6000"
         merchantName.contains("schwab", ignoreCase = true) -> "#00A0DF"
 
-        // Sri Lanka
+        // Sri Lanka & digital services
         merchantName.contains("dialog axiata", ignoreCase = true) -> "#D81818"
         merchantName.contains("mobitel", ignoreCase = true) -> "#4CA64C"
         merchantName.contains("slt", ignoreCase = true) -> "#004890"
         merchantName.contains("pickme", ignoreCase = true) -> "#F0C000"
         merchantName.contains("glomark", ignoreCase = true) -> "#002B5C"
-        merchantName.contains("keells", ignoreCase = true) -> "#FFFFFF"
+        merchantName.contains("keells", ignoreCase = true) -> "#2E7D32"
+        merchantName.contains("cargills", ignoreCase = true) -> "#D32F2F"
+        merchantName.contains("arpico", ignoreCase = true) -> "#0055A5"
+        merchantName.contains("laugfs", ignoreCase = true) -> "#F9A825"
+        merchantName.contains("ceypetco", ignoreCase = true) -> "#C62828"
+        merchantName.contains("daraz", ignoreCase = true) -> "#F85606"
+        merchantName.contains("odel", ignoreCase = true) -> "#111111"
+        merchantName.contains("nolimit", ignoreCase = true) -> "#E65100"
+        merchantName.contains("cool planet", ignoreCase = true) -> "#0277BD"
+        merchantName.contains("fashion bug", ignoreCase = true) -> "#AD1457"
+        merchantName.contains("barista", ignoreCase = true) -> "#D84315"
+        merchantName.contains("java lounge", ignoreCase = true) -> "#4E342E"
+        merchantName.contains("perera", ignoreCase = true) -> "#B71C1C"
+        merchantName.contains("sampath", ignoreCase = true) -> "#EF6C00"
+        merchantName.contains("combank", ignoreCase = true) || merchantName.contains("commercial bank", ignoreCase = true) -> "#0D47A1"
+        merchantName.contains("hnb", ignoreCase = true) -> "#1565C0"
+        merchantName.contains("seylan", ignoreCase = true) -> "#B71C1C"
+        merchantName.contains("frimi", ignoreCase = true) -> "#00897B"
+        merchantName.contains("openai", ignoreCase = true) || merchantName.contains("chatgpt", ignoreCase = true) -> "#10A37F"
+        merchantName.contains("claude", ignoreCase = true) || merchantName.contains("anthropic", ignoreCase = true) -> "#D97757"
+        merchantName.contains("github", ignoreCase = true) -> "#24292F"
+        merchantName.contains("steam", ignoreCase = true) -> "#1B2838"
+        merchantName.contains("aliexpress", ignoreCase = true) -> "#E62E04"
+        merchantName.contains("temu", ignoreCase = true) -> "#FB7701"
 
         else -> null
     }

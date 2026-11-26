@@ -42,6 +42,18 @@ fun BrandIcon(
 ) {
     val iconResource = IconProvider.getTransactionIcon(merchantName, category)
 
+    // For unmapped "Others" merchants with no logo drawable, render a crisp colored
+    // monogram avatar instead of an identical gray "more" icon on every row.
+    val isGenericOthers = category.isNullOrBlank() || category.equals("Others", ignoreCase = true)
+    if (isGenericOthers && iconResource !is IconResource.DrawableResource && merchantName.isNotBlank()) {
+        LetterAvatar(
+            merchantName = merchantName,
+            modifier = modifier,
+            size = size
+        )
+        return
+    }
+
     val backgroundColor = if (category.isValidCategoryOverride()
         && iconResource !is IconResource.DrawableResource
     ) {
