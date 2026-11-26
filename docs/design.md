@@ -1,9 +1,6 @@
-# PennyWise Design System
+# Mudal Design System — Warm Editorial Ledger
 
-Material 3 (Expressive), with a small set of app-specific tokens and components
-layered on top. This document describes what is **actually implemented** — if
-the code and this file disagree, the code in `app/src/main/java/com/pennywiseai/tracker/ui/theme/`
-is the source of truth and this file is the bug.
+A Warm Editorial Ledger system built on Material 3, pairing crisp `1dp` hairline-bordered paper surfaces with an editorial serif display font (`Newsreader`) and tabular sans UI typography (`Google Sans` / `SN Pro`). This document describes what is **actually implemented** — if the code and this file disagree, the code in `app/src/main/java/com/pennywiseai/tracker/ui/theme/` is the source of truth and this file is the bug.
 
 ## The one rule
 
@@ -47,7 +44,7 @@ Prefer these — they name the *role*, so the rhythm can be retuned in one place
 | `sectionGap` | 20dp | Between two top-level sections |
 | `headerToContent` | 8dp | Section header → the content it labels |
 | `listGap` | 8dp | Between sibling rows in a plain list |
-| `groupedListGap` | 2dp | Between rows of a connected/grouped block |
+| `groupedListGap` | 0dp | Rows inside a framed ledger sheet meet cleanly on a `0.5dp` hairline divider |
 | `nestedContent` | 12dp | Content nested inside an already-padded card |
 | `scrollBottomPadding` | 24dp | Bottom breathing room in a scrolling list |
 
@@ -130,8 +127,7 @@ common contrast bug in this codebase. Secondary text should be
 
 ## Typography
 
-`theme/Type.kt` is the Material scale with two deliberate departures, both aimed
-at making hierarchy readable in a dense, number-heavy UI:
+`theme/Type.kt` pairs **`Newsreader` (SIL OFL editorial serif)** for hero figures and screen titles (`displayLarge`/`Medium`/`Small`, `headlineLarge`/`Medium`/`Small`, `titleLarge`) with the user's UI sans (`Google Sans`, `SN Pro`, or `System`) for `titleMedium`/`Small`, `body*`, and `label*`. Two deliberate departures from stock Material 3 remain:
 
 1. **Titles and headlines are `SemiBold`, not `Normal`/`Medium`.** Material's
    defaults leave a `titleMedium` heading nearly indistinguishable from the
@@ -174,31 +170,31 @@ the jobs the plain roles don't cover:
 
 ## Shape
 
-`theme/Shape.kt`: `extraSmall` 4 · `small` 8 · `medium` 12 · `large` 16 ·
-`extraLarge` 28.
+`theme/Shape.kt`: `extraSmall` 4 · `small` 6 · `medium` 10 · `large` 12 · `extraLarge` 20.
 
-Reference `MaterialTheme.shapes.*` rather than re-typing
-`RoundedCornerShape(16.dp)`. Cards use `large`; grouped-list interiors use
-`extraSmall`; pill shapes use `CircleShape`.
+Reference `MaterialTheme.shapes.*` rather than re-typing `RoundedCornerShape(12.dp)`. Paper cards and framed ledger sheets use `large` (`12dp`); pill docks and action chips use `CircleShape`; the Passbook Home Header uses `Dimensions.CornerRadius.passbookBottom` (`20dp`) on its bottom corners.
 
 ---
 
 ## Components
 
-### `PennyWiseCardV2` — the standard card
+### `PennyWiseCardV2` — the standard paper card
 
-One card style everywhere: `shapes.large`, `surfaceContainerLow` fill, no
-elevation, and — in **dark mode only** — a 0.5dp hairline so the card separates
-from an AMOLED-black background where a tonal fill barely registers.
+One card style everywhere: `shapes.large` (`12dp`), crisp paper fill (`surface` `#FDFCF8` in light mode, `surfaceContainerLow` in dark/AMOLED), `0dp` elevation, and a **`1dp` hairline border** (`outlineVariant` at `0.65f` light / `0.35f` dark).
 
-Pass `contentPadding` rather than padding the content yourself, so the ripple on
-a clickable card covers the whole surface.
+Pass `contentPadding` rather than padding the content yourself, so the ripple on a clickable card covers the whole surface.
 
-### Grouped lists — `GroupedList` / `GroupedRow` / `GroupedColumn`
+### Framed ledger lists — `GroupedList` / `GroupedRow` / `GroupedColumn`
 
-The app's one grouped-list pattern: sibling rows share a tonal surface,
-separated by a 2dp gutter, with the block's outer corners rounded and interior
-corners nearly square. **The shape does the grouping — no dividers.**
+Sibling rows live inside a single hairline-bordered paper `Surface` (`12dp` outer corners, `0dp` inner corners) separated by subtle `0.5dp` horizontal hairlines (`HorizontalDivider`) between rows.
+
+### Floating pill dock — `PennyWiseBottomNavigation`
+
+Replaces the full-width M3 `NavigationBar` with a floating `60dp` pill dock (`mudal_green_strong` `#1E5147` in light mode; `surfaceContainerHigh` with `1dp` hairline in dark/AMOLED) paired with an integrated `56dp` circular `+` quick-add button on the right, accessible from all top-level tabs.
+
+### Passbook Home Header — `PassbookHomeHeader`
+
+Full-bleed deep forest-green header band (`mudal_green_strong` light / `mudal_passbook_dark` `#132620` dark) at the top of `HomeScreen`: top utility row (avatar/greeting, profile filter, menu), `Newsreader` hero spending figure with hide toggle, currency switcher, and tap-to-expand breakdown, plus a compact Income | Total Balance (or Net for cash-only users) strip and an inline **Scan SMS** pill (tap to scan, long-press for full resync, onboarding spotlight target).
 
 ```kotlin
 GroupedList {
