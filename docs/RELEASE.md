@@ -116,8 +116,5 @@ parser is added, regenerate the catalogue first
 - The Play Store bundle is not built unless `--play` is passed. Mudal is
   distributed through GitHub Releases and F-Droid.
 
-### F-Droid
-The `fastlane/metadata/android/` folder is the F-Droid listing. It carries a
-unique application ID (`com.mudal.tracker`), the store title, description and
-changelogs. The listing images are still upstream's screenshots and must be
-replaced with Mudal's own before the F-Droid submission.
+### F-Droid / IzzyOnDroid
+The `fastlane/metadata/android/` folder is the F-Droid / IzzyOnDroid listing. It carries a unique application ID (`com.mudal.tracker`), the store title, description, icon, feature graphic, and changelogs. `dependenciesInfo` is disabled in `app/build.gradle.kts` so release APKs omit Google's encrypted `DEPENDENCY_INFO_BLOCK`.

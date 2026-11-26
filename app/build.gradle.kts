@@ -18,6 +18,13 @@ android {
         buildConfig = true
     }
 
+    // Omit Google's encrypted DEPENDENCY_INFO_BLOCK from APKs/AABs so F-Droid
+    // and IzzyOnDroid accept the builds cleanly.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     defaultConfig {
         applicationId = "com.mudal.tracker"
         minSdk = 26
