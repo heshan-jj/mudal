@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 // same hues lifted for dark surfaces.
 val mudal_green = Color(0xFF2F6A5B)
 val mudal_green_strong = Color(0xFF1E5147)
+val mudal_passbook_dark = Color(0xFF132620)
 val mudal_mint = Color(0xFFB8EAD9)
 val mudal_sage = Color(0xFF8BBDAE)
 val mudal_cream = Color(0xFFF7F5EF)
