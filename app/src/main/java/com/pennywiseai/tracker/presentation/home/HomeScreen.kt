@@ -93,6 +93,7 @@ import com.pennywiseai.tracker.ui.components.cards.AccountCarousel
 import com.pennywiseai.tracker.ui.components.cards.BudgetCarousel
 import com.pennywiseai.tracker.ui.components.cards.CashFlowCard
 import com.pennywiseai.tracker.ui.components.cards.GroupCard
+import com.pennywiseai.tracker.ui.components.cards.GroupedList
 import com.pennywiseai.tracker.ui.components.cards.GroupedRow
 import com.pennywiseai.tracker.ui.components.cards.ListItemPosition
 import com.pennywiseai.tracker.ui.components.cards.PassbookHomeHeader
@@ -1000,41 +1001,40 @@ fun HomeScreen(
                         .fillMaxWidth()
                 )
 
-                // Monthly recap (Top) — the growth loop lives here rather than buried
-                // in the Subscriptions screen, where nobody would find it. Named for what
-                // it is rather than "Share ...": the menu sits beside Settings and Rate,
-                // and leading with the ask makes it read as a favour being requested.
-                MenuListItem(
-                    headline = stringResource(R.string.home_menu_monthly_recap),
-                    icon = { Icon(Icons.Default.Share, contentDescription = null) },
-                    position = ListItemPosition.Top,
-                    onClick = {
-                        showMenuSheet = false
-                        showShareSheet = true
-                    }
-                )
+                GroupedList(modifier = Modifier.padding(horizontal = Dimensions.Padding.content)) {
+                    // Monthly recap (Top)
+                    MenuListItem(
+                        headline = stringResource(R.string.home_menu_monthly_recap),
+                        icon = { Icon(Icons.Default.Share, contentDescription = null) },
+                        position = ListItemPosition.Top,
+                        onClick = {
+                            showMenuSheet = false
+                            showShareSheet = true
+                        }
+                    )
 
-                // Settings (Middle)
-                MenuListItem(
-                    headline = stringResource(R.string.home_menu_settings),
-                    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                    position = ListItemPosition.Middle,
-                    onClick = {
-                        showMenuSheet = false
-                        onNavigateToSettings()
-                    }
-                )
+                    // Settings (Middle)
+                    MenuListItem(
+                        headline = stringResource(R.string.home_menu_settings),
+                        icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                        position = ListItemPosition.Middle,
+                        onClick = {
+                            showMenuSheet = false
+                            onNavigateToSettings()
+                        }
+                    )
 
-                // Edit home screen (Bottom) — reorder / hide Home sections (#770)
-                MenuListItem(
-                    headline = stringResource(R.string.home_menu_edit_home),
-                    icon = { Icon(Icons.Default.Tune, contentDescription = null) },
-                    position = ListItemPosition.Bottom,
-                    onClick = {
-                        showMenuSheet = false
-                        showEditWidgetsSheet = true
-                    }
-                )
+                    // Edit home screen (Bottom) — reorder / hide Home sections (#770)
+                    MenuListItem(
+                        headline = stringResource(R.string.home_menu_edit_home),
+                        icon = { Icon(Icons.Default.Tune, contentDescription = null) },
+                        position = ListItemPosition.Bottom,
+                        onClick = {
+                            showMenuSheet = false
+                            showEditWidgetsSheet = true
+                        }
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(Spacing.sm))
 
@@ -1090,32 +1090,33 @@ fun HomeScreen(
                         .padding(bottom = Spacing.sm)
                         .fillMaxWidth()
                 )
-                homeSectionLayout.forEachIndexed { i, (section, isVisible) ->
-                    GroupedRow(
-                        position = ListItemPosition.from(i, homeSectionLayout.size),
-                        modifier = Modifier.padding(horizontal = Dimensions.Padding.content),
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
-                    ) {
-                        val sectionLabel = stringResource(section.titleRes())
-                        Text(
-                            text = sectionLabel,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = if (isVisible) MaterialTheme.colorScheme.onSurface
-                            else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(
-                            enabled = i > 0,
-                            onClick = { viewModel.moveHomeSection(section, -1) }
-                        ) { Icon(Icons.Default.KeyboardArrowUp, contentDescription = stringResource(R.string.home_edit_move_up, sectionLabel)) }
-                        IconButton(
-                            enabled = i < homeSectionLayout.lastIndex,
-                            onClick = { viewModel.moveHomeSection(section, +1) }
-                        ) { Icon(Icons.Default.KeyboardArrowDown, contentDescription = stringResource(R.string.home_edit_move_down, sectionLabel)) }
-                        Switch(
-                            checked = isVisible,
-                            onCheckedChange = { on -> viewModel.setHomeSectionVisible(section, on) }
-                        )
+                GroupedList(modifier = Modifier.padding(horizontal = Dimensions.Padding.content)) {
+                    homeSectionLayout.forEachIndexed { i, (section, isVisible) ->
+                        GroupedRow(
+                            position = ListItemPosition.from(i, homeSectionLayout.size),
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
+                        ) {
+                            val sectionLabel = stringResource(section.titleRes())
+                            Text(
+                                text = sectionLabel,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = if (isVisible) MaterialTheme.colorScheme.onSurface
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f)
+                            )
+                            IconButton(
+                                enabled = i > 0,
+                                onClick = { viewModel.moveHomeSection(section, -1) }
+                            ) { Icon(Icons.Default.KeyboardArrowUp, contentDescription = stringResource(R.string.home_edit_move_up, sectionLabel)) }
+                            IconButton(
+                                enabled = i < homeSectionLayout.lastIndex,
+                                onClick = { viewModel.moveHomeSection(section, +1) }
+                            ) { Icon(Icons.Default.KeyboardArrowDown, contentDescription = stringResource(R.string.home_edit_move_down, sectionLabel)) }
+                            Switch(
+                                checked = isVisible,
+                                onCheckedChange = { on -> viewModel.setHomeSectionVisible(section, on) }
+                            )
+                        }
                     }
                 }
             }

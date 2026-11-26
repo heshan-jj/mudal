@@ -1,6 +1,7 @@
 // Mudal fork: new file in Mudal (Warm Editorial Ledger UI) - see NOTICE.
 package com.pennywiseai.tracker.ui.components.cards
 
+import android.app.Activity
 import android.content.res.Configuration
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.animateContentSize
@@ -10,8 +11,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +29,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -42,6 +44,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,16 +56,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import coil.compose.AsyncImage
 import com.pennywiseai.tracker.R
 import com.pennywiseai.tracker.data.database.entity.AccountBalanceEntity
@@ -72,6 +76,7 @@ import com.pennywiseai.tracker.ui.components.ProfileFilterDropdown
 import com.pennywiseai.tracker.ui.components.profileFilterIcon
 import com.pennywiseai.tracker.ui.components.spotlightTarget
 import com.pennywiseai.tracker.ui.theme.Dimensions
+import com.pennywiseai.tracker.ui.theme.LocalIsDarkTheme
 import com.pennywiseai.tracker.ui.theme.PennyWiseText
 import com.pennywiseai.tracker.ui.theme.PennyWiseTheme
 import com.pennywiseai.tracker.ui.theme.Spacing
@@ -139,10 +144,22 @@ fun PassbookHomeHeader(
     onScanButtonPositioned: (Rect) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = LocalIsDarkTheme.current
     val view = LocalView.current
     var isExpanded by rememberSaveable { mutableStateOf(false) }
     var showProfileFilterMenu by remember { mutableStateOf(false) }
+
+    // Keep status-bar icons light over the dark forest-green Passbook Header in light mode.
+    if (!view.isInEditMode) {
+        DisposableEffect(isDark, view) {
+            val window = (view.context as? Activity)?.window
+            val controller = window?.let { WindowCompat.getInsetsController(it, view) }
+            controller?.isAppearanceLightStatusBars = false
+            onDispose {
+                controller?.isAppearanceLightStatusBars = !isDark
+            }
+        }
+    }
 
     val chevronRotation by animateFloatAsState(
         targetValue = if (isExpanded) 180f else 0f,
@@ -323,13 +340,17 @@ fun PassbookHomeHeader(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
+                        modifier = Modifier.weight(1f),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                     ) {
                         Text(
                             text = stringResource(R.string.balance_card_this_month),
                             style = MaterialTheme.typography.labelLarge,
-                            color = onHeaderMuted
+                            color = onHeaderMuted,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
                         )
                         if (availableCurrencies.size > 1 || isUnifiedMode) {
                             Surface(
@@ -341,6 +362,7 @@ fun PassbookHomeHeader(
                                     text = if (isUnifiedMode) "$currency ≈" else currency,
                                     style = MaterialTheme.typography.labelSmall,
                                     color = mudal_mint,
+                                    maxLines = 1,
                                     modifier = Modifier.padding(horizontal = Spacing.sm, vertical = Spacing.xxs)
                                 )
                             }
@@ -360,7 +382,9 @@ fun PassbookHomeHeader(
                         ) {
                             Icon(
                                 imageVector = if (isBalanceHidden) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                contentDescription = null,
+                                contentDescription = stringResource(
+                                    if (isBalanceHidden) R.string.balance_show else R.string.balance_hide
+                                ),
                                 tint = onHeaderMuted,
                                 modifier = Modifier.size(Dimensions.Icon.inline)
                             )
@@ -380,12 +404,17 @@ fun PassbookHomeHeader(
                     formatted = CurrencyFormatter.formatCurrency(currentMonthExpenses, currency),
                     isHidden = isBalanceHidden
                 )
-                Text(
+                val heroStyle = PennyWiseText.heroAmount.copy(color = onHeaderPrimary)
+                BasicText(
                     text = heroFormatted,
-                    style = PennyWiseText.heroAmount,
-                    color = onHeaderPrimary,
+                    style = heroStyle,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    autoSize = TextAutoSize.StepBased(
+                        minFontSize = PennyWiseText.autoSizeFloor,
+                        maxFontSize = heroStyle.fontSize
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(Spacing.xs))
@@ -418,7 +447,8 @@ fun PassbookHomeHeader(
                             currency = currency,
                             isBalanceHidden = isBalanceHidden,
                             comparisonData = lastMonthSpendingHistory.takeIf { it.size >= 2 },
-                            comparisonLineColor = Color.White.copy(alpha = 0.35f)
+                            comparisonLineColor = Color.White.copy(alpha = 0.35f),
+                            labelColor = onHeaderMuted
                         )
                         Spacer(modifier = Modifier.height(Spacing.sm))
                     }
@@ -551,7 +581,7 @@ fun PassbookHomeHeader(
                         color = chipFill
                     ) {
                         Text(
-                            text = stringResource(R.string.balance_card_total),
+                            text = "View breakdown",
                             style = MaterialTheme.typography.labelMedium,
                             color = mudal_mint,
                             modifier = Modifier.padding(horizontal = Spacing.smd, vertical = Spacing.xs)
@@ -582,6 +612,9 @@ fun PassbookHomeHeader(
                 horizontalArrangement = Arrangement.spacedBy(Spacing.smd),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val incomeAmountStyle = PennyWiseText.amountRow.copy(color = mudal_mint)
+                val secondaryAmountStyle = PennyWiseText.amountRow.copy(color = onHeaderPrimary)
+
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Income",
@@ -590,15 +623,18 @@ fun PassbookHomeHeader(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    Text(
+                    BasicText(
                         text = formatPassbookAmount(
                             CurrencyFormatter.formatCurrency(currentMonthIncome, currency),
                             isBalanceHidden
                         ),
-                        style = PennyWiseText.amountRow,
-                        color = mudal_mint,
+                        style = incomeAmountStyle,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        autoSize = TextAutoSize.StepBased(
+                            minFontSize = PennyWiseText.autoSizeFloor,
+                            maxFontSize = incomeAmountStyle.fontSize
+                        )
                     )
                 }
 
@@ -617,49 +653,47 @@ fun PassbookHomeHeader(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    Text(
+                    BasicText(
                         text = formatPassbookAmount(secondaryRaw, isBalanceHidden),
-                        style = PennyWiseText.amountRow,
-                        color = onHeaderPrimary,
+                        style = secondaryAmountStyle,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        autoSize = TextAutoSize.StepBased(
+                            minFontSize = PennyWiseText.autoSizeFloor,
+                            maxFontSize = secondaryAmountStyle.fontSize
+                        )
                     )
                 }
 
+                // Compact 48dp circular Sync action so Income/Total are never crushed
+                // and SpotlightTutorial's circular cutout + tooltip stay on-screen.
                 Surface(
                     modifier = Modifier
                         .spotlightTarget(onScanButtonPositioned)
-                        .defaultMinSize(minHeight = Dimensions.Component.minTouchTarget)
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onTap = { onScanSms() },
-                                onLongPress = {
-                                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                                    onLongPressScanSms()
-                                }
-                            )
-                        },
+                        .size(Dimensions.Component.minTouchTarget)
+                        .clip(CircleShape)
+                        .combinedClickable(
+                            role = Role.Button,
+                            onClick = onScanSms,
+                            onLongClick = {
+                                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                                onLongPressScanSms()
+                            }
+                        ),
                     shape = CircleShape,
                     color = mudal_mint,
                     contentColor = mudal_green_strong
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = Spacing.smd, vertical = Spacing.sm),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Sync,
                             contentDescription = stringResource(R.string.home_fab_sync),
                             modifier = Modifier
-                                .size(Dimensions.Icon.inline)
+                                .size(Dimensions.Icon.medium)
                                 .then(if (isScanning) Modifier.rotate(scanRotation) else Modifier)
-                        )
-                        Text(
-                            text = stringResource(R.string.home_fab_sync),
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 1
                         )
                     }
                 }
@@ -759,7 +793,7 @@ private fun PassbookExpandedStat(
 
 @Composable
 fun PassbookHomeHeaderSkeleton(modifier: Modifier = Modifier) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = LocalIsDarkTheme.current
     val headerColor = if (isDark) mudal_passbook_dark else mudal_green_strong
     val shimmerFill = Color.White.copy(alpha = 0.14f)
 

@@ -2,7 +2,6 @@ package com.pennywiseai.tracker.ui.components.cards
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
@@ -16,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import com.pennywiseai.tracker.ui.theme.Dimensions
+import com.pennywiseai.tracker.ui.theme.LocalIsDarkTheme
 
 internal fun ledgerCardBorderAlpha(isDark: Boolean): Float =
     if (isDark) 0.35f else 0.65f
@@ -42,7 +42,7 @@ fun PennyWiseCardV2(
      */
     containerColor: androidx.compose.ui.graphics.Color? = null,
     colors: CardColors = CardDefaults.cardColors(
-        containerColor = containerColor ?: if (isSystemInDarkTheme()) {
+        containerColor = containerColor ?: if (LocalIsDarkTheme.current) {
             MaterialTheme.colorScheme.surfaceContainerLow
         } else {
             MaterialTheme.colorScheme.surface
@@ -71,7 +71,7 @@ fun PennyWiseCardV2(
     val effectiveBorder = border ?: BorderStroke(
         width = Dimensions.Component.hairlineBorder,
         color = MaterialTheme.colorScheme.outlineVariant.copy(
-            alpha = ledgerCardBorderAlpha(isSystemInDarkTheme())
+            alpha = ledgerCardBorderAlpha(LocalIsDarkTheme.current)
         )
     )
 

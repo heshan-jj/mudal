@@ -14,6 +14,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -102,34 +103,37 @@ internal val DarkColorScheme = darkColorScheme(
     surfaceContainerHighest = md_theme_dark_surfaceContainerHighest,
 )
 
+/** Resolved app dark-theme state (honours explicit Light/Dark override, not just OS theme). */
+val LocalIsDarkTheme = compositionLocalOf { false }
+
 // Custom color extensions
 val ColorScheme.success: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) success_dark else success_light
+    get() = if (LocalIsDarkTheme.current) success_dark else success_light
 
 val ColorScheme.warning: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) warning_dark else warning_light
+    get() = if (LocalIsDarkTheme.current) warning_dark else warning_light
 
 val ColorScheme.income: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) income_dark else income_light
+    get() = if (LocalIsDarkTheme.current) income_dark else income_light
 
 val ColorScheme.expense: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) expense_dark else expense_light
+    get() = if (LocalIsDarkTheme.current) expense_dark else expense_light
 
 val ColorScheme.credit: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) credit_dark else credit_light
+    get() = if (LocalIsDarkTheme.current) credit_dark else credit_light
 
 val ColorScheme.transfer: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) transfer_dark else transfer_light
+    get() = if (LocalIsDarkTheme.current) transfer_dark else transfer_light
 
 val ColorScheme.investment: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) investment_dark else investment_light
+    get() = if (LocalIsDarkTheme.current) investment_dark else investment_light
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -185,7 +189,10 @@ fun PennyWiseTheme(
         AppFont.SYSTEM -> FontFamily.Default
     }
 
-    CompositionLocalProvider(LocalBlurEffects provides blurEffects) {
+    CompositionLocalProvider(
+        LocalBlurEffects provides blurEffects,
+        LocalIsDarkTheme provides darkTheme,
+    ) {
         MaterialExpressiveTheme(
             colorScheme = colorScheme,
             typography = getTypography(fontFamily = fontFamily),

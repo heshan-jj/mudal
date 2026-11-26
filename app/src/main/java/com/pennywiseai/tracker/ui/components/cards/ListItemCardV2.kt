@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.pennywiseai.tracker.ui.theme.Dimensions
+import com.pennywiseai.tracker.ui.theme.LocalIsDarkTheme
 import com.pennywiseai.tracker.ui.theme.PennyWiseText
 import com.pennywiseai.tracker.ui.theme.Spacing
 
@@ -107,6 +108,14 @@ fun ListItemCardV2(
         shape = shape,
         contentPadding = contentPadding,
         containerColor = containerColor,
+        // Use 0.5dp border on standalone list rows so adjacent rows in a 0dp-gap
+        // LazyColumn meet cleanly on a 1dp hairline instead of stacking to 2dp.
+        border = BorderStroke(
+            width = Dimensions.Component.hairline,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(
+                alpha = ledgerCardBorderAlpha(LocalIsDarkTheme.current)
+            )
+        ),
         onClick = onClick,
         onLongClick = onLongClick
     ) {

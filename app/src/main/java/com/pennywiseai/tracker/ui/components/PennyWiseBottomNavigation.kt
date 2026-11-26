@@ -8,10 +8,10 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -52,6 +52,7 @@ import com.pennywiseai.tracker.presentation.navigation.goHome
 import com.pennywiseai.tracker.ui.components.cards.ledgerCardBorderAlpha
 import com.pennywiseai.tracker.ui.effects.BlurredAnimatedVisibility
 import com.pennywiseai.tracker.ui.theme.Dimensions
+import com.pennywiseai.tracker.ui.theme.LocalIsDarkTheme
 import com.pennywiseai.tracker.ui.theme.Spacing
 import com.pennywiseai.tracker.ui.theme.mudal_green
 import com.pennywiseai.tracker.ui.theme.mudal_green_strong
@@ -66,6 +67,12 @@ internal fun shouldShowDockLabel(
     fontScale: Float,
 ): Boolean = isSelected || fontScale < 1.5f || visibleTabCount < 3
 
+internal fun dockTabWeight(
+    visibleTabCount: Int,
+    isSelected: Boolean,
+    fontScale: Float,
+): Float = if (isSelected && fontScale >= 1.5f && visibleTabCount >= 3) 1.8f else 1f
+
 @Composable
 fun PennyWiseBottomNavigation(
     modifier: Modifier = Modifier,
@@ -78,7 +85,7 @@ fun PennyWiseBottomNavigation(
     onAddClick: (() -> Unit)? = null,
 ) {
     val navigationItems = BottomNavItem.visible(hiddenTabs)
-    val isDark = isSystemInDarkTheme()
+    val isDark = LocalIsDarkTheme.current
     val fontScale = LocalDensity.current.fontScale
 
     val pillColor = if (isDark) MaterialTheme.colorScheme.surfaceContainerHigh else mudal_green_strong
@@ -126,7 +133,7 @@ fun PennyWiseBottomNavigation(
                 Surface(
                     modifier = Modifier
                         .weight(1f)
-                        .height(Dimensions.Component.floatingDockHeight)
+                        .defaultMinSize(minHeight = Dimensions.Component.floatingDockHeight)
                         .clip(CircleShape)
                         .then(
                             if (blurEffects) Modifier.hazeEffect(
@@ -149,7 +156,8 @@ fun PennyWiseBottomNavigation(
                 ) {
                     Row(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Min)
                             .padding(horizontal = Spacing.xs, vertical = Spacing.xs),
                         horizontalArrangement = Arrangement.spacedBy(Spacing.xxs),
                         verticalAlignment = Alignment.CenterVertically
@@ -164,11 +172,16 @@ fun PennyWiseBottomNavigation(
                                 isSelected = isSelected,
                                 fontScale = fontScale
                             )
+                            val tabWeight = dockTabWeight(
+                                visibleTabCount = navigationItems.size,
+                                isSelected = isSelected,
+                                fontScale = fontScale
+                            )
                             val contentColor = if (isSelected) activeContentColor else inactiveContentColor
 
                             Box(
                                 modifier = Modifier
-                                    .weight(1f)
+                                    .weight(tabWeight)
                                     .fillMaxHeight()
                                     .defaultMinSize(
                                         minWidth = Dimensions.Component.minTouchTarget,
@@ -200,7 +213,7 @@ fun PennyWiseBottomNavigation(
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Center,
-                                    modifier = Modifier.padding(horizontal = Spacing.xs)
+                                    modifier = Modifier.padding(horizontal = Spacing.xxs, vertical = Spacing.xxs)
                                 ) {
                                     Icon(
                                         imageVector = item.icon,
