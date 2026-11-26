@@ -110,12 +110,12 @@ object Dimensions {
     // Mirrors MaterialTheme.shapes; use the theme shapes where a Shape is
     // accepted and these only where a raw Dp is needed.
     object CornerRadius {
-        /** Interior corners of a row inside a connected/grouped list block. */
         val small = 4.dp
-        val medium = 8.dp
-        val card = 12.dp
-        val large = 16.dp
-        val extraLarge = 28.dp
+        val medium = 6.dp
+        val card = 10.dp
+        val large = 12.dp
+        val extraLarge = 20.dp
+        val passbookBottom = 20.dp
 
         /** For circular elements. */
         val full = 50.dp
@@ -123,7 +123,10 @@ object Dimensions {
 
     // ── Component metrics ─────────────────────────────────────────────────
     object Component {
-        val bottomBarHeight = 80.dp
+        val bottomBarHeight = 88.dp
+        val floatingDockHeight = 60.dp
+        val floatingDockAddSize = 56.dp
+        val floatingDockBottomMargin = 12.dp
         val buttonHeight = 48.dp
 
         /** Accessibility floor for anything tappable. */
@@ -142,8 +145,11 @@ object Dimensions {
 
         val dividerThickness = 1.dp
 
-        /** Hairline used to outline cards in dark mode. */
+        /** Subtle interior hairline divider inside framed ledger lists. */
         val hairline = 0.5.dp
+
+        /** Crisp outer hairline border for paper cards and framed ledger sheets. */
+        val hairlineBorder = 1.dp
 
         val progressIndicatorSize = 24.dp
         val chipHeight = 32.dp

@@ -56,11 +56,10 @@ object Spacing {
         val listGap = 8.dp
 
         /**
-         * Gap between rows of a *grouped* list — the connected
-         * rounded-corner-block pattern where rows read as one unit.
-         * Deliberately tiny; the shape does the separating.
+         * Gap between rows of a *grouped* list — rows share a single framed
+         * ledger sheet separated by internal hairlines rather than pill gaps.
          */
-        val groupedListGap = 2.dp
+        val groupedListGap = 0.dp
 
         /** Inset for content nested inside an already-padded card. */
         val nestedContent = 12.dp

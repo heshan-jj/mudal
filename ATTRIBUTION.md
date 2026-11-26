@@ -49,6 +49,7 @@ Mudal forks PennyWise AI to provide a focused, privacy-first personal finance tr
 | Haze & Haze Materials (Chris Banes) | Apache 2.0 |
 | **SQLCipher (`net.zetetic:sqlcipher-android`)** — *added by Mudal* | **BSD-3-Clause** |
 | Google Sans (app and website font) | SIL OFL 1.1. Subset of the variable font in [google/fonts `ofl/googlesans`](https://github.com/google/fonts/tree/main/ofl/googlesans), keeping Latin, Cyrillic, Arabic, Devanagari, Sinhala and Thai. Licence: [`app/src/main/assets/licenses/google-sans/OFL.txt`](app/src/main/assets/licenses/google-sans/OFL.txt) |
+| **Newsreader** (editorial display & title font) — *added by Mudal* | SIL OFL 1.1. Variable font from [google/fonts `ofl/newsreader`](https://github.com/google/fonts/tree/main/ofl/newsreader). |
 | Open Exchange Rates API (`open.er-api.com`) | Open data |
 
 The optional AI assistant calls the **Google Gemini API** using the user's own API key. No model is bundled or downloaded, and Mudal has no key of its own.
