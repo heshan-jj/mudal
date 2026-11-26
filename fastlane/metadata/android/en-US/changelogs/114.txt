@@ -1,0 +1,3 @@
+Version 2.26.1
+
+• chore(release): disable dependenciesInfo block for F-Droid and IzzyOnDroid
