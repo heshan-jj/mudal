@@ -95,6 +95,8 @@ import com.pennywiseai.tracker.ui.components.cards.CashFlowCard
 import com.pennywiseai.tracker.ui.components.cards.GroupCard
 import com.pennywiseai.tracker.ui.components.cards.GroupedRow
 import com.pennywiseai.tracker.ui.components.cards.ListItemPosition
+import com.pennywiseai.tracker.ui.components.cards.PassbookHomeHeader
+import com.pennywiseai.tracker.ui.components.cards.PassbookHomeHeaderSkeleton
 import com.pennywiseai.tracker.ui.components.cards.TransactionItem
 import com.pennywiseai.tracker.ui.components.skeleton.BalanceCardSkeleton
 import com.pennywiseai.tracker.ui.components.skeleton.TransactionItemSkeleton
@@ -280,7 +282,6 @@ fun HomeScreen(
     }
     
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehaviorLarge.nestedScrollConnection),
         containerColor = Color.Transparent,
         // The bottom nav bar is overlaid on top of this Scaffold by MainScreen,
         // so pad the host clear of it — otherwise snackbars (notably the
@@ -290,111 +291,22 @@ fun HomeScreen(
                 hostState = snackbarHostState,
                 modifier = Modifier.padding(bottom = Dimensions.Component.bottomBarHeight)
             )
-        },
-        topBar = {
-            CustomTitleTopAppBar(
-                scrollBehaviorSmall = scrollBehaviorSmall,
-                scrollBehaviorLarge = scrollBehaviorLarge,
-                title = "Mudal",
-                isHomeScreen = true,
-                userName = uiState.userName,
-                profileImageUri = uiState.profileImageUri,
-                profileBackgroundColor = uiState.profileBackgroundColor,
-                hazeState = hazeState,
-                blurEffects = blurEffects,
-                actionContent = {
-                    val containerColor = MaterialTheme.colorScheme.surfaceContainer
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(end = Dimensions.Padding.content),
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
-                    ) {
-                        // Business/Personal filter dropdown
-                        Box {
-                            Box(
-                                modifier = Modifier
-                                    .size(Dimensions.Component.iconButton)
-                                    .clip(CircleShape)
-                                    .background(
-                                        color = if (blurEffects) containerColor.copy(0.5f) else containerColor,
-                                        shape = CircleShape
-                                    )
-                                    .clickable(
-                                        onClick = { showProfileFilterMenu = true },
-                                        interactionSource = remember { MutableInteractionSource() },
-                                        indication = null,
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = profileFilterIcon(uiState.profiles, uiState.selectedProfileId),
-                                    contentDescription = stringResource(R.string.home_profile_filter),
-                                    tint = MaterialTheme.colorScheme.inverseSurface,
-                                    modifier = Modifier.size(Dimensions.Icon.inline)
-                                )
-                            }
-                            ProfileFilterDropdown(
-                                expanded = showProfileFilterMenu,
-                                profiles = uiState.profiles,
-                                selectedProfileId = uiState.selectedProfileId,
-                                onProfileSelected = { viewModel.updateSelectedProfile(it) },
-                                onDismiss = { showProfileFilterMenu = false }
-                            )
-                        }
-                        // More options button
-                        Box(
-                            modifier = Modifier
-                                .size(Dimensions.Component.iconButton)
-                                .clip(CircleShape)
-                                .background(
-                                    color = if (blurEffects) containerColor.copy(0.5f) else containerColor,
-                                    shape = CircleShape
-                                )
-                                .clickable(
-                                    onClick = { showMenuSheet = true },
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null,
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.MoreHoriz,
-                                contentDescription = stringResource(R.string.home_more_options),
-                                tint = MaterialTheme.colorScheme.inverseSurface,
-                                modifier = Modifier.size(Dimensions.Icon.medium)
-                            )
-                        }
-                    }
-                },
-                extraInfoCard = {
-                    GreetingCard(
-                        userName = uiState.userName,
-                        profileImageUri = uiState.profileImageUri,
-                        profileBackgroundColor = uiState.profileBackgroundColor,
-                        onAvatarClick = onNavigateToSettings,
-                        onMenuClick = { showMenuSheet = true },
-                        profiles = uiState.profiles,
-                        selectedProfileId = uiState.selectedProfileId,
-                        onProfileSelected = { viewModel.updateSelectedProfile(it) },
-                        cycleEnd = currentCycleWindow.second
-                    )
-                }
-            )
         }
-    ) { paddingValues ->
+    ) { _ ->
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        // Banner gradient at y=0 — paints behind the transparent TopAppBar
-        if (coverStyle != CoverStyle.NONE) {
-            CoverGradientBanner(
-                coverStyle = coverStyle,
-                hazeStateBanner = hazeStateBanner,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-            )
-        }
+        // Scan SMS rotation animation
+        val infiniteTransition = rememberInfiniteTransition(label = "scan_rotation")
+        val continuousRotation by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1000, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart
+            ),
+            label = "scan_rotation"
+        )
+        val scanRotation = if (uiState.isScanning) continuousRotation else 0f
 
-        // LazyColumn scrolls over the banner
         LazyColumn(
             state = lazyListState,
             modifier = Modifier
@@ -403,76 +315,67 @@ fun HomeScreen(
                 .overScrollVertical(),
             flingBehavior = rememberOverscrollFlingBehavior { lazyListState },
             contentPadding = PaddingValues(
-                top = Dimensions.Padding.content + paddingValues.calculateTopPadding(),
-                // Clears the nav bar plus the Add + Sync FAB stack above it.
-                bottom = Dimensions.Component.bottomBarHeight +
-                    Dimensions.Component.fabScrollClearance
+                top = Spacing.none,
+                bottom = Dimensions.Component.bottomBarHeight + Spacing.Layout.scrollBottomPadding
             ),
             verticalArrangement = Arrangement.spacedBy(Spacing.md)
         ) {
-            // 1. Balance Card (0ms delay)
+            // 1. Full-bleed Passbook Header (0ms delay)
             item {
-                val visible = remember { mutableStateOf(hasAnimated) }
-                LaunchedEffect(Unit) {
-                    if (!hasAnimated) { delay(0); visible.value = true }
-                }
-                AnimatedVisibility(
-                    visible = visible.value,
-                    enter = fadeIn(tween(300)) + slideInVertically(
-                        initialOffsetY = { slideOffsetPx },
-                        animationSpec = tween(300)
-                    )
-                ) {
-                    if (!uiState.isBalanceReady) {
-                        BalanceCardSkeleton(
-                            modifier = Modifier.padding(horizontal = Dimensions.Padding.content)
-                        )
-                    } else {
-                        com.pennywiseai.tracker.ui.components.cards.BalanceCard(
-                            modifier = Modifier.padding(horizontal = Dimensions.Padding.content),
-                            blurEffects = blurEffects,
-                            hazeState = hazeStateBanner,
-                            userName = uiState.userName,
-                            totalBalance = uiState.totalBalance,
-                            monthlyChange = uiState.monthlyChange,
-                            monthlyChangePercent = uiState.monthlyChangePercent,
-                            currency = uiState.selectedCurrency,
-                            currentMonthIncome = uiState.currentMonthIncome,
-                            currentMonthExpenses = uiState.currentMonthExpenses,
-                            currentMonthLent = uiState.currentMonthLent,
-                            currentMonthTotal = uiState.currentMonthTotal,
-                            balanceHistory = uiState.balanceHistory,
-                            spendingHistory = uiState.spendingHistory,
-                            lastMonthSpendingHistory = uiState.lastMonthSpendingHistory,
-                            lastMonthSpending = uiState.lastMonthExpenses,
-                            availableCurrencies = uiState.availableCurrencies,
-                            isUnifiedMode = uiState.isUnifiedMode,
-                            isApproximate = uiState.isApproximateBalance,
-                            isBalanceHidden = uiState.isBalanceHidden,
-                            onToggleBalanceVisibility = { viewModel.toggleBalanceVisibility() },
-                            onCurrencyClick = {
-                                // Cycle through currencies when tapped
-                                val currencies = uiState.availableCurrencies
-                                if (currencies.size > 1) {
-                                    val currentIdx = currencies.indexOf(uiState.selectedCurrency)
-                                    val nextIdx = (currentIdx + 1) % currencies.size
-                                    viewModel.selectCurrency(currencies[nextIdx])
-                                }
-                            },
-                            onShowBreakdown = { viewModel.showBreakdownDialog() },
-                            accountBalances = uiState.accountBalances,
-                            creditCards = uiState.creditCards,
-                            totalAvailableCredit = uiState.totalAvailableCredit,
-                            onAccountClick = { bankName, accountLast4 ->
-                                navController.navigate(
-                                    com.pennywiseai.tracker.navigation.AccountDetail(
-                                        bankName = bankName,
-                                        accountLast4 = accountLast4
-                                    )
-                                ) { launchSingleTop = true }
+                if (!uiState.isBalanceReady) {
+                    PassbookHomeHeaderSkeleton()
+                } else {
+                    PassbookHomeHeader(
+                        userName = uiState.userName,
+                        profileImageUri = uiState.profileImageUri,
+                        profileBackgroundColor = uiState.profileBackgroundColor,
+                        profiles = uiState.profiles,
+                        selectedProfileId = uiState.selectedProfileId,
+                        onProfileSelected = { viewModel.updateSelectedProfile(it) },
+                        onAvatarClick = onNavigateToSettings,
+                        onMenuClick = { showMenuSheet = true },
+                        cycleEnd = currentCycleWindow.second,
+                        totalBalance = uiState.totalBalance,
+                        monthlyChange = uiState.monthlyChange,
+                        monthlyChangePercent = uiState.monthlyChangePercent,
+                        currency = uiState.selectedCurrency,
+                        currentMonthIncome = uiState.currentMonthIncome,
+                        currentMonthExpenses = uiState.currentMonthExpenses,
+                        currentMonthLent = uiState.currentMonthLent,
+                        currentMonthTotal = uiState.currentMonthTotal,
+                        spendingHistory = uiState.spendingHistory,
+                        lastMonthSpendingHistory = uiState.lastMonthSpendingHistory,
+                        availableCurrencies = uiState.availableCurrencies,
+                        isUnifiedMode = uiState.isUnifiedMode,
+                        isApproximate = uiState.isApproximateBalance,
+                        isBalanceHidden = uiState.isBalanceHidden,
+                        onToggleBalanceVisibility = { viewModel.toggleBalanceVisibility() },
+                        onCurrencyClick = {
+                            val currencies = uiState.availableCurrencies
+                            if (currencies.size > 1) {
+                                val currentIdx = currencies.indexOf(uiState.selectedCurrency)
+                                val nextIdx = (currentIdx + 1) % currencies.size
+                                viewModel.selectCurrency(currencies[nextIdx])
                             }
-                        )
-                    }
+                        },
+                        onShowBreakdown = { viewModel.showBreakdownDialog() },
+                        accountBalances = uiState.accountBalances,
+                        creditCards = uiState.creditCards,
+                        onAccountClick = { bankName, accountLast4 ->
+                            navController.navigate(
+                                com.pennywiseai.tracker.navigation.AccountDetail(
+                                    bankName = bankName,
+                                    accountLast4 = accountLast4
+                                )
+                            ) { launchSingleTop = true }
+                        },
+                        isScanning = uiState.isScanning,
+                        scanRotation = scanRotation,
+                        showNewUserSyncHint = uiState.recentItems.isEmpty() && !uiState.isLoading,
+                        onScanSms = { viewModel.scanSmsMessages() },
+                        onLongPressScanSms = { showFullResyncDialog = true },
+                        onScanButtonPositioned = onFabPositioned
+                    )
                 }
             }
 
@@ -991,94 +894,6 @@ fun HomeScreen(
                             }
                         }
                     }
-                }
-            }
-        }
-        
-        // Scan FAB rotation animation
-        val infiniteTransition = rememberInfiniteTransition(label = "scan_rotation")
-        val rotationAngle by animateFloatAsState(
-            targetValue = if (uiState.isScanning) 1f else 0f,
-            animationSpec = tween(300),
-            label = "scan_trigger"
-        )
-        val continuousRotation by infiniteTransition.animateFloat(
-            initialValue = 0f,
-            targetValue = 360f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1000, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "scan_rotation"
-        )
-        val scanRotation = if (uiState.isScanning) continuousRotation else 0f
-
-        // FABs - Direct access (no speed dial)
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(
-                    end = Dimensions.Padding.content,
-                    bottom = Dimensions.Component.fabBottomInset
-                ),
-            verticalArrangement = Arrangement.spacedBy(Spacing.smd),
-            horizontalAlignment = Alignment.End
-        ) {
-            // Add FAB (top, small)
-            SmallFloatingActionButton(
-                onClick = onNavigateToAddScreen,
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.home_fab_add)
-                )
-            }
-            
-            // Sync FAB (bottom, primary)
-            // Single tap: incremental scan, Long press: full resync
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Spacing.xs)
-            ) {
-                Surface(
-                    modifier = Modifier
-                        .spotlightTarget(onFabPositioned)
-                        .size(Dimensions.Component.fab)
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onTap = { viewModel.scanSmsMessages() },
-                                onLongPress = {
-                                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                                    showFullResyncDialog = true
-                                }
-                            )
-                        },
-                    shape = FloatingActionButtonDefaults.shape,
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    shadowElevation = Dimensions.Elevation.fab,
-                    tonalElevation = Dimensions.Elevation.fab,
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Sync,
-                            contentDescription = stringResource(R.string.home_fab_sync),
-                            modifier = if (uiState.isScanning) Modifier.rotate(scanRotation) else Modifier,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                }
-                // Hint for long-press functionality - only show for new users (no transactions yet)
-                if (uiState.recentItems.isEmpty() && !uiState.isLoading) {
-                    Text(
-                        text = stringResource(R.string.home_fab_sync_hint),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
                 }
             }
         }

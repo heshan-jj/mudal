@@ -280,17 +280,6 @@ fun AppearanceScreen(
                     }
                 }
 
-                // Cover Style Section
-                SectionHeaderV2(
-                    title = stringResource(R.string.appearance_cover_section),
-                    modifier = Modifier.padding(start = Dimensions.Padding.content)
-                )
-                CoverStyleSelector(
-                    currentStyle = themeUiState.coverStyle,
-                    isDark = themeUiState.isDarkTheme ?: isSystemInDarkTheme(),
-                    onStyleSelected = { themeViewModel.updateCoverStyle(it) }
-                )
-
                 Spacer(modifier = Modifier.height(Spacing.xl))
             }
         }
