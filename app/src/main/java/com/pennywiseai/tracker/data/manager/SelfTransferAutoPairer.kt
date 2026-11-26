@@ -26,10 +26,10 @@ class SelfTransferAutoPairer @Inject constructor(
 ) {
 
     companion object {
-        private const val WINDOW_SECONDS = 120L
+        private const val WINDOW_SECONDS = 600L
         private const val MERGED_HASH_PREFIX = "MERGED_TRANSFER_"
         private val TRANSFER_CUE_REGEX = Regex(
-            """(?i)\b(?:tfr|transfer|neft|imps|rtgs|ceft|slips|owner)\b"""
+            """(?i)\b(?:tfr|trrr|transfer|neft|imps|rtgs|ceft\w*|slips|ibft|lankapay|justpay|frimi|owner|fund\s*trf|ft)\b"""
         )
         private val RETAIL_OR_ATM_REGEX = Regex(
             """(?i)(?:\bvia\s+pos\s+at\b|\bvia\s+atm\s+at\b|\batm\s*-|\bfor\s+ecom\b|\bpurchase\s+at\b|\bwithdrawal\s+at\b)"""
@@ -78,9 +78,10 @@ class SelfTransferAutoPairer @Inject constructor(
         if (acctA.identity == acctB.identity) return false
         if (RecurringMatcher.isReversalSms(a.smsBody) || RecurringMatcher.isReversalSms(b.smsBody)) return false
 
+        val sameBank = acctA.bank.isNotEmpty() && acctA.bank.equals(acctB.bank, ignoreCase = true)
         val refA = a.reference?.trim()?.takeIf { it.isNotEmpty() }
         val refB = b.reference?.trim()?.takeIf { it.isNotEmpty() }
-        if (refA != null && refB != null && !refA.equals(refB, ignoreCase = true)) return false
+        if (sameBank && refA != null && refB != null && !refA.equals(refB, ignoreCase = true)) return false
 
         val gapSeconds = abs(Duration.between(a.dateTime, b.dateTime).seconds)
         if (gapSeconds > WINDOW_SECONDS) return false

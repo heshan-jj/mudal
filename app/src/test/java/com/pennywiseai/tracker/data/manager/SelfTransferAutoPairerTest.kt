@@ -202,4 +202,35 @@ class SelfTransferAutoPairerTest {
         coEvery { transactionRepository.findSelfTransferCandidates(BigDecimal("1500.00"), any(), any(), 35L) } returns listOf(cardSpend)
         assertFalse(pairer.tryPairSavedTransaction(acctCredit))
     }
+
+    @Test
+    fun `pairs cross-bank Sri Lankan CEFTLV transfer with different bank references 5 minutes apart`() = runBlocking {
+        val dt = LocalDateTime.of(2026, 10, 22, 11, 15, 0)
+        val sampathDebit = smsTx(
+            id = 50L,
+            type = TransactionType.EXPENSE,
+            amount = "15000.00",
+            account = "7700",
+            merchant = "CEFTLV",
+            smsBody = "LKR 15,000.00 debited from AC **7700 for CEFTLV -REF111",
+            dateTime = dt,
+            reference = "REF111",
+            bankName = "Sampath Bank"
+        )
+        val combankCredit = smsTx(
+            id = 51L,
+            type = TransactionType.INCOME,
+            amount = "15000.00",
+            account = "3415",
+            merchant = "CEFTS Credit",
+            smsBody = "Your A/C **3415 credited with LKR 15,000.00 via CEFTS Ref CB999",
+            dateTime = dt.plusMinutes(5),
+            reference = "CB999",
+            bankName = "Commercial Bank"
+        )
+
+        coEvery { transactionRepository.findSelfTransferCandidates(BigDecimal("15000.00"), any(), any(), 51L) } returns listOf(sampathDebit)
+
+        assertTrue(pairer.tryPairSavedTransaction(combankCredit))
+    }
 }
