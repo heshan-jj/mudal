@@ -1,0 +1,11 @@
+Version 2.26.0
+
+New Features:
+• add Clean up Others merchant batch sheet
+• expand Sri Lankan & digital categories and monogram fallback for Others
+• broaden Sri Lankan inter-bank self-transfer auto-pairing
+• add 1-tap bulk recategorize by merchant name
+• wire PassbookHomeHeader and remove redundant Home FABs and CoverStyle UI
+
+Bug Fixes:
+• address branch review findings (LocalIsDarkTheme, compact sync button, TextAutoSize, dock scaling)
