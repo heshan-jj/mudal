@@ -1,6 +1,6 @@
 # Mudal Design System — Warm Editorial Ledger
 
-A Warm Editorial Ledger system built on Material 3, pairing crisp `1dp` hairline-bordered paper surfaces with an editorial serif display font (`Newsreader`) and tabular sans UI typography (`Google Sans` / `SN Pro`). This document describes what is **actually implemented** — if the code and this file disagree, the code in `app/src/main/java/com/pennywiseai/tracker/ui/theme/` is the source of truth and this file is the bug.
+A Warm Editorial Ledger system built on Material 3, pairing crisp `1dp` hairline-bordered paper surfaces with a single unified UI font (`Google Sans` by default, or `SN Pro` / `System`) and tabular figures for money. This document describes what is **actually implemented** — if the code and this file disagree, the code in `app/src/main/java/com/pennywiseai/tracker/ui/theme/` is the source of truth and this file is the bug.
 
 ## The one rule
 
@@ -127,7 +127,7 @@ common contrast bug in this codebase. Secondary text should be
 
 ## Typography
 
-`theme/Type.kt` pairs **`Newsreader` (SIL OFL editorial serif)** for hero figures and screen titles (`displayLarge`/`Medium`/`Small`, `headlineLarge`/`Medium`/`Small`, `titleLarge`) with the user's UI sans (`Google Sans`, `SN Pro`, or `System`) for `titleMedium`/`Small`, `body*`, and `label*`. Two deliberate departures from stock Material 3 remain:
+`theme/Type.kt` uses a single unified font family (`Google Sans`, `SN Pro`, or `System`) across all display, title, body, and label roles. Two deliberate departures from stock Material 3 remain:
 
 1. **Titles and headlines are `SemiBold`, not `Normal`/`Medium`.** Material's
    defaults leave a `titleMedium` heading nearly indistinguishable from the
@@ -194,7 +194,7 @@ Replaces the full-width M3 `NavigationBar` with a floating `60dp` pill dock (`mu
 
 ### Passbook Home Header — `PassbookHomeHeader`
 
-Full-bleed deep forest-green header band (`mudal_green_strong` light / `mudal_passbook_dark` `#132620` dark) at the top of `HomeScreen`: top utility row (avatar/greeting, profile filter, menu), `Newsreader` hero spending figure with hide toggle, currency switcher, and tap-to-expand breakdown, plus a compact Income | Total Balance (or Net for cash-only users) strip and an inline **Scan SMS** pill (tap to scan, long-press for full resync, onboarding spotlight target).
+Full-bleed deep forest-green header band (`mudal_green_strong` light / `mudal_passbook_dark` `#132620` dark) at the top of `HomeScreen`: top utility row (avatar/greeting, profile filter, menu), hero spending figure with hide toggle, currency switcher, and tap-to-expand breakdown, plus a compact Income | Total Balance (or Net for cash-only users) strip and an inline **Scan SMS** button (tap to scan, long-press for full resync, onboarding spotlight target).
 
 ```kotlin
 GroupedList {

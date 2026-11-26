@@ -8,16 +8,13 @@ import org.junit.Test
 
 class EditorialThemeTokensTest {
     @Test
-    fun `editorial typography uses display font for hero and screen titles and body font for UI`() {
-        val typo = getTypography(
-            fontFamily = FontFamily.SansSerif,
-            displayFontFamily = FontFamily.Serif
-        )
-        assertEquals(FontFamily.Serif, typo.displayLarge.fontFamily)
-        assertEquals(FontFamily.Serif, typo.displaySmall.fontFamily)
-        assertEquals(FontFamily.Serif, typo.headlineMedium.fontFamily)
-        assertEquals(FontFamily.Serif, typo.headlineSmall.fontFamily)
-        assertEquals(FontFamily.Serif, typo.titleLarge.fontFamily)
+    fun `typography uses a single unified font family across display, title, and body roles`() {
+        val typo = getTypography(fontFamily = FontFamily.SansSerif)
+        assertEquals(FontFamily.SansSerif, typo.displayLarge.fontFamily)
+        assertEquals(FontFamily.SansSerif, typo.displaySmall.fontFamily)
+        assertEquals(FontFamily.SansSerif, typo.headlineMedium.fontFamily)
+        assertEquals(FontFamily.SansSerif, typo.headlineSmall.fontFamily)
+        assertEquals(FontFamily.SansSerif, typo.titleLarge.fontFamily)
         assertEquals(FontFamily.SansSerif, typo.titleMedium.fontFamily)
         assertEquals(FontFamily.SansSerif, typo.titleSmall.fontFamily)
         assertEquals(FontFamily.SansSerif, typo.bodyLarge.fontFamily)

@@ -32,22 +32,6 @@ val GoogleSansFontFamily = FontFamily(
     googleSans(FontWeight.Bold, italic = true),
 )
 
-// SIL OFL 1.1 variable font (google/fonts ofl/newsreader). wght runs 400–700.
-@OptIn(ExperimentalTextApi::class)
-private fun newsreader(weight: FontWeight) = Font(
-    resId = R.font.newsreader,
-    weight = weight,
-    style = FontStyle.Normal,
-    variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)),
-)
-
-val NewsreaderFontFamily = FontFamily(
-    newsreader(FontWeight.Normal),
-    newsreader(FontWeight.Medium),
-    newsreader(FontWeight.SemiBold),
-    newsreader(FontWeight.Bold),
-)
-
 val SNProFontFamily = FontFamily(
     Font(R.font.sn_pro_regular, FontWeight.Normal),
     Font(R.font.sn_pro_italic, FontWeight.Normal, FontStyle.Italic),
@@ -98,54 +82,51 @@ val SNProFontFamily = FontFamily(
  * | `labelLarge` | Buttons, prominent inline actions |
  * | `labelMedium`/`Small` | Chips, badges, axis ticks, overlines |
  */
-fun getTypography(
-    fontFamily: FontFamily = GoogleSansFontFamily,
-    displayFontFamily: FontFamily = NewsreaderFontFamily,
-): Typography = Typography(
+fun getTypography(fontFamily: FontFamily = GoogleSansFontFamily): Typography = Typography(
     displayLarge = TextStyle(
-        fontFamily = displayFontFamily,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 57.sp,
         lineHeight = 64.sp,
         letterSpacing = (-1).sp
     ),
     displayMedium = TextStyle(
-        fontFamily = displayFontFamily,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 45.sp,
         lineHeight = 52.sp,
         letterSpacing = (-0.5).sp
     ),
     displaySmall = TextStyle(
-        fontFamily = displayFontFamily,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 36.sp,
         lineHeight = 44.sp,
         letterSpacing = (-0.25).sp
     ),
     headlineLarge = TextStyle(
-        fontFamily = displayFontFamily,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 32.sp,
         lineHeight = 40.sp,
         letterSpacing = (-0.25).sp
     ),
     headlineMedium = TextStyle(
-        fontFamily = displayFontFamily,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 28.sp,
         lineHeight = 36.sp,
         letterSpacing = (-0.2).sp
     ),
     headlineSmall = TextStyle(
-        fontFamily = displayFontFamily,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
         lineHeight = 32.sp,
         letterSpacing = (-0.15).sp
     ),
     titleLarge = TextStyle(
-        fontFamily = displayFontFamily,
+        fontFamily = fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 22.sp,
         lineHeight = 28.sp,
