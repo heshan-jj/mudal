@@ -1781,3 +1781,24 @@ internal suspend fun applyCategoryChange(
         updateSingle(transactionId, newCategory)
     }
 }
+
+data class OthersMerchantGroup(
+    val merchantName: String,
+    val count: Int,
+    val sampleTransaction: TransactionEntity
+)
+
+internal fun groupOthersMerchants(transactions: List<TransactionEntity>): List<OthersMerchantGroup> =
+    transactions
+        .asSequence()
+        .filter { it.category.equals("Others", ignoreCase = true) && it.merchantName.isNotBlank() }
+        .groupBy { it.merchantName.trim().lowercase() }
+        .values
+        .map { list ->
+            OthersMerchantGroup(
+                merchantName = list.first().merchantName.trim(),
+                count = list.size,
+                sampleTransaction = list.first()
+            )
+        }
+        .sortedWith(compareByDescending<OthersMerchantGroup> { it.count }.thenBy { it.merchantName.lowercase() })

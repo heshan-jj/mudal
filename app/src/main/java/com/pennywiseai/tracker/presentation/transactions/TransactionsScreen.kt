@@ -48,6 +48,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -367,19 +368,35 @@ fun TransactionsScreen(
                     hazeState = hazeState
                 )
             } else {
+                val othersGroups = remember(uiState.transactions) {
+                    groupOthersMerchants(uiState.transactions)
+                }
+                var showOthersCleanupSheet by remember { mutableStateOf(false) }
+
                 CustomTitleTopAppBar(
                     scrollBehaviorSmall = scrollBehaviorSmall,
                     scrollBehaviorLarge = scrollBehaviorLarge,
                     title = stringResource(R.string.txn_list_title),
                     hasBackButton = showBackButton,
                     actionContent = {
-                        if (uiState.transactions.isNotEmpty()) {
-                            IconButton(onClick = { showExportDialog = true }) {
-                                Icon(
-                                    imageVector = Icons.Default.FileDownload,
-                                    contentDescription = stringResource(R.string.txn_list_export_csv),
-                                    modifier = Modifier.size(Dimensions.Icon.medium)
-                                )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (othersGroups.isNotEmpty()) {
+                                IconButton(onClick = { showOthersCleanupSheet = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.AutoFixHigh,
+                                        contentDescription = "Clean up Others",
+                                        modifier = Modifier.size(Dimensions.Icon.medium)
+                                    )
+                                }
+                            }
+                            if (uiState.transactions.isNotEmpty()) {
+                                IconButton(onClick = { showExportDialog = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.FileDownload,
+                                        contentDescription = stringResource(R.string.txn_list_export_csv),
+                                        modifier = Modifier.size(Dimensions.Icon.medium)
+                                    )
+                                }
                             }
                         }
                     },
@@ -393,6 +410,74 @@ fun TransactionsScreen(
                     },
                     hazeState = hazeState
                 )
+
+                if (showOthersCleanupSheet) {
+                    ModalBottomSheet(
+                        onDismissRequest = { showOthersCleanupSheet = false }
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = Dimensions.Padding.content)
+                                .padding(bottom = Spacing.lg),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.sm)
+                        ) {
+                            Text(
+                                text = "Clean up Others (${othersGroups.sumOf { it.count }})",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = "Tap a merchant to categorize all its past and future transactions in one tap.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 420.dp),
+                                verticalArrangement = Arrangement.spacedBy(Spacing.xs)
+                            ) {
+                                items(othersGroups, key = { it.merchantName.lowercase() }) { group ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(MaterialTheme.shapes.medium)
+                                            .clickable {
+                                                pendingCategoryEditId = group.sampleTransaction.id
+                                            }
+                                            .padding(vertical = Spacing.sm, horizontal = Spacing.xs),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(Spacing.smd)
+                                    ) {
+                                        BrandIcon(
+                                            merchantName = group.merchantName,
+                                            category = "Others",
+                                            size = Dimensions.Icon.list
+                                        )
+                                        Text(
+                                            text = group.merchantName,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Surface(
+                                            shape = CircleShape,
+                                            color = MaterialTheme.colorScheme.surfaceContainerHigh
+                                        ) {
+                                            Text(
+                                                text = "${group.count}",
+                                                style = MaterialTheme.typography.labelMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.padding(horizontal = Spacing.sm, vertical = Spacing.xxs)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
     ) { paddingValues ->
