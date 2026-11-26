@@ -15,6 +15,7 @@ import com.pennywiseai.tracker.data.database.entity.expandWithChildren
 import com.pennywiseai.tracker.data.database.entity.parentNameOf
 import com.pennywiseai.tracker.data.repository.CategoryRepository
 import com.pennywiseai.tracker.data.repository.MerchantAliasRepository
+import com.pennywiseai.tracker.data.repository.MerchantMappingRepository
 import com.pennywiseai.tracker.data.repository.TagRepository
 import com.pennywiseai.tracker.data.repository.TransactionRepository
 import com.pennywiseai.tracker.presentation.common.TimePeriod
@@ -59,6 +60,7 @@ class TransactionsViewModel @Inject constructor(
     private val categoryRepository: CategoryRepository,
     private val tagRepository: TagRepository,
     private val merchantAliasRepository: MerchantAliasRepository,
+    private val merchantMappingRepository: MerchantMappingRepository,
     private val transactionSplitDao: TransactionSplitDao,
     private val userPreferencesRepository: com.pennywiseai.tracker.data.preferences.UserPreferencesRepository,
     private val currencyConversionService: CurrencyConversionService,
@@ -976,10 +978,27 @@ class TransactionsViewModel @Inject constructor(
         _searchQuery.value = query
     }
 
-    fun updateCategory(transaction: TransactionEntity, newCategory: String) {
-        if (transaction.category == newCategory) return
+    fun updateCategory(
+        transaction: TransactionEntity,
+        newCategory: String,
+        applyToAllFromMerchant: Boolean = false
+    ) {
+        if (!applyToAllFromMerchant && transaction.category == newCategory) return
         viewModelScope.launch {
-            transactionRepository.updateCategory(transaction.id, newCategory)
+            applyCategoryChange(
+                transactionId = transaction.id,
+                merchantName = transaction.merchantName,
+                newCategory = newCategory,
+                applyToAllFromMerchant = applyToAllFromMerchant,
+                updateSingle = { id, cat -> transactionRepository.updateCategory(id, cat) },
+                updateMerchant = { merchant, cat ->
+                    transactionRepository.updateCategoryForMerchant(merchant, cat)
+                },
+                saveMapping = { merchant, cat ->
+                    merchantMappingRepository.setMapping(merchant, cat)
+                }
+            )
+            refreshWidgets()
         }
     }
 
@@ -1743,4 +1762,22 @@ internal fun computeSelfTransferPairs(
         claimedIncome.add(match.id)
     }
     return pair
+}
+
+
+internal suspend fun applyCategoryChange(
+    transactionId: Long,
+    merchantName: String,
+    newCategory: String,
+    applyToAllFromMerchant: Boolean,
+    updateSingle: suspend (Long, String) -> Unit,
+    updateMerchant: suspend (String, String) -> Unit,
+    saveMapping: suspend (String, String) -> Unit,
+) {
+    if (applyToAllFromMerchant && merchantName.isNotBlank()) {
+        updateMerchant(merchantName, newCategory)
+        saveMapping(merchantName, newCategory)
+    } else {
+        updateSingle(transactionId, newCategory)
+    }
 }

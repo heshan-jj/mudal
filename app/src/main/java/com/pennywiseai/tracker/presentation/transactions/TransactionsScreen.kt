@@ -734,11 +734,21 @@ fun TransactionsScreen(
             // Drop the pending edit so we don't keep an orphan sheet alive.
             LaunchedEffect(id) { pendingCategoryEditId = null }
         } else {
+            var applyToAll by remember(transaction.id) { mutableStateOf(true) }
             QuickCategoryPickerSheet(
                 transaction = transaction,
                 categories = categoriesMap.values.toList(),
+                applyToAllLabel = if (transaction.merchantName.isNotBlank()) {
+                    "Apply to all from ${transaction.merchantName} (past & future)"
+                } else null,
+                applyToAllChecked = applyToAll,
+                onApplyToAllChanged = { applyToAll = it },
                 onCategorySelected = { name ->
-                    viewModel.updateCategory(transaction, name)
+                    viewModel.updateCategory(
+                        transaction = transaction,
+                        newCategory = name,
+                        applyToAllFromMerchant = applyToAll
+                    )
                     pendingCategoryEditId = null
                 },
                 onDismiss = { pendingCategoryEditId = null }

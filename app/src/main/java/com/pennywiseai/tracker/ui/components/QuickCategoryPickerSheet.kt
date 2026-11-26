@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -58,7 +59,10 @@ fun QuickCategoryPickerSheet(
     // also picking a category. In-app call sites omit these and see no change.
     tagSuggestions: List<String> = emptyList(),
     initialTags: List<String> = emptyList(),
-    onTagsChanged: ((List<String>) -> Unit)? = null
+    onTagsChanged: ((List<String>) -> Unit)? = null,
+    applyToAllLabel: String? = null,
+    applyToAllChecked: Boolean = false,
+    onApplyToAllChanged: ((Boolean) -> Unit)? = null
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(
@@ -102,6 +106,35 @@ fun QuickCategoryPickerSheet(
                 bottom = Spacing.sm
             )
         )
+        if (applyToAllLabel != null && onApplyToAllChanged != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onApplyToAllChanged(!applyToAllChecked) }
+                    .padding(
+                        horizontal = Dimensions.Padding.content,
+                        vertical = Spacing.xs
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
+            ) {
+                Checkbox(
+                    checked = applyToAllChecked,
+                    onCheckedChange = onApplyToAllChanged
+                )
+                Text(
+                    text = applyToAllLabel,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            HorizontalDivider(
+                modifier = Modifier.padding(
+                    horizontal = Dimensions.Padding.content,
+                    vertical = Spacing.xs
+                )
+            )
+        }
         // LazyColumn so long category lists stay reachable when the sheet is
         // fully expanded — a plain Column would render items past the screen
         // bottom unscrollable.
@@ -157,10 +190,16 @@ fun QuickCategoryPickerSheet(
     transaction: TransactionEntity,
     categories: List<CategoryEntity>,
     onCategorySelected: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    applyToAllLabel: String? = null,
+    applyToAllChecked: Boolean = false,
+    onApplyToAllChanged: ((Boolean) -> Unit)? = null
 ) = QuickCategoryPickerSheet(
     currentCategory = transaction.category,
     categories = categories,
     onCategorySelected = onCategorySelected,
-    onDismiss = onDismiss
+    onDismiss = onDismiss,
+    applyToAllLabel = applyToAllLabel,
+    applyToAllChecked = applyToAllChecked,
+    onApplyToAllChanged = onApplyToAllChanged
 )
