@@ -1,7 +1,9 @@
 package com.pennywiseai.tracker.ui.components.cards
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -31,33 +34,31 @@ import com.pennywiseai.tracker.ui.theme.PennyWiseText
 import com.pennywiseai.tracker.ui.theme.Spacing
 
 /**
- * The app's one grouped-list pattern: sibling rows share a tonal surface and
- * are separated by a 2dp gutter, with the outer corners of the block rounded
- * and the interior corners nearly square. The shape does the grouping, so no
- * dividers are needed.
- *
- * [GroupedList] handles the gutter; each child passes its
- * [ListItemPosition] (use `ListItemPosition.from(index, size)`) so the corners
- * come out right without any per-screen shape maths.
- *
- * ```
- * GroupedList {
- *     items.forEachIndexed { i, item ->
- *         GroupedRow(position = ListItemPosition.from(i, items.size), onClick = …) { … }
- *     }
- * }
- * ```
+ * Framed Ledger Sheet: sibling rows share a single hairline-bordered paper
+ * container and are separated by subtle 0.5dp horizontal hairlines rather than
+ * 2dp pill gutters.
  */
 @Composable
 fun GroupedList(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(
+    val isDark = isSystemInDarkTheme()
+    Surface(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(Spacing.Layout.groupedListGap),
-        content = content
-    )
+        shape = MaterialTheme.shapes.large,
+        color = if (isDark) MaterialTheme.colorScheme.surfaceContainerLow else MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            width = Dimensions.Component.hairlineBorder,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = ledgerCardBorderAlpha(isDark))
+        )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(Spacing.Layout.groupedListGap),
+            content = content
+        )
+    }
 }
 
 /**
@@ -73,7 +74,7 @@ fun GroupedRow(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
+    containerColor: Color = Color.Transparent,
     contentPadding: PaddingValues = PaddingValues(
         horizontal = Spacing.md,
         vertical = Dimensions.Padding.listRowVertical
@@ -88,16 +89,24 @@ fun GroupedRow(
         color = containerColor,
         shape = position.toShape()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier)
-                .defaultMinSize(minHeight = minHeight)
-                .padding(contentPadding),
-            horizontalArrangement = horizontalArrangement,
-            verticalAlignment = verticalAlignment,
-            content = content
-        )
+        Column(modifier = Modifier.fillMaxWidth()) {
+            if (shouldShowTopLedgerDivider(position)) {
+                HorizontalDivider(
+                    thickness = Dimensions.Component.hairline,
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier)
+                    .defaultMinSize(minHeight = minHeight)
+                    .padding(contentPadding),
+                horizontalArrangement = horizontalArrangement,
+                verticalAlignment = verticalAlignment,
+                content = content
+            )
+        }
     }
 }
 
@@ -109,7 +118,7 @@ fun GroupedRow(
 fun GroupedColumn(
     position: ListItemPosition,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
+    containerColor: Color = Color.Transparent,
     contentPadding: PaddingValues = PaddingValues(
         horizontal = Spacing.md,
         vertical = Dimensions.Padding.listRowVertical
@@ -122,13 +131,21 @@ fun GroupedColumn(
         color = containerColor,
         shape = position.toShape()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(contentPadding),
-            verticalArrangement = verticalArrangement,
-            content = content
-        )
+        Column(modifier = Modifier.fillMaxWidth()) {
+            if (shouldShowTopLedgerDivider(position)) {
+                HorizontalDivider(
+                    thickness = Dimensions.Component.hairline,
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(contentPadding),
+                verticalArrangement = verticalArrangement,
+                content = content
+            )
+        }
     }
 }
 

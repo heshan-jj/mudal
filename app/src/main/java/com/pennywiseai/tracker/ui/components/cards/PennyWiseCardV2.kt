@@ -17,13 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import com.pennywiseai.tracker.ui.theme.Dimensions
 
+internal fun ledgerCardBorderAlpha(isDark: Boolean): Float =
+    if (isDark) 0.35f else 0.65f
+
 /**
- * The app's standard card container.
+ * The app's standard card container — Warm Editorial Ledger style.
  *
- * One card style, everywhere: `shapes.large` corners, `surfaceContainerLow`
- * fill, no elevation, and — in dark mode only — a 0.5dp hairline so the card
- * separates from an AMOLED-black background where a tonal fill alone barely
- * registers. Light mode needs no border because the tonal step is visible.
+ * Crisp paper surface (`surface` in light mode, `surfaceContainerLow` in
+ * dark/AMOLED) with a 1dp hairline border (`outlineVariant`), tightened
+ * `shapes.large` (12dp) corners, and 0dp elevation.
  *
  * Pass [contentPadding] rather than padding the content yourself, so the
  * ripple on a clickable card covers the whole surface.
@@ -40,7 +42,11 @@ fun PennyWiseCardV2(
      */
     containerColor: androidx.compose.ui.graphics.Color? = null,
     colors: CardColors = CardDefaults.cardColors(
-        containerColor = containerColor ?: MaterialTheme.colorScheme.surfaceContainerLow
+        containerColor = containerColor ?: if (isSystemInDarkTheme()) {
+            MaterialTheme.colorScheme.surfaceContainerLow
+        } else {
+            MaterialTheme.colorScheme.surface
+        }
     ),
     elevation: CardElevation = CardDefaults.cardElevation(
         defaultElevation = Dimensions.Elevation.card
@@ -62,14 +68,12 @@ fun PennyWiseCardV2(
     contentPadding: Dp = Dimensions.Padding.card,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val effectiveBorder = border ?: if (isSystemInDarkTheme()) {
-        BorderStroke(
-            width = Dimensions.Component.hairline,
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.15f)
+    val effectiveBorder = border ?: BorderStroke(
+        width = Dimensions.Component.hairlineBorder,
+        color = MaterialTheme.colorScheme.outlineVariant.copy(
+            alpha = ledgerCardBorderAlpha(isSystemInDarkTheme())
         )
-    } else {
-        null
-    }
+    )
 
     when {
         onLongClick != null -> {

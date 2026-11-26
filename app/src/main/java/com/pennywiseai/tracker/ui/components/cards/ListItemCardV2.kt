@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerBasedShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,29 +45,35 @@ enum class ListItemPosition {
     }
 }
 
+internal fun ledgerRowShape(position: ListItemPosition, outerCorner: Dp): RoundedCornerShape =
+    when (position) {
+        ListItemPosition.Top -> RoundedCornerShape(
+            topStart = outerCorner,
+            topEnd = outerCorner,
+            bottomStart = 0.dp,
+            bottomEnd = 0.dp
+        )
+        ListItemPosition.Middle -> RoundedCornerShape(0.dp)
+        ListItemPosition.Bottom -> RoundedCornerShape(
+            topStart = 0.dp,
+            topEnd = 0.dp,
+            bottomStart = outerCorner,
+            bottomEnd = outerCorner
+        )
+        ListItemPosition.Single -> RoundedCornerShape(outerCorner)
+    }
+
+internal fun shouldShowTopLedgerDivider(position: ListItemPosition): Boolean =
+    position == ListItemPosition.Middle || position == ListItemPosition.Bottom
+
 /**
- * The single source of truth for grouped-row corners. Derived from the theme
- * shape scale so a change to `shapes.large` carries through, rather than being
- * re-typed as `RoundedCornerShape(16.dp)` per screen.
+ * The single source of truth for grouped-row corners in a framed ledger sheet:
+ * outer edges take `Dimensions.CornerRadius.large` (12dp) and interior edges
+ * stay square so rows meet cleanly on a hairline divider.
  */
 @Composable
-fun ListItemPosition.toShape(): CornerBasedShape {
-    val outer = MaterialTheme.shapes.large
-    val inner = MaterialTheme.shapes.extraSmall
-
-    return when (this) {
-        ListItemPosition.Top -> outer.copy(
-            bottomStart = inner.bottomStart,
-            bottomEnd = inner.bottomEnd
-        )
-        ListItemPosition.Middle -> inner
-        ListItemPosition.Bottom -> outer.copy(
-            topStart = inner.topStart,
-            topEnd = inner.topEnd
-        )
-        ListItemPosition.Single -> outer
-    }
-}
+fun ListItemPosition.toShape(): CornerBasedShape =
+    ledgerRowShape(this, Dimensions.CornerRadius.large)
 
 /**
  * A transaction-style row: leading avatar, title + one metadata line, trailing
@@ -100,10 +107,6 @@ fun ListItemCardV2(
         shape = shape,
         contentPadding = contentPadding,
         containerColor = containerColor,
-        // Suppress the inherited 0.5dp dark-mode hairline on list rows: long
-        // lists of bordered rows read as a chunky grid; bare surfaces with the
-        // surrounding column's spacing carry the divisions better.
-        border = BorderStroke(0.dp, Color.Transparent),
         onClick = onClick,
         onLongClick = onLongClick
     ) {
