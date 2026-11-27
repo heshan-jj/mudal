@@ -1,8 +1,0 @@
-Version 2.15.21
-
-New Features:
-• update parsing logic and add PII warning
-• add parser for OneCard credit card SMS transactions
-• enhance transaction message filtering
-• add parser for American Express SMS transactions
-

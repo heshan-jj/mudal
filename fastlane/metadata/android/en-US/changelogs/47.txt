@@ -1,5 +1,0 @@
-Version 2.15.12
-
-New Features:
-feat: enhance HDFCBankParser to support UPI credit transaction parsing
-

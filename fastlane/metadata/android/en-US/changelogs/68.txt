@@ -1,5 +1,0 @@
-What's New in v2.15.33
-
-• Added support for Mashreq Bank - automatically track your transactions from SMS notifications
-
-• Bug fixes and performance improvements

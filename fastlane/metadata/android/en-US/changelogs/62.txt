@@ -1,3 +1,0 @@
-Version 2.15.27
-
-• chore: update ProGuard rules to suppress warnings for SLF4J and ProtoPresenceCheckedField

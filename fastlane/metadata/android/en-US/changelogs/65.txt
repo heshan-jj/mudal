@@ -1,9 +1,0 @@
-What's New in v2.15.30
-
-• Improved Federal Bank transaction parsing - better merchant name detection
-• Enhanced transaction details screen with currency selection
-• Better scrolling in permissions screen for small devices
-• Improved Settings and FAQ screen layouts
-• Various performance improvements and bug fixes
-
-Thank you for using Mudal! Your feedback helps us

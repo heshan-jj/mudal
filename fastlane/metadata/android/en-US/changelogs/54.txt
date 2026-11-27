@@ -1,6 +1,0 @@
-Version 2.15.19
-
-New Features:
-• implement backup and restore functionality
-• enhance search functionality to include SMS body
-

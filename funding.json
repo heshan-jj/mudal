@@ -15,7 +15,7 @@
     "projects": [{
         "guid": "mudal",
         "name": "Mudal",
-        "description": "Mudal turns the transaction SMS that Sri Lankan banks already send into categorised, searchable financial records. Parsing, storage and the optional on-device AI assistant (a local Qwen 2.5 model via LiteRT-LM) run entirely on the device: no account, no ads, no analytics, no tracking SDKs. The only network use is optional exchange-rate lookup for multi-currency features. It is a fork of PennyWise AI (AGPL-3.0-only) focused on Sri Lankan banks, with no paywall and no feature limits.",
+        "description": "Mudal turns the transaction SMS that Sri Lankan banks already send into categorised, searchable financial records. Parsing, SQLCipher-encrypted storage, and budgets run entirely on the device: no account, no ads, no analytics, no tracking SDKs. Optional network features are exchange-rate lookup (open.er-api.com) and an opt-in AI chat assistant using your own Google Gemini API key. It is a fork of PennyWise AI (AGPL-3.0-only) focused on Sri Lankan banks, with no paywall and no feature limits.",
         "webpageUrl": {
             "url": "https://github.com/heshan-jj/mudal"
         },

@@ -1,7 +1,0 @@
-What's New in v2.15.34
-
-• Added support for Bandhan Bank - automatic transaction tracking now available for Bandhan Bank customers
-• Improved app stability and performance
-• Bug fixes and enhancements
-
-Thank you for using Mudal! Keep tracking your expenses effortlessly.

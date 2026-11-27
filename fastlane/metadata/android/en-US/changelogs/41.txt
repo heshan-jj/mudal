@@ -1,9 +1,0 @@
-Version 2.15.6
-
-New Features:
-feat: add SouthIndianBankParser to BankParserFactory
-feat: add South Indian Bank parser for SMS transaction handling
-feat: add balance update notification parsing for HDFC Bank
-feat: implement balance update parsing and storage for HDFC Bank notifications
-feat: enhance HSBCBankParser to support additional transaction patterns
-

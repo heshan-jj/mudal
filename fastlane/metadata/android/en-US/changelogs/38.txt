@@ -1,8 +1,0 @@
-Version 2.15.3
-
-New Features:
-feat: add SBI UPI-Mandate subscription support
-
-Bug Fixes:
-fix: enhance HDFC Bank parser to handle new transaction formats and skip reminders
-• refine future debit notification detection and enhance transaction keywords

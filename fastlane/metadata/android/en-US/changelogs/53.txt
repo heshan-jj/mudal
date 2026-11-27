@@ -1,7 +1,0 @@
-Version 2.15.18
-
-New Features:
-• add Current FY filter and SMS data info banner
-• add last scan timestamp and period management
-• implement card linking and orphaned card handling
-

@@ -1,7 +1,0 @@
-What's New in v2.15.41
-
-• Added support for Dhanlaxmi Bank (India) and CIB Egypt
-• IDFC First Bank now supports multi-currency transactions
-• New full resync feature to reprocess all your SMS messages
-• Improved accuracy for Dhanlaxmi Bank UPI transaction parsing
-• Bug fixes and stability improvements

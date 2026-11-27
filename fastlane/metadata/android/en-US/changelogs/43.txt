@@ -1,9 +1,0 @@
-Version 2.15.8
-
-New Features:
-feat: enhance transaction search bar with improved placeholder text
-feat: update SBIBankParser to skip future transactions
-feat: enhance JKBankParser to improve merchant extraction for UPI transactions
-feat: add JioPayParser for handling JioPay wallet transactions
-feat: update database schema and enhance account balance handling
-

@@ -1,4 +1,0 @@
-• Spending Pie widget — pin a live breakdown of your spending categories directly to your home screen
-• Groups section on the home screen — a quick-access rail of all your transaction groups
-• Monthly Recap — generate a shareable summary card for any month, with an AI-crafted caption to kick off the next month's habit
-• Mark any two selected transactions as a transfer, with improved automatic transfer detection

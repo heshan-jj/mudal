@@ -652,67 +652,6 @@ private fun NavBarStyleSelector(
     }
 }
 
-// --- Cover Style Selector ---
-
-@Composable
-private fun CoverStyleSelector(
-    currentStyle: CoverStyle,
-    isDark: Boolean,
-    onStyleSelected: (CoverStyle) -> Unit
-) {
-    LazyRow(
-        modifier = Modifier.padding(horizontal = Spacing.md),
-        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-        contentPadding = PaddingValues(vertical = Spacing.xs)
-    ) {
-        items(CoverStyle.entries.toList()) { style ->
-            val isSelected = currentStyle == style
-
-            Box(
-                modifier = Modifier
-                    .size(width = 80.dp, height = 56.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .then(
-                        if (style == CoverStyle.NONE) {
-                            Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
-                        } else {
-                            Modifier.background(
-                                Brush.verticalGradient(
-                                    colors = getCoverGradientColors(style, isDark, forPreview = true)
-                                )
-                            )
-                        }
-                    )
-                    .then(
-                        if (isSelected) Modifier.border(
-                            width = 3.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(12.dp)
-                        ) else Modifier
-                    )
-                    .clickable { onStyleSelected(style) },
-                contentAlignment = Alignment.Center
-            ) {
-                if (style == CoverStyle.NONE) {
-                    Text(
-                        text = stringResource(R.string.appearance_cover_none),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                if (isSelected) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = stringResource(R.string.appearance_cover_selected),
-                        tint = Color.White,
-                        modifier = Modifier.size(Dimensions.Icon.medium)
-                    )
-                }
-            }
-        }
-    }
-}
-
 // --- Font Selector ---
 
 @Composable

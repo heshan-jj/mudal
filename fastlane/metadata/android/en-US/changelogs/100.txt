@@ -1,5 +1,0 @@
-• Import transactions from a CSV file — great for migrating from another app or adding bulk history
-• Tags now support multiple values per transaction, with filtering and a dedicated analytics view (Top Tags)
-• Record manual account-to-account Transfers with explicit From and To accounts
-• Automated daily folder backup at 2 AM keeps your data safe without any manual action (Pro)
-• New bank supported: D360 Bank (Saudi Arabia) SMS parsing

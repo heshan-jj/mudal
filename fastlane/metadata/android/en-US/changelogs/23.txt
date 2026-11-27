@@ -1,6 +1,0 @@
-• Added Google Play Store automated deployment
-• Improved F-Droid build compatibility
-• Enhanced SMS parser to ignore payment requests
-• Fixed analytics navigation with period filters
-• Improved category navigation URL handling
-• Bug fixes and performance improvements

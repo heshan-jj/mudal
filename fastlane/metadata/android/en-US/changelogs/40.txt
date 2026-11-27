@@ -1,7 +1,0 @@
-Version 2.15.5
-
-New Features:
-feat: enhance TransactionDetailScreen with IME padding and edit mode adjustments
-feat: enhance transaction deletion handling with improved snackbar and state management
-feat: update ICICI Bank parser to support new cash deposit formats
-

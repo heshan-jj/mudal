@@ -1,6 +1,0 @@
-Version 2.15.9
-
-New Features:
-feat: introduce UnifiedAccountsCard component for combined account overview
-feat: enhance BankOfBarodaParser to support credit card transaction detection
-

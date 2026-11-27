@@ -1,4 +1,0 @@
-• Added F-Droid support
-• Improved build configuration for multiple distribution channels
-• Enhanced privacy-focused features
-• Bug fixes and performance improvements

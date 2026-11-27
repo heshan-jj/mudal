@@ -1,9 +1,0 @@
-Version 2.15.7
-
-New Features:
-feat: enhance FederalBankParser to support additional transaction patterns
-feat: update SouthIndianBankParser to skip UPI auto-pay reminders
-feat: enhance SouthIndianBankParser to extract merchant names and balance updates
-feat: enhance ICICIBankParser to skip payment due reminders
-feat: add JKBankParser for SMS transaction handling
-

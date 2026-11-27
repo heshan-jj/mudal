@@ -1,4 +1,0 @@
-Version 2.24.1
-
-Bug Fixes:
-• explain a blocked SMS permission instead of asking again

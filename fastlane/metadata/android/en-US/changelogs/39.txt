@@ -1,7 +1,0 @@
-Version 2.15.4
-
-New Features:
-feat: add expandable balance chart and improve account detail view
-feat: add account detail view with transaction filtering
-feat: improve subscription management with 30-day filtering and SMS display
-

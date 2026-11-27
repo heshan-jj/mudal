@@ -1,5 +1,0 @@
-• Recurring transactions — schedule any manual or cash transaction to repeat automatically on your chosen cadence
-• Transactions is now a permanent bottom-nav tab, so your full history is always one tap away
-• Tag expenses inline from the notification quick-picker without opening the app
-• Added Pluxee India meal-card parser — Pluxee SMS messages are now parsed automatically
-• Added Banque Saudi Fransi (BSF) parser — BSF transactions are now parsed automatically

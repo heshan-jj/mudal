@@ -1,3 +1,0 @@
-• New home-screen widget: a Spending Pie chart that shows your category breakdown at a glance without opening the app
-• Monthly recap share card — generate a visual summary of the month's spending and share it; the share prompt loops you back for the next month
-• Mark any two selected transactions as a transfer, and automatic transfer detection now catches a wider range of patterns

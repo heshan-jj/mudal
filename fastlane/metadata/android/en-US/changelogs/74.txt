@@ -1,9 +1,0 @@
-What's New in v2.15.39
-
-• Edit your bank accounts - update names and balances anytime
-• Hide accounts you don't want to see in transaction details
-• Delete accounts with confirmation for safety
-• Improved Bandhan Bank transaction detection
-• Fixed South Indian Bank parser
-• Better ICICI Bank UPI transaction support
-• Backend improvements for reliability

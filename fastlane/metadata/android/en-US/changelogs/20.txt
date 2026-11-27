@@ -1,5 +1,0 @@
-• Enhanced transaction filtering by category and merchant
-• Implemented expandable list component for better category display
-• Added transaction detail screen with navigation
-• Improved token limit checks in chat functionality
-• Better transaction handling in ChatContext and LlmRepository

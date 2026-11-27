@@ -1,9 +1,0 @@
-Version 2.15.16
-
-New Features:
-• enhance merchant and account extraction logic
-• enhance merchant name extraction and balance regex patterns
-• enhance transaction type detection and filtering logic
-
-Bug Fixes:
-• update regex patterns for amount and merchant extraction

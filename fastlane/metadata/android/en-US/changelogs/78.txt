@@ -1,8 +1,0 @@
-What's New in v2.15.43
-
-• Top categories now shown in notifications for quick expense categorization
-• Enhanced ICICI Bank support with better transaction filtering
-• Axis Bank credit card transactions now tracked with available limit
-• Federal Bank now supports Scapia credit card transactions
-• Improved balance calculations for better accuracy
-• Bug fixes and performance improvements

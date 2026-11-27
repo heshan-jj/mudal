@@ -1,6 +1,0 @@
-• Google Play Store automated deployment
-• Optimized APK sizes with architecture splits
-• F-Droid flavor with ARM-only builds (under 30MB)
-• Enhanced release workflow with multiple APK variants
-• Updated fastlane metadata structure
-• Bug fixes and performance improvements

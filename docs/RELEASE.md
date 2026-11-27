@@ -106,7 +106,7 @@ parser is added, regenerate the catalogue first
 
 ### Reproducibility notes
 - The build is a plain Gradle build with no proprietary steps: JDK 21,
-  Android SDK Platform 37, `./scripts/release.sh`.
+  Android SDK Platform 36, `./scripts/release.sh`.
 - The release APK is signed with the project's own key. Anyone rebuilding from
   source gets a *different* signature (a different key) and therefore a
   different package identity — which is why the key is backed up separately

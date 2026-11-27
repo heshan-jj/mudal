@@ -1,8 +1,0 @@
-Version 2.15.22
-
-New Features:
-• implement SMS report feature and enhance UI
-• add parser for various bank SMS transactions
-
-Bug Fixes:
-• correct expense calculation in TransactionTotalsCard

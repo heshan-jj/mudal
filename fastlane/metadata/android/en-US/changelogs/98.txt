@@ -1,3 +1,0 @@
-• Added support for Access Bank, Zenith Bank, and Keystone Bank (Nigeria) — SMS transactions from these banks are now parsed automatically
-• Added support for CRDB Bank (Tanzania), including Tanzanian Shilling (TZS) currency
-• Type-aware budgets: you can now create a budget that tracks a specific transaction type (e.g. all subscriptions or all transfers) instead of just a category

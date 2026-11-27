@@ -1,7 +1,0 @@
-Version 2.15.23
-
-New Features:
-• enhance rule creation and management UI
-• implement rule engine for transaction categorization
-• enhance SBIBankParser with additional transaction patterns
-

@@ -1,3 +1,0 @@
-• Added Nations Trust Bank and National Savings Bank (Sri Lanka), bKash (Bangladesh), six Nepal banks, Kerala Bank, NSDL Payments Bank, and Jana Small Finance Bank (India)
-• Added Arab Bank covering Egypt (EGP) and Jordan (JOD/USD, including 3-decimal currencies), Bankino and blu Bank (Iran, Persian SMS), and Jaiz Bank and Opay (Nigeria)
-• Added NMB Bank Tanzania, Diamond Trust Bank (DTB) Tanzania, and Mixx by Yas (Tanzania) mobile wallet

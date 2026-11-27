@@ -1,8 +1,0 @@
-What's New in v2.15.38
-
-• App Lock with biometric authentication for enhanced privacy
-• Custom date range filtering for transactions
-• Added support for Navy Federal Credit Union, Saraswat Bank, and Indian Bank
-• Enhanced Axis Bank, IndusInd Bank, and Juspay parsers for better accuracy
-• Improved ATM withdrawal detection
-• Bug fixes and performance improvements

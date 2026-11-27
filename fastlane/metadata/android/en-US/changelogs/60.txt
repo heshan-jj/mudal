@@ -1,9 +1,0 @@
-Version 2.15.25
-
-New Features:
-• implement currency breakdown and selection in home screen
-• implement currency grouping and selection in transaction screens
-• add comprehensive test suite for new bank parsers
-• add OldHickoryParser and EverestBankParser for transaction handling
-• add CBEBankParser for Ethiopian transactions and update currency support
-
